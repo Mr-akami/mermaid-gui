@@ -1,6 +1,6 @@
 import { Handle, Position, NodeProps } from 'reactflow'
 import { StateNode as StateNodeType } from '../../types/diagram'
-import { useState, useCallback, useRef, useEffect } from 'react'
+import { useState, useCallback, useRef } from 'react'
 import { useSetAtom } from 'jotai'
 import { nodesAtom } from '@/store/flowStore'
 import clsx from 'clsx'
@@ -11,9 +11,10 @@ export default function StateNode({ data, id, selected }: NodeProps<StateNodeTyp
   const setNodes = useSetAtom(nodesAtom)
   const isComposingRef = useRef(false)
 
-  useEffect(() => {
+  // Reset label when not editing and data changes
+  if (!isEditing && label !== data.label) {
     setLabel(data.label)
-  }, [data.label])
+  }
 
   const updateNodeLabel = useCallback(() => {
     setNodes((nodes) =>

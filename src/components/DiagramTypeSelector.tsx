@@ -1,8 +1,9 @@
-import { useAtom } from 'jotai'
-import { diagramTypeAtom, diagramTypes } from '@/store/diagramStore'
+import { useAtom, useAtomValue } from 'jotai'
+import { diagramTypeAtom, diagramTypeClearEffectAtom, diagramTypes } from '@/store/diagramStore'
 
 const DiagramTypeSelector = () => {
-  const [diagramType, setDiagramType] = useAtom(diagramTypeAtom)
+  const diagramType = useAtomValue(diagramTypeAtom)
+  const [, setDiagramType] = useAtom(diagramTypeClearEffectAtom)
 
   return (
     <div className="flex items-center space-x-2 px-4 py-2 bg-gray-100 border-b border-gray-200">

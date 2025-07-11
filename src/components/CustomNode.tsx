@@ -1,4 +1,4 @@
-import { memo, useState, useCallback, useRef, useEffect } from 'react'
+import { memo, useState, useCallback, useRef } from 'react'
 import { Handle, Position, NodeProps } from 'reactflow'
 import { useSetAtom } from 'jotai'
 import { nodesAtom } from '@/store/flowStore'
@@ -8,11 +8,12 @@ const CustomNode = memo(({ data, id }: NodeProps) => {
   const [label, setLabel] = useState(data.label)
   const setNodes = useSetAtom(nodesAtom)
   const isComposingRef = useRef(false)
-
-  // Sync label with data.label
-  useEffect(() => {
+  
+  // Reset label when not editing and data changes
+  if (!isEditing && label !== data.label) {
     setLabel(data.label)
-  }, [data.label])
+  }
+
 
   const handleDoubleClick = useCallback(() => {
     setIsEditing(true)

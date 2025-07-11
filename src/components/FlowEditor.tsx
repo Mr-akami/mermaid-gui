@@ -5,8 +5,6 @@ import ReactFlow, {
   BackgroundVariant,
   Controls,
   MiniMap,
-  useNodesState,
-  useEdgesState,
   Connection,
   ReactFlowProvider,
 } from 'reactflow'
@@ -42,18 +40,6 @@ const FlowCanvas = () => {
   const [nodes, setNodes] = useAtom(nodesAtom)
   const [edges, setEdges] = useAtom(edgesAtom)
   const diagramType = useAtomValue(diagramTypeAtom)
-  const [localNodes, setLocalNodes, onNodesChange] = useNodesState(nodes)
-  const [localEdges, setLocalEdges, onEdgesChange] = useEdgesState(edges)
-
-  // Sync nodes from atom to local state
-  useEffect(() => {
-    setLocalNodes(nodes)
-  }, [nodes, setLocalNodes])
-
-  // Sync edges from atom to local state
-  useEffect(() => {
-    setLocalEdges(edges)
-  }, [edges, setLocalEdges])
 
   const nodeTypes = useMemo(() => ({
     custom: CustomNode,
@@ -91,62 +77,82 @@ const FlowCanvas = () => {
         data: edgeData,
       }
       
-      const newEdges = addEdge(newEdge, localEdges)
-      setLocalEdges(newEdges)
-      setEdges(newEdges)
+      setEdges(prevEdges => addEdge(newEdge, prevEdges))
     },
-    [localEdges, setLocalEdges, setEdges, diagramType],
+    [setEdges, diagramType],
   )
 
-  const onNodesChangeHandler = useCallback(
+  const onNodesChange = useCallback(
     (changes: any) => {
-      onNodesChange(changes)
-      setNodes(localNodes)
+      setNodes(prevNodes => {
+        // Apply React Flow changes directly to the atom
+        return changes.reduce((acc: any, change: any) => {
+          if (change.type === 'remove') {
+            return acc.filter((node: any) => node.id !== change.id)
+          }
+          if (change.type === 'position' && change.position) {
+            return acc.map((node: any) => 
+              node.id === change.id ? { ...node, position: change.position } : node
+            )
+          }
+          if (change.type === 'select') {
+            return acc.map((node: any) => 
+              node.id === change.id ? { ...node, selected: change.selected } : node
+            )
+          }
+          return acc
+        }, prevNodes)
+      })
     },
-    [localNodes, onNodesChange, setNodes],
+    [setNodes],
   )
 
-  const onEdgesChangeHandler = useCallback(
+  const onEdgesChange = useCallback(
     (changes: any) => {
-      onEdgesChange(changes)
-      setEdges(localEdges)
+      setEdges(prevEdges => {
+        // Apply React Flow changes directly to the atom
+        return changes.reduce((acc: any, change: any) => {
+          if (change.type === 'remove') {
+            return acc.filter((edge: any) => edge.id !== change.id)
+          }
+          if (change.type === 'select') {
+            return acc.map((edge: any) => 
+              edge.id === change.id ? { ...edge, selected: change.selected } : edge
+            )
+          }
+          return acc
+        }, prevEdges)
+      })
     },
-    [localEdges, onEdgesChange, setEdges],
+    [setEdges],
   )
 
   // Custom delete handler
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Delete' || event.key === 'Backspace') {
-        const selectedNodes = localNodes.filter((node) => node.selected)
-        const selectedEdges = localEdges.filter((edge) => edge.selected)
+        const selectedNodes = nodes.filter((node) => node.selected)
+        const selectedEdges = edges.filter((edge) => edge.selected)
         
         if (selectedNodes.length > 0 || selectedEdges.length > 0) {
           event.preventDefault()
-          const newNodes = localNodes.filter((node) => !node.selected)
-          const newEdges = localEdges.filter((edge) => !edge.selected)
-          setNodes(newNodes)
-          setEdges(newEdges)
+          setNodes(prevNodes => prevNodes.filter((node) => !node.selected))
+          setEdges(prevEdges => prevEdges.filter((edge) => !edge.selected))
         }
       }
     }
 
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [localNodes, localEdges, setNodes, setEdges])
+  }, [nodes, edges, setNodes, setEdges])
 
-  // Clear canvas when diagram type changes
-  useEffect(() => {
-    setNodes([])
-    setEdges([])
-  }, [diagramType, setNodes, setEdges])
 
   return (
     <ReactFlow
-      nodes={localNodes}
-      edges={localEdges}
-      onNodesChange={onNodesChangeHandler}
-      onEdgesChange={onEdgesChangeHandler}
+      nodes={nodes}
+      edges={edges}
+      onNodesChange={onNodesChange}
+      onEdgesChange={onEdgesChange}
       onConnect={onConnect}
       nodeTypes={nodeTypes}
       edgeTypes={edgeTypes}

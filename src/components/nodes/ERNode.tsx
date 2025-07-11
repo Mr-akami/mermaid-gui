@@ -1,6 +1,6 @@
 import { Handle, Position, NodeProps } from 'reactflow'
 import { ERNode as ERNodeType } from '../../types/diagram'
-import { useState, useCallback, useRef, useEffect } from 'react'
+import { useState, useCallback, useRef } from 'react'
 import { useSetAtom } from 'jotai'
 import { nodesAtom } from '@/store/flowStore'
 import clsx from 'clsx'
@@ -12,9 +12,10 @@ export default function ERNode({ data, id, selected }: NodeProps<ERNodeType['dat
   const setNodes = useSetAtom(nodesAtom)
   const isComposingRef = useRef(false)
 
-  useEffect(() => {
+  // Reset entity name when not editing and data changes
+  if (!editingEntity && entityName !== data.label) {
     setEntityName(data.label)
-  }, [data.label])
+  }
 
   const updateNode = useCallback((updates: Partial<ERNodeType['data']>) => {
     setNodes((nodes) =>

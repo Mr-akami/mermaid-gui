@@ -1,6 +1,6 @@
 import { Handle, Position, NodeProps } from 'reactflow'
 import { SequenceNode as SequenceNodeType } from '../../types/diagram'
-import { useState, useCallback, useRef, useEffect } from 'react'
+import { useState, useCallback, useRef } from 'react'
 import { useSetAtom } from 'jotai'
 import { nodesAtom } from '@/store/flowStore'
 import clsx from 'clsx'
@@ -13,10 +13,11 @@ export default function SequenceNode({ data, id, selected }: NodeProps<SequenceN
   const isComposingRef = useRef(false)
   const isActor = data.type === 'actor'
 
-  useEffect(() => {
+  // Reset label and alias when not editing and data changes
+  if (!isEditing && (label !== data.label || alias !== (data.alias || ''))) {
     setLabel(data.label)
     setAlias(data.alias || '')
-  }, [data.label, data.alias])
+  }
 
   const handleDoubleClick = useCallback(() => {
     setIsEditing(true)

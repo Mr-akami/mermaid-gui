@@ -1,6 +1,6 @@
 import { Handle, Position, NodeProps } from 'reactflow'
 import { ClassNode as ClassNodeType } from '../../types/diagram'
-import { useState, useCallback, useRef, useEffect } from 'react'
+import { useState, useCallback, useRef } from 'react'
 import { useSetAtom } from 'jotai'
 import { nodesAtom } from '@/store/flowStore'
 import clsx from 'clsx'
@@ -13,9 +13,10 @@ export default function ClassNode({ data, id, selected }: NodeProps<ClassNodeTyp
   const setNodes = useSetAtom(nodesAtom)
   const isComposingRef = useRef(false)
 
-  useEffect(() => {
+  // Reset class name when not editing and data changes
+  if (!editingClass && className !== data.label) {
     setClassName(data.label)
-  }, [data.label])
+  }
 
   const updateNode = useCallback((updates: Partial<ClassNodeType['data']>) => {
     setNodes((nodes) =>

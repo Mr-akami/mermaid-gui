@@ -12,7 +12,6 @@ export const useHistory = () => {
 
   // Save to history when nodes or edges change
   useEffect(() => {
-    console.log('History: nodes/edges changed', { nodes: nodes.length, edges: edges.length })
     pushToHistory()
   }, [nodes, edges, pushToHistory])
 
