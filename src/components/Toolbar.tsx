@@ -87,8 +87,8 @@ const Toolbar = () => {
     setSequenceBlocks((blocks) => [...blocks, newBlock])
   }
 
-  const addClassNode = () => {
-    const id = getNextNodeId('Class')
+  const addClassNode = (stereotype?: 'interface' | 'abstract' | 'enumeration') => {
+    const id = getNextNodeId(stereotype ? stereotype.charAt(0).toUpperCase() + stereotype.slice(1) : 'Class')
     
     const newNode: Node = {
       id,
@@ -98,9 +98,15 @@ const Toolbar = () => {
         y: 100 + Math.floor(nodes.length / 3) * 250 
       },
       data: {
-        label: `Class${nodes.length + 1}`,
-        attributes: [],
-        methods: [],
+        label: stereotype ? `${stereotype.charAt(0).toUpperCase() + stereotype.slice(1)}${nodes.length + 1}` : `Class${nodes.length + 1}`,
+        stereotype,
+        attributes: stereotype === 'enumeration' ? [
+          { name: 'VALUE1', type: 'enum', visibility: '+' as const, isStatic: false, isAbstract: false },
+          { name: 'VALUE2', type: 'enum', visibility: '+' as const, isStatic: false, isAbstract: false }
+        ] : [],
+        methods: stereotype === 'interface' ? [
+          { name: 'method', parameters: [], returnType: 'void', visibility: '+' as const, isStatic: false, isAbstract: true }
+        ] : [],
       },
     }
 
@@ -294,10 +300,32 @@ const Toolbar = () => {
         return (
           <>
             <button
-              onClick={addClassNode}
+              onClick={() => addClassNode()}
               className="w-full px-3 py-2 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+              title="Add Regular Class"
             >
-              Add Class
+              📋 Class
+            </button>
+            <button
+              onClick={() => addClassNode('interface')}
+              className="w-full px-3 py-2 text-sm bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
+              title="Add Interface"
+            >
+              🔌 Interface
+            </button>
+            <button
+              onClick={() => addClassNode('abstract')}
+              className="w-full px-3 py-2 text-sm bg-purple-500 text-white rounded hover:bg-purple-600 transition-colors"
+              title="Add Abstract Class"
+            >
+              🎭 Abstract
+            </button>
+            <button
+              onClick={() => addClassNode('enumeration')}
+              className="w-full px-3 py-2 text-sm bg-orange-500 text-white rounded hover:bg-orange-600 transition-colors"
+              title="Add Enumeration"
+            >
+              🏷️ Enum
             </button>
           </>
         )

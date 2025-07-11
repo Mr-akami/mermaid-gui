@@ -21,6 +21,7 @@ import UndoRedoButtons from './UndoRedoButtons'
 import EdgeStyleSelector from './EdgeStyleSelector'
 import FlowchartDirectionSelector from './FlowchartDirectionSelector'
 import SequenceControls from './SequenceControls'
+import ClassControls from './ClassControls'
 import { useHistory } from '@/hooks/useHistory'
 
 // Import custom nodes
@@ -173,6 +174,7 @@ const FlowEditor = () => {
         <EdgeStyleSelector />
         <FlowchartDirectionSelector />
         <SequenceControls />
+        <ClassControls />
         <ReactFlowProvider>
           <FlowCanvas />
         </ReactFlowProvider>
