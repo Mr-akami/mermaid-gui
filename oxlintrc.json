@@ -1,0 +1,9 @@
+{
+  "rules": {
+    "react/jsx-no-undef": "error",
+    "react/jsx-uses-react": "error",
+    "react/jsx-uses-vars": "error",
+    "react/no-unknown-property": "error",
+    "import/no-duplicates": "warn"
+  }
+}
