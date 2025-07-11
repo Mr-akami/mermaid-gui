@@ -89,6 +89,16 @@ export function generateSequenceCode(
 ): string {
   let code = 'sequenceDiagram\n'
   
+  // Add auto-numbering if any edge has sequence numbers
+  const hasSequenceNumbers = edges.some(edge => {
+    const seqEdge = edge as SequenceEdge
+    return seqEdge.data?.sequence !== undefined
+  })
+  
+  if (hasSequenceNumbers) {
+    code += '    autonumber\n'
+  }
+  
   // Add participants
   nodes.forEach((node) => {
     const seqNode = node as SequenceNode
@@ -108,11 +118,13 @@ export function generateSequenceCode(
       
       let arrow = '->>'
       switch (messageType) {
+        case 'solid': arrow = '->'; break
         case 'dotted': arrow = '-->>'; break
         case 'solidArrow': arrow = '->>'; break
         case 'dottedArrow': arrow = '-->>'; break
         case 'cross': arrow = '-x'; break
         case 'async': arrow = '-)'; break
+        case 'bidirectional': arrow = '<->'; break
       }
       
       if (seqEdge.data?.activate) {
@@ -157,6 +169,10 @@ export function generateSequenceCode(
         case 'rect':
           const color = block.color || 'rgb(0, 0, 0)'
           code += `    rect ${color}\n`
+          code += `    end\n`
+          break
+        case 'break':
+          code += `    break ${block.label}\n`
           code += `    end\n`
           break
       }

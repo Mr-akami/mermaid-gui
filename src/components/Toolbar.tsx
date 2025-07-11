@@ -1,16 +1,18 @@
 import { useSetAtom, useAtomValue } from 'jotai'
-import { nodesAtom, edgesAtom } from '@/store/flowStore'
+import { nodesAtom, edgesAtom, sequenceBlocksAtom } from '@/store/flowStore'
 import { diagramTypeAtom } from '@/store/diagramStore'
 import { Node } from 'reactflow'
 import {
   FlowchartNode,
   SequenceNode,
-  StateNode
+  StateNode,
+  SequenceBlock
 } from '@/types/diagram'
 
 const Toolbar = () => {
   const setNodes = useSetAtom(nodesAtom)
   const setEdges = useSetAtom(edgesAtom)
+  const setSequenceBlocks = useSetAtom(sequenceBlocksAtom)
   const nodes = useAtomValue(nodesAtom)
   const diagramType = useAtomValue(diagramTypeAtom)
 
@@ -69,6 +71,20 @@ const Toolbar = () => {
     }
 
     setNodes((nodes) => [...nodes, newNode])
+  }
+
+  const addSequenceBlock = (type: SequenceBlock['type']) => {
+    const id = getNextNodeId(`${type.charAt(0).toUpperCase()}${type.slice(1)}`)
+    
+    const newBlock: SequenceBlock = {
+      id,
+      type,
+      label: `${type} condition`,
+      children: [],
+      condition: `${type} condition`
+    }
+
+    setSequenceBlocks((blocks) => [...blocks, newBlock])
   }
 
   const addClassNode = () => {
@@ -232,14 +248,44 @@ const Toolbar = () => {
             <button
               onClick={() => addSequenceNode('participant')}
               className="w-full px-3 py-2 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+              title="Add Participant"
             >
-              Add Participant
+              👥 Participant
             </button>
             <button
               onClick={() => addSequenceNode('actor')}
               className="w-full px-3 py-2 text-sm bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
+              title="Add Actor"
             >
-              Add Actor
+              👤 Actor
+            </button>
+            <button
+              onClick={() => addSequenceBlock('loop')}
+              className="w-full px-3 py-2 text-sm bg-purple-500 text-white rounded hover:bg-purple-600 transition-colors"
+              title="Add Loop Block"
+            >
+              🔄 Loop
+            </button>
+            <button
+              onClick={() => addSequenceBlock('alt')}
+              className="w-full px-3 py-2 text-sm bg-orange-500 text-white rounded hover:bg-orange-600 transition-colors"
+              title="Add Alternative Block"
+            >
+              ⚡ Alt
+            </button>
+            <button
+              onClick={() => addSequenceBlock('opt')}
+              className="w-full px-3 py-2 text-sm bg-cyan-500 text-white rounded hover:bg-cyan-600 transition-colors"
+              title="Add Optional Block"
+            >
+              ❓ Opt
+            </button>
+            <button
+              onClick={() => addSequenceBlock('par')}
+              className="w-full px-3 py-2 text-sm bg-pink-500 text-white rounded hover:bg-pink-600 transition-colors"
+              title="Add Parallel Block"
+            >
+              ⚡ Par
             </button>
           </>
         )

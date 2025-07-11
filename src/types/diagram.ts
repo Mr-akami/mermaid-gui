@@ -32,18 +32,27 @@ export interface SequenceNode extends DiagramNode {
 export interface SequenceEdge extends DiagramEdge {
   data: {
     label?: string
-    messageType: 'solid' | 'dotted' | 'solidArrow' | 'dottedArrow' | 'cross' | 'async'
+    messageType: 'solid' | 'dotted' | 'solidArrow' | 'dottedArrow' | 'cross' | 'async' | 'bidirectional'
     activate?: boolean
     deactivate?: boolean
+    sequence?: number
   }
 }
 
 export interface SequenceBlock {
   id: string
-  type: 'loop' | 'alt' | 'opt' | 'par' | 'critical' | 'rect'
+  type: 'loop' | 'alt' | 'opt' | 'par' | 'critical' | 'rect' | 'break'
   label: string
   color?: string
   children: string[]  // node ids
+  condition?: string
+}
+
+export interface SequenceNote {
+  id: string
+  text: string
+  position: 'left' | 'right' | 'over'
+  participants: string[]  // participant ids
 }
 
 // Class Diagram Types
