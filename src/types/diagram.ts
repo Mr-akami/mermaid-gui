@@ -105,6 +105,7 @@ export interface StateEdge extends DiagramEdge {
   data: {
     label?: string
     guard?: string
+    transitionType?: 'normal' | 'internal' | 'entry' | 'exit'
   }
 }
 

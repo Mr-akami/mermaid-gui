@@ -357,6 +357,18 @@ const Toolbar = () => {
             >
               Add Choice
             </button>
+            <button
+              onClick={() => addStateNode('fork')}
+              className="w-full px-3 py-2 text-sm bg-purple-500 text-white rounded hover:bg-purple-600 transition-colors"
+            >
+              Add Fork
+            </button>
+            <button
+              onClick={() => addStateNode('join')}
+              className="w-full px-3 py-2 text-sm bg-indigo-500 text-white rounded hover:bg-indigo-600 transition-colors"
+            >
+              Add Join
+            </button>
           </>
         )
       

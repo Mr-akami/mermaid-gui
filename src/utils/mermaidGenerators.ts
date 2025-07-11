@@ -356,6 +356,7 @@ export function generateStateCode(nodes: Node[], edges: Edge[]): string {
     code += '\n'
     edges.forEach((edge) => {
       const stateEdge = edge as StateEdge
+      const transitionType = stateEdge.data?.transitionType || 'normal'
       const label = stateEdge.data?.label ? ` : ${stateEdge.data.label}` : ''
       const sourceNode = nodes.find(n => n.id === edge.source) as StateNode
       const targetNode = nodes.find(n => n.id === edge.target) as StateNode
@@ -363,7 +364,25 @@ export function generateStateCode(nodes: Node[], edges: Edge[]): string {
       const source = sourceNode?.data.type === 'start' ? '[*]' : edge.source
       const target = targetNode?.data.type === 'end' ? '[*]' : edge.target
       
-      code += `    ${source} --> ${target}${label}\n`
+      // Handle different transition types
+      let transitionLine = '-->'
+      switch (transitionType) {
+        case 'internal':
+          // Internal transitions stay within the same state
+          code += `    ${source} : do / ${label || 'internal action'}\n`
+          return
+        case 'entry':
+          code += `    ${source} : entry / ${label || 'entry action'}\n`
+          return
+        case 'exit':
+          code += `    ${source} : exit / ${label || 'exit action'}\n`
+          return
+        default:
+          transitionLine = '-->'
+          break
+      }
+      
+      code += `    ${source} ${transitionLine} ${target}${label}\n`
     })
   }
 
