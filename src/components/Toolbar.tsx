@@ -1,29 +1,128 @@
 import { useSetAtom, useAtomValue } from 'jotai'
 import { nodesAtom, edgesAtom } from '@/store/flowStore'
+import { diagramTypeAtom } from '@/store/diagramStore'
 import { Node } from 'reactflow'
+import {
+  FlowchartNode,
+  SequenceNode,
+  StateNode
+} from '@/types/diagram'
 
 const Toolbar = () => {
   const setNodes = useSetAtom(nodesAtom)
   const setEdges = useSetAtom(edgesAtom)
   const nodes = useAtomValue(nodesAtom)
+  const diagramType = useAtomValue(diagramTypeAtom)
 
-  const addNode = (type: string, shape: string) => {
-    const nodeCount = nodes.length
-    const id = shape === 'rectangle' ? `A${nodeCount + 1}` : 
-                shape === 'circle' ? `B${nodeCount + 1}` : 
-                `C${nodeCount + 1}`
+  const getNextNodeId = (prefix: string) => {
+    const existingIds = nodes.filter(n => n.id.startsWith(prefix))
+    return `${prefix}${existingIds.length + 1}`
+  }
+
+  const addFlowchartNode = (shape: FlowchartNode['data']['shape']) => {
+    const id = getNextNodeId(shape.charAt(0).toUpperCase())
+    const labels = {
+      rectangle: 'Process',
+      roundedRectangle: 'Process',
+      stadium: 'Terminal',
+      subroutine: 'Subroutine',
+      cylindrical: 'Database',
+      circle: 'Start/End',
+      asymmetric: 'Manual Input',
+      rhombus: 'Decision',
+      hexagon: 'Preparation',
+      parallelogram: 'Input/Output',
+      trapezoid: 'Manual Operation',
+      doubleCircle: 'Stop'
+    }
     
     const newNode: Node = {
       id,
-      type: 'custom',
+      type: 'flowchart',
       position: { 
-        x: 100 + (nodeCount * 150) % 600, 
-        y: 100 + Math.floor(nodeCount / 4) * 150 
+        x: 100 + (nodes.length * 150) % 600, 
+        y: 100 + Math.floor(nodes.length / 4) * 150 
       },
       data: {
-        label: `${type}`,
-        type,
+        label: labels[shape],
         shape,
+      },
+    }
+
+    setNodes((nodes) => [...nodes, newNode])
+  }
+
+  const addSequenceNode = (type: SequenceNode['data']['type']) => {
+    const id = getNextNodeId(type === 'actor' ? 'Actor' : 'P')
+    
+    const newNode: Node = {
+      id,
+      type: 'sequence',
+      position: { 
+        x: 100 + (nodes.length * 150) % 600, 
+        y: 100
+      },
+      data: {
+        label: `${type === 'actor' ? 'Actor' : 'Participant'} ${nodes.length + 1}`,
+        type,
+      },
+    }
+
+    setNodes((nodes) => [...nodes, newNode])
+  }
+
+  const addClassNode = () => {
+    const id = getNextNodeId('Class')
+    
+    const newNode: Node = {
+      id,
+      type: 'class',
+      position: { 
+        x: 100 + (nodes.length * 200) % 600, 
+        y: 100 + Math.floor(nodes.length / 3) * 250 
+      },
+      data: {
+        label: `Class${nodes.length + 1}`,
+        attributes: [],
+        methods: [],
+      },
+    }
+
+    setNodes((nodes) => [...nodes, newNode])
+  }
+
+  const addStateNode = (type: StateNode['data']['type']) => {
+    const id = getNextNodeId(type === 'state' ? 'S' : type)
+    
+    const newNode: Node = {
+      id,
+      type: 'state',
+      position: { 
+        x: 100 + (nodes.length * 150) % 600, 
+        y: 100 + Math.floor(nodes.length / 4) * 150 
+      },
+      data: {
+        label: type === 'state' ? `State${nodes.length + 1}` : type,
+        type,
+      },
+    }
+
+    setNodes((nodes) => [...nodes, newNode])
+  }
+
+  const addERNode = () => {
+    const id = getNextNodeId('Entity')
+    
+    const newNode: Node = {
+      id,
+      type: 'er',
+      position: { 
+        x: 100 + (nodes.length * 200) % 600, 
+        y: 100 + Math.floor(nodes.length / 3) * 200 
+      },
+      data: {
+        label: `Entity${nodes.length + 1}`,
+        attributes: [],
       },
     }
 
@@ -35,27 +134,182 @@ const Toolbar = () => {
     setEdges([])
   }
 
+  const renderToolbarButtons = () => {
+    switch (diagramType) {
+      case 'flowchart':
+        return (
+          <>
+            <button
+              onClick={() => addFlowchartNode('rectangle')}
+              className="w-full px-3 py-2 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+              title="Rectangle - Process"
+            >
+              □ Process
+            </button>
+            <button
+              onClick={() => addFlowchartNode('roundedRectangle')}
+              className="w-full px-3 py-2 text-sm bg-blue-400 text-white rounded hover:bg-blue-500 transition-colors"
+              title="Rounded Rectangle"
+            >
+              ▢ Rounded Process
+            </button>
+            <button
+              onClick={() => addFlowchartNode('stadium')}
+              className="w-full px-3 py-2 text-sm bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
+              title="Stadium - Terminal"
+            >
+              ⬭ Terminal
+            </button>
+            <button
+              onClick={() => addFlowchartNode('subroutine')}
+              className="w-full px-3 py-2 text-sm bg-indigo-500 text-white rounded hover:bg-indigo-600 transition-colors"
+              title="Subroutine"
+            >
+              ⎔ Subroutine
+            </button>
+            <button
+              onClick={() => addFlowchartNode('cylindrical')}
+              className="w-full px-3 py-2 text-sm bg-cyan-500 text-white rounded hover:bg-cyan-600 transition-colors"
+              title="Cylinder - Database"
+            >
+              ⊙ Database
+            </button>
+            <button
+              onClick={() => addFlowchartNode('circle')}
+              className="w-full px-3 py-2 text-sm bg-emerald-500 text-white rounded hover:bg-emerald-600 transition-colors"
+              title="Circle - Start/End"
+            >
+              ○ Start/End
+            </button>
+            <button
+              onClick={() => addFlowchartNode('asymmetric')}
+              className="w-full px-3 py-2 text-sm bg-teal-500 text-white rounded hover:bg-teal-600 transition-colors"
+              title="Asymmetric - Manual Input"
+            >
+              ⎨ Manual Input
+            </button>
+            <button
+              onClick={() => addFlowchartNode('rhombus')}
+              className="w-full px-3 py-2 text-sm bg-yellow-500 text-white rounded hover:bg-yellow-600 transition-colors"
+              title="Rhombus - Decision"
+            >
+              ◊ Decision
+            </button>
+            <button
+              onClick={() => addFlowchartNode('hexagon')}
+              className="w-full px-3 py-2 text-sm bg-orange-500 text-white rounded hover:bg-orange-600 transition-colors"
+              title="Hexagon - Preparation"
+            >
+              ⬟ Preparation
+            </button>
+            <button
+              onClick={() => addFlowchartNode('parallelogram')}
+              className="w-full px-3 py-2 text-sm bg-purple-500 text-white rounded hover:bg-purple-600 transition-colors"
+              title="Parallelogram - Input/Output"
+            >
+              ▱ Input/Output
+            </button>
+            <button
+              onClick={() => addFlowchartNode('trapezoid')}
+              className="w-full px-3 py-2 text-sm bg-pink-500 text-white rounded hover:bg-pink-600 transition-colors"
+              title="Trapezoid - Manual Operation"
+            >
+              ⏢ Manual Operation
+            </button>
+            <button
+              onClick={() => addFlowchartNode('doubleCircle')}
+              className="w-full px-3 py-2 text-sm bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
+              title="Double Circle - Stop"
+            >
+              ◉ Stop
+            </button>
+          </>
+        )
+      
+      case 'sequence':
+        return (
+          <>
+            <button
+              onClick={() => addSequenceNode('participant')}
+              className="w-full px-3 py-2 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+            >
+              Add Participant
+            </button>
+            <button
+              onClick={() => addSequenceNode('actor')}
+              className="w-full px-3 py-2 text-sm bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
+            >
+              Add Actor
+            </button>
+          </>
+        )
+      
+      case 'class':
+        return (
+          <>
+            <button
+              onClick={addClassNode}
+              className="w-full px-3 py-2 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+            >
+              Add Class
+            </button>
+          </>
+        )
+      
+      case 'state':
+        return (
+          <>
+            <button
+              onClick={() => addStateNode('state')}
+              className="w-full px-3 py-2 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+            >
+              Add State
+            </button>
+            <button
+              onClick={() => addStateNode('start')}
+              className="w-full px-3 py-2 text-sm bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
+            >
+              Add Start
+            </button>
+            <button
+              onClick={() => addStateNode('end')}
+              className="w-full px-3 py-2 text-sm bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
+            >
+              Add End
+            </button>
+            <button
+              onClick={() => addStateNode('choice')}
+              className="w-full px-3 py-2 text-sm bg-yellow-500 text-white rounded hover:bg-yellow-600 transition-colors"
+            >
+              Add Choice
+            </button>
+          </>
+        )
+      
+      case 'er':
+        return (
+          <>
+            <button
+              onClick={addERNode}
+              className="w-full px-3 py-2 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+            >
+              Add Entity
+            </button>
+          </>
+        )
+      
+      default:
+        return null
+    }
+  }
+
   return (
     <div className="absolute top-4 left-4 z-10 bg-white rounded-lg shadow-lg p-2">
       <div className="space-y-2">
-        <button
-          onClick={() => addNode('Process', 'rectangle')}
-          className="w-full px-3 py-2 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-        >
-          Add Rectangle
-        </button>
-        <button
-          onClick={() => addNode('Start/End', 'circle')}
-          className="w-full px-3 py-2 text-sm bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
-        >
-          Add Circle
-        </button>
-        <button
-          onClick={() => addNode('Decision', 'diamond')}
-          className="w-full px-3 py-2 text-sm bg-yellow-500 text-white rounded hover:bg-yellow-600 transition-colors"
-        >
-          Add Diamond
-        </button>
+        <div className="text-xs font-semibold text-gray-600 uppercase tracking-wider px-1">
+          {diagramType} Tools
+        </div>
+        {renderToolbarButtons()}
         <hr className="my-2 border-gray-300" />
         <button
           onClick={clearCanvas}

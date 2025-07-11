@@ -1,8 +1,10 @@
 import { atom } from 'jotai'
 
 export type DiagramType = 'flowchart' | 'sequence' | 'class' | 'er' | 'state'
+export type FlowchartDirection = 'TB' | 'TD' | 'BT' | 'LR' | 'RL'
 
 export const diagramTypeAtom = atom<DiagramType>('flowchart')
+export const flowchartDirectionAtom = atom<FlowchartDirection>('TD')
 
 export const diagramTypes = [
   { value: 'flowchart', label: 'Flowchart', icon: '📊' },

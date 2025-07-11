@@ -11,17 +11,33 @@ import ReactFlow, {
   ReactFlowProvider,
 } from 'reactflow'
 import 'reactflow/dist/style.css'
-import { useAtom } from 'jotai'
+import { useAtom, useAtomValue } from 'jotai'
 import { nodesAtom, edgesAtom } from '@/store/flowStore'
+import { diagramTypeAtom } from '@/store/diagramStore'
 import Toolbar from './Toolbar'
 import CustomNode from './CustomNode'
 import DiagramTypeSelector from './DiagramTypeSelector'
 import UndoRedoButtons from './UndoRedoButtons'
+import EdgeStyleSelector from './EdgeStyleSelector'
+import FlowchartDirectionSelector from './FlowchartDirectionSelector'
 import { useHistory } from '@/hooks/useHistory'
+
+// Import custom nodes
+import SequenceNode from './nodes/SequenceNode'
+import ClassNode from './nodes/ClassNode'
+import StateNode from './nodes/StateNode'
+import ERNode from './nodes/ERNode'
+
+// Import custom edges
+import FlowchartEdge from './edges/FlowchartEdge'
+import SequenceEdge from './edges/SequenceEdge'
+import ClassEdge from './edges/ClassEdge'
+import EREdge from './edges/EREdge'
 
 const FlowCanvas = () => {
   const [nodes, setNodes] = useAtom(nodesAtom)
   const [edges, setEdges] = useAtom(edgesAtom)
+  const diagramType = useAtomValue(diagramTypeAtom)
   const [localNodes, setLocalNodes, onNodesChange] = useNodesState(nodes)
   const [localEdges, setLocalEdges, onEdgesChange] = useEdgesState(edges)
 
@@ -37,15 +53,45 @@ const FlowCanvas = () => {
 
   const nodeTypes = useMemo(() => ({
     custom: CustomNode,
+    flowchart: CustomNode, // Reuse CustomNode for flowchart
+    sequence: SequenceNode,
+    class: ClassNode,
+    state: StateNode,
+    er: ERNode,
+  }), [])
+
+  const edgeTypes = useMemo(() => ({
+    flowchart: FlowchartEdge,
+    sequence: SequenceEdge,
+    class: ClassEdge,
+    er: EREdge,
+    // Default edge type will be used for state
   }), [])
 
   const onConnect = useCallback(
     (params: Connection) => {
-      const newEdges = addEdge(params, localEdges)
+      // Add custom edge type based on diagram type
+      const edgeType = ['flowchart', 'sequence', 'class', 'er'].includes(diagramType) ? diagramType : undefined
+      const edgeData = diagramType === 'flowchart' ? { style: 'solid', hasArrow: true } :
+                      diagramType === 'sequence' ? { messageType: 'solid' } : 
+                      diagramType === 'class' ? { relationType: 'association' } :
+                      diagramType === 'er' ? { 
+                        relationshipType: 'identifying', 
+                        sourceCardinality: '1..1',
+                        targetCardinality: '1..1'
+                      } : undefined
+
+      const newEdge = {
+        ...params,
+        type: edgeType,
+        data: edgeData,
+      }
+      
+      const newEdges = addEdge(newEdge, localEdges)
       setLocalEdges(newEdges)
       setEdges(newEdges)
     },
-    [localEdges, setLocalEdges, setEdges],
+    [localEdges, setLocalEdges, setEdges, diagramType],
   )
 
   const onNodesChangeHandler = useCallback(
@@ -85,6 +131,12 @@ const FlowCanvas = () => {
     return () => document.removeEventListener('keydown', handleKeyDown)
   }, [localNodes, localEdges, setNodes, setEdges])
 
+  // Clear canvas when diagram type changes
+  useEffect(() => {
+    setNodes([])
+    setEdges([])
+  }, [diagramType, setNodes, setEdges])
+
   return (
     <ReactFlow
       nodes={localNodes}
@@ -93,6 +145,7 @@ const FlowCanvas = () => {
       onEdgesChange={onEdgesChangeHandler}
       onConnect={onConnect}
       nodeTypes={nodeTypes}
+      edgeTypes={edgeTypes}
       multiSelectionKeyCode="Shift"
       deleteKeyCode={null} // Disable default delete handling
       fitView
@@ -116,6 +169,8 @@ const FlowEditor = () => {
       <div className="flex-1 relative">
         <Toolbar />
         <UndoRedoButtons />
+        <EdgeStyleSelector />
+        <FlowchartDirectionSelector />
         <ReactFlowProvider>
           <FlowCanvas />
         </ReactFlowProvider>
