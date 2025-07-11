@@ -248,23 +248,28 @@ export function generateClassCode(nodes: Node[], edges: Edge[]): string {
 export function generateERCode(nodes: Node[], edges: Edge[]): string {
   let code = 'erDiagram\n'
   
-  // Add entities
+  // Add entities with proper attribute formatting
   nodes.forEach((node) => {
     const erNode = node as ERNode
     
     code += `    ${erNode.id} {\n`
     
     if (erNode.data.attributes.length === 0) {
-      code += `        string id PK "Primary Key"\n`
+      code += `        int id PK "Primary Key"\n`
     } else {
       erNode.data.attributes.forEach((attr) => {
         const constraints: string[] = []
         if (attr.isPrimaryKey) constraints.push('PK')
-        if (attr.isForeignKey) constraints.push('FK')
+        if (attr.isForeignKey) constraints.push('FK')  
         if (attr.isUnique) constraints.push('UK')
+        
+        // Format: type name constraints "comment"
         const constraintStr = constraints.length > 0 ? ` ${constraints.join(',')}` : ''
-        const comment = attr.name !== attr.name.toLowerCase() ? ` "${attr.name}"` : ''
-        code += `        ${attr.type} ${attr.name}${constraintStr}${comment}\n`
+        const nullableComment = attr.isNullable ? ' "nullable"' : ''
+        const comment = attr.name !== attr.name.toLowerCase() || attr.isNullable ? 
+          ` "${attr.name}${attr.isNullable ? ' (nullable)' : ''}"` : ''
+        
+        code += `        ${attr.type} ${attr.name}${constraintStr}${comment || nullableComment}\n`
       })
     }
     

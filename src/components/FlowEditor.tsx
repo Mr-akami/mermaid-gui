@@ -23,6 +23,7 @@ import FlowchartDirectionSelector from './FlowchartDirectionSelector'
 import SequenceControls from './SequenceControls'
 import ClassControls from './ClassControls'
 import StateControls from './StateControls'
+import ERControls from './ERControls'
 import { useHistory } from '@/hooks/useHistory'
 
 // Import custom nodes
@@ -177,6 +178,7 @@ const FlowEditor = () => {
         <SequenceControls />
         <ClassControls />
         <StateControls />
+        <ERControls />
         <ReactFlowProvider>
           <FlowCanvas />
         </ReactFlowProvider>
