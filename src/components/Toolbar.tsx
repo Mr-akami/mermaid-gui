@@ -8,6 +8,35 @@ import {
   StateNode,
   SequenceBlock
 } from '@/types/diagram'
+import Tooltip from './ui/Tooltip'
+import {
+  RiRectangleLine,
+  RiCircleLine,
+  RiStopCircleLine,
+  RiDatabase2Line,
+  RiArrowUpSLine,
+  RiArrowDownSLine,
+  RiStopLine,
+  RiPlayCircleLine,
+  RiUser3Line,
+  RiTeamLine,
+  RiLoopLeftLine,
+  RiFlaskLine,
+  RiQuestionLine,
+  RiSplitCellsHorizontal,
+  RiFileList3Line,
+  RiPlugLine,
+  RiTaskLine,
+  RiPriceTag3Line,
+  RiCheckboxBlankLine,
+  RiStopCircleFill,
+  RiGitBranchLine,
+  RiDeleteBin6Line,
+  RiShapeLine,
+  RiCodeBoxLine,
+  RiInputMethodLine,
+  RiTapeLine
+} from 'react-icons/ri'
 
 const Toolbar = () => {
   const setNodes = useSetAtom(nodesAtom)
@@ -161,226 +190,262 @@ const Toolbar = () => {
       case 'flowchart':
         return (
           <>
-            <button
-              onClick={() => addFlowchartNode('rectangle')}
-              className="w-full px-3 py-2 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-              title="Rectangle - Process"
-            >
-              □ Process
-            </button>
-            <button
-              onClick={() => addFlowchartNode('roundedRectangle')}
-              className="w-full px-3 py-2 text-sm bg-blue-400 text-white rounded hover:bg-blue-500 transition-colors"
-              title="Rounded Rectangle"
-            >
-              ▢ Rounded Process
-            </button>
-            <button
-              onClick={() => addFlowchartNode('stadium')}
-              className="w-full px-3 py-2 text-sm bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
-              title="Stadium - Terminal"
-            >
-              ⬭ Terminal
-            </button>
-            <button
-              onClick={() => addFlowchartNode('subroutine')}
-              className="w-full px-3 py-2 text-sm bg-indigo-500 text-white rounded hover:bg-indigo-600 transition-colors"
-              title="Subroutine"
-            >
-              ⎔ Subroutine
-            </button>
-            <button
-              onClick={() => addFlowchartNode('cylindrical')}
-              className="w-full px-3 py-2 text-sm bg-cyan-500 text-white rounded hover:bg-cyan-600 transition-colors"
-              title="Cylinder - Database"
-            >
-              ⊙ Database
-            </button>
-            <button
-              onClick={() => addFlowchartNode('circle')}
-              className="w-full px-3 py-2 text-sm bg-emerald-500 text-white rounded hover:bg-emerald-600 transition-colors"
-              title="Circle - Start/End"
-            >
-              ○ Start/End
-            </button>
-            <button
-              onClick={() => addFlowchartNode('asymmetric')}
-              className="w-full px-3 py-2 text-sm bg-teal-500 text-white rounded hover:bg-teal-600 transition-colors"
-              title="Asymmetric - Manual Input"
-            >
-              ⎨ Manual Input
-            </button>
-            <button
-              onClick={() => addFlowchartNode('rhombus')}
-              className="w-full px-3 py-2 text-sm bg-yellow-500 text-white rounded hover:bg-yellow-600 transition-colors"
-              title="Rhombus - Decision"
-            >
-              ◊ Decision
-            </button>
-            <button
-              onClick={() => addFlowchartNode('hexagon')}
-              className="w-full px-3 py-2 text-sm bg-orange-500 text-white rounded hover:bg-orange-600 transition-colors"
-              title="Hexagon - Preparation"
-            >
-              ⬟ Preparation
-            </button>
-            <button
-              onClick={() => addFlowchartNode('parallelogram')}
-              className="w-full px-3 py-2 text-sm bg-purple-500 text-white rounded hover:bg-purple-600 transition-colors"
-              title="Parallelogram - Input/Output"
-            >
-              ▱ Input/Output
-            </button>
-            <button
-              onClick={() => addFlowchartNode('trapezoid')}
-              className="w-full px-3 py-2 text-sm bg-pink-500 text-white rounded hover:bg-pink-600 transition-colors"
-              title="Trapezoid - Manual Operation"
-            >
-              ⏢ Manual Operation
-            </button>
-            <button
-              onClick={() => addFlowchartNode('doubleCircle')}
-              className="w-full px-3 py-2 text-sm bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
-              title="Double Circle - Stop"
-            >
-              ◉ Stop
-            </button>
+            <Tooltip content="Rectangle - Process">
+              <button
+                onClick={() => addFlowchartNode('rectangle')}
+                className="w-8 h-8 flex items-center justify-center bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+              >
+                <RiRectangleLine className="w-4 h-4" />
+              </button>
+            </Tooltip>
+            <Tooltip content="Rounded Rectangle">
+              <button
+                onClick={() => addFlowchartNode('roundedRectangle')}
+                className="w-8 h-8 flex items-center justify-center bg-blue-400 text-white rounded hover:bg-blue-500 transition-colors"
+              >
+                <RiShapeLine className="w-4 h-4" />
+              </button>
+            </Tooltip>
+            <Tooltip content="Stadium - Terminal">
+              <button
+                onClick={() => addFlowchartNode('stadium')}
+                className="w-8 h-8 flex items-center justify-center bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
+              >
+                <RiStopLine className="w-4 h-4" />
+              </button>
+            </Tooltip>
+            <Tooltip content="Subroutine">
+              <button
+                onClick={() => addFlowchartNode('subroutine')}
+                className="w-8 h-8 flex items-center justify-center bg-indigo-500 text-white rounded hover:bg-indigo-600 transition-colors"
+              >
+                <RiCodeBoxLine className="w-4 h-4" />
+              </button>
+            </Tooltip>
+            <Tooltip content="Cylinder - Database">
+              <button
+                onClick={() => addFlowchartNode('cylindrical')}
+                className="w-8 h-8 flex items-center justify-center bg-cyan-500 text-white rounded hover:bg-cyan-600 transition-colors"
+              >
+                <RiDatabase2Line className="w-4 h-4" />
+              </button>
+            </Tooltip>
+            <Tooltip content="Circle - Start/End">
+              <button
+                onClick={() => addFlowchartNode('circle')}
+                className="w-8 h-8 flex items-center justify-center bg-emerald-500 text-white rounded hover:bg-emerald-600 transition-colors"
+              >
+                <RiCircleLine className="w-4 h-4" />
+              </button>
+            </Tooltip>
+            <Tooltip content="Asymmetric - Manual Input">
+              <button
+                onClick={() => addFlowchartNode('asymmetric')}
+                className="w-8 h-8 flex items-center justify-center bg-teal-500 text-white rounded hover:bg-teal-600 transition-colors"
+              >
+                <RiInputMethodLine className="w-4 h-4" />
+              </button>
+            </Tooltip>
+            <Tooltip content="Rhombus - Decision">
+              <button
+                onClick={() => addFlowchartNode('rhombus')}
+                className="w-8 h-8 flex items-center justify-center bg-yellow-500 text-white rounded hover:bg-yellow-600 transition-colors"
+              >
+                <RiGitBranchLine className="w-4 h-4" />
+              </button>
+            </Tooltip>
+            <Tooltip content="Hexagon - Preparation">
+              <button
+                onClick={() => addFlowchartNode('hexagon')}
+                className="w-8 h-8 flex items-center justify-center bg-orange-500 text-white rounded hover:bg-orange-600 transition-colors"
+              >
+                <RiStopCircleLine className="w-4 h-4" />
+              </button>
+            </Tooltip>
+            <Tooltip content="Parallelogram - Input/Output">
+              <button
+                onClick={() => addFlowchartNode('parallelogram')}
+                className="w-8 h-8 flex items-center justify-center bg-purple-500 text-white rounded hover:bg-purple-600 transition-colors"
+              >
+                <RiSplitCellsHorizontal className="w-4 h-4" />
+              </button>
+            </Tooltip>
+            <Tooltip content="Trapezoid - Manual Operation">
+              <button
+                onClick={() => addFlowchartNode('trapezoid')}
+                className="w-8 h-8 flex items-center justify-center bg-pink-500 text-white rounded hover:bg-pink-600 transition-colors"
+              >
+                <RiTapeLine className="w-4 h-4" />
+              </button>
+            </Tooltip>
+            <Tooltip content="Double Circle - Stop">
+              <button
+                onClick={() => addFlowchartNode('doubleCircle')}
+                className="w-8 h-8 flex items-center justify-center bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
+              >
+                <RiStopCircleFill className="w-4 h-4" />
+              </button>
+            </Tooltip>
           </>
         )
       
       case 'sequence':
         return (
           <>
-            <button
-              onClick={() => addSequenceNode('participant')}
-              className="w-full px-3 py-2 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-              title="Add Participant"
-            >
-              👥 Participant
-            </button>
-            <button
-              onClick={() => addSequenceNode('actor')}
-              className="w-full px-3 py-2 text-sm bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
-              title="Add Actor"
-            >
-              👤 Actor
-            </button>
-            <button
-              onClick={() => addSequenceBlock('loop')}
-              className="w-full px-3 py-2 text-sm bg-purple-500 text-white rounded hover:bg-purple-600 transition-colors"
-              title="Add Loop Block"
-            >
-              🔄 Loop
-            </button>
-            <button
-              onClick={() => addSequenceBlock('alt')}
-              className="w-full px-3 py-2 text-sm bg-orange-500 text-white rounded hover:bg-orange-600 transition-colors"
-              title="Add Alternative Block"
-            >
-              ⚡ Alt
-            </button>
-            <button
-              onClick={() => addSequenceBlock('opt')}
-              className="w-full px-3 py-2 text-sm bg-cyan-500 text-white rounded hover:bg-cyan-600 transition-colors"
-              title="Add Optional Block"
-            >
-              ❓ Opt
-            </button>
-            <button
-              onClick={() => addSequenceBlock('par')}
-              className="w-full px-3 py-2 text-sm bg-pink-500 text-white rounded hover:bg-pink-600 transition-colors"
-              title="Add Parallel Block"
-            >
-              ⚡ Par
-            </button>
+            <Tooltip content="Add Participant">
+              <button
+                onClick={() => addSequenceNode('participant')}
+                className="w-8 h-8 flex items-center justify-center bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+              >
+                <RiTeamLine className="w-4 h-4" />
+              </button>
+            </Tooltip>
+            <Tooltip content="Add Actor">
+              <button
+                onClick={() => addSequenceNode('actor')}
+                className="w-8 h-8 flex items-center justify-center bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
+              >
+                <RiUser3Line className="w-4 h-4" />
+              </button>
+            </Tooltip>
+            <Tooltip content="Add Loop Block">
+              <button
+                onClick={() => addSequenceBlock('loop')}
+                className="w-8 h-8 flex items-center justify-center bg-purple-500 text-white rounded hover:bg-purple-600 transition-colors"
+              >
+                <RiLoopLeftLine className="w-4 h-4" />
+              </button>
+            </Tooltip>
+            <Tooltip content="Add Alternative Block">
+              <button
+                onClick={() => addSequenceBlock('alt')}
+                className="w-8 h-8 flex items-center justify-center bg-orange-500 text-white rounded hover:bg-orange-600 transition-colors"
+              >
+                <RiFlaskLine className="w-4 h-4" />
+              </button>
+            </Tooltip>
+            <Tooltip content="Add Optional Block">
+              <button
+                onClick={() => addSequenceBlock('opt')}
+                className="w-8 h-8 flex items-center justify-center bg-cyan-500 text-white rounded hover:bg-cyan-600 transition-colors"
+              >
+                <RiQuestionLine className="w-4 h-4" />
+              </button>
+            </Tooltip>
+            <Tooltip content="Add Parallel Block">
+              <button
+                onClick={() => addSequenceBlock('par')}
+                className="w-8 h-8 flex items-center justify-center bg-pink-500 text-white rounded hover:bg-pink-600 transition-colors"
+              >
+                <RiSplitCellsHorizontal className="w-4 h-4" />
+              </button>
+            </Tooltip>
           </>
         )
       
       case 'class':
         return (
           <>
-            <button
-              onClick={() => addClassNode()}
-              className="w-full px-3 py-2 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-              title="Add Regular Class"
-            >
-              📋 Class
-            </button>
-            <button
-              onClick={() => addClassNode('interface')}
-              className="w-full px-3 py-2 text-sm bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
-              title="Add Interface"
-            >
-              🔌 Interface
-            </button>
-            <button
-              onClick={() => addClassNode('abstract')}
-              className="w-full px-3 py-2 text-sm bg-purple-500 text-white rounded hover:bg-purple-600 transition-colors"
-              title="Add Abstract Class"
-            >
-              🎭 Abstract
-            </button>
-            <button
-              onClick={() => addClassNode('enumeration')}
-              className="w-full px-3 py-2 text-sm bg-orange-500 text-white rounded hover:bg-orange-600 transition-colors"
-              title="Add Enumeration"
-            >
-              🏷️ Enum
-            </button>
+            <Tooltip content="Add Regular Class">
+              <button
+                onClick={() => addClassNode()}
+                className="w-8 h-8 flex items-center justify-center bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+              >
+                <RiFileList3Line className="w-4 h-4" />
+              </button>
+            </Tooltip>
+            <Tooltip content="Add Interface">
+              <button
+                onClick={() => addClassNode('interface')}
+                className="w-8 h-8 flex items-center justify-center bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
+              >
+                <RiPlugLine className="w-4 h-4" />
+              </button>
+            </Tooltip>
+            <Tooltip content="Add Abstract Class">
+              <button
+                onClick={() => addClassNode('abstract')}
+                className="w-8 h-8 flex items-center justify-center bg-purple-500 text-white rounded hover:bg-purple-600 transition-colors"
+              >
+                <RiTaskLine className="w-4 h-4" />
+              </button>
+            </Tooltip>
+            <Tooltip content="Add Enumeration">
+              <button
+                onClick={() => addClassNode('enumeration')}
+                className="w-8 h-8 flex items-center justify-center bg-orange-500 text-white rounded hover:bg-orange-600 transition-colors"
+              >
+                <RiPriceTag3Line className="w-4 h-4" />
+              </button>
+            </Tooltip>
           </>
         )
       
       case 'state':
         return (
           <>
-            <button
-              onClick={() => addStateNode('state')}
-              className="w-full px-3 py-2 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-            >
-              Add State
-            </button>
-            <button
-              onClick={() => addStateNode('start')}
-              className="w-full px-3 py-2 text-sm bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
-            >
-              Add Start
-            </button>
-            <button
-              onClick={() => addStateNode('end')}
-              className="w-full px-3 py-2 text-sm bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
-            >
-              Add End
-            </button>
-            <button
-              onClick={() => addStateNode('choice')}
-              className="w-full px-3 py-2 text-sm bg-yellow-500 text-white rounded hover:bg-yellow-600 transition-colors"
-            >
-              Add Choice
-            </button>
-            <button
-              onClick={() => addStateNode('fork')}
-              className="w-full px-3 py-2 text-sm bg-purple-500 text-white rounded hover:bg-purple-600 transition-colors"
-            >
-              Add Fork
-            </button>
-            <button
-              onClick={() => addStateNode('join')}
-              className="w-full px-3 py-2 text-sm bg-indigo-500 text-white rounded hover:bg-indigo-600 transition-colors"
-            >
-              Add Join
-            </button>
+            <Tooltip content="Add State">
+              <button
+                onClick={() => addStateNode('state')}
+                className="w-8 h-8 flex items-center justify-center bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+              >
+                <RiCheckboxBlankLine className="w-4 h-4" />
+              </button>
+            </Tooltip>
+            <Tooltip content="Add Start State">
+              <button
+                onClick={() => addStateNode('start')}
+                className="w-8 h-8 flex items-center justify-center bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
+              >
+                <RiPlayCircleLine className="w-4 h-4" />
+              </button>
+            </Tooltip>
+            <Tooltip content="Add End State">
+              <button
+                onClick={() => addStateNode('end')}
+                className="w-8 h-8 flex items-center justify-center bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
+              >
+                <RiStopCircleFill className="w-4 h-4" />
+              </button>
+            </Tooltip>
+            <Tooltip content="Add Choice State">
+              <button
+                onClick={() => addStateNode('choice')}
+                className="w-8 h-8 flex items-center justify-center bg-yellow-500 text-white rounded hover:bg-yellow-600 transition-colors"
+              >
+                <RiGitBranchLine className="w-4 h-4" />
+              </button>
+            </Tooltip>
+            <Tooltip content="Add Fork State">
+              <button
+                onClick={() => addStateNode('fork')}
+                className="w-8 h-8 flex items-center justify-center bg-purple-500 text-white rounded hover:bg-purple-600 transition-colors"
+              >
+                <RiArrowUpSLine className="w-4 h-4" />
+              </button>
+            </Tooltip>
+            <Tooltip content="Add Join State">
+              <button
+                onClick={() => addStateNode('join')}
+                className="w-8 h-8 flex items-center justify-center bg-indigo-500 text-white rounded hover:bg-indigo-600 transition-colors"
+              >
+                <RiArrowDownSLine className="w-4 h-4" />
+              </button>
+            </Tooltip>
           </>
         )
       
       case 'er':
         return (
           <>
-            <button
-              onClick={addERNode}
-              className="w-full px-3 py-2 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-            >
-              Add Entity
-            </button>
+            <Tooltip content="Add Entity">
+              <button
+                onClick={addERNode}
+                className="w-8 h-8 flex items-center justify-center bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+              >
+                <RiDatabase2Line className="w-4 h-4" />
+              </button>
+            </Tooltip>
           </>
         )
       
@@ -391,18 +456,22 @@ const Toolbar = () => {
 
   return (
     <div className="absolute top-4 left-4 z-10 bg-white rounded-lg shadow-lg p-2">
-      <div className="space-y-2">
-        <div className="text-xs font-semibold text-gray-600 uppercase tracking-wider px-1">
-          {diagramType} Tools
+      <div className="flex flex-col gap-2">
+        <div className="text-xs font-semibold text-gray-600 uppercase tracking-wider text-center">
+          {diagramType}
         </div>
-        {renderToolbarButtons()}
-        <hr className="my-2 border-gray-300" />
-        <button
-          onClick={clearCanvas}
-          className="w-full px-3 py-2 text-sm bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
-        >
-          Clear Canvas
-        </button>
+        <div className="grid grid-cols-3 gap-1">
+          {renderToolbarButtons()}
+        </div>
+        <hr className="border-gray-300" />
+        <Tooltip content="Clear Canvas">
+          <button
+            onClick={clearCanvas}
+            className="w-8 h-8 flex items-center justify-center bg-red-500 text-white rounded hover:bg-red-600 transition-colors mx-auto"
+          >
+            <RiDeleteBin6Line className="w-4 h-4" />
+          </button>
+        </Tooltip>
       </div>
     </div>
   )
