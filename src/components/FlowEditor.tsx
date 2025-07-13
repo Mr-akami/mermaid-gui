@@ -8,8 +8,10 @@ import ReactFlow, {
   Connection,
   ReactFlowProvider,
   useReactFlow,
+  MarkerType,
 } from 'reactflow'
 import 'reactflow/dist/style.css'
+import '@/styles/edge-handles.css'
 import { useAtom, useAtomValue } from 'jotai'
 import { nodesAtom, edgesAtom } from '@/store/flowStore'
 import { diagramTypeAtom } from '@/store/diagramStore'
@@ -84,6 +86,12 @@ const FlowCanvas = () => {
         ...params,
         type: edgeType,
         data: edgeData,
+        markerEnd: {
+          type: MarkerType.ArrowClosed,
+          width: 20,
+          height: 20,
+          color: '#374151',
+        },
       }
       
       setEdges(prevEdges => addEdge(newEdge, prevEdges))
@@ -200,9 +208,18 @@ const FlowCanvas = () => {
       connectionLineComponent={CustomConnectionLine}
       multiSelectionKeyCode="Shift"
       deleteKeyCode={null} // Disable default delete handling
-      connectionRadius={50} // Allow connections from anywhere within 50px of node
+      connectionRadius={30} // Connection detection radius
+      connectOnClick={false} // Require drag to connect
       fitView
       style={flowStyle}
+      defaultEdgeOptions={{
+        markerEnd: {
+          type: MarkerType.ArrowClosed,
+          width: 20,
+          height: 20,
+          color: '#374151',
+        },
+      }}
     >
       <Background variant={BackgroundVariant.Dots} gap={12} size={1} />
       <Controls />

@@ -1,8 +1,9 @@
 import { memo, useState, useCallback, useRef } from 'react'
-import { Handle, Position, NodeProps } from 'reactflow'
+import { Handle, Position, NodeProps, useStore } from 'reactflow'
 import { useSetAtom, useAtomValue } from 'jotai'
 import { nodesAtom } from '@/store/flowStore'
 import { drawingModeAtom } from '@/store/drawingStore'
+import { EdgeHandle } from './EdgeHandle'
 
 const CustomNode = memo(({ data, id, isConnectable }: NodeProps) => {
   const [isEditing, setIsEditing] = useState(false)
@@ -10,6 +11,9 @@ const CustomNode = memo(({ data, id, isConnectable }: NodeProps) => {
   const setNodes = useSetAtom(nodesAtom)
   const drawingMode = useAtomValue(drawingModeAtom)
   const isComposingRef = useRef(false)
+  
+  // Check if this node is being connected to
+  const connectionNodeId = useStore((state) => state.connectionNodeId)
   
   // Reset label when not editing and data changes
   if (!isEditing && label !== data.label) {
@@ -66,38 +70,14 @@ const CustomNode = memo(({ data, id, isConnectable }: NodeProps) => {
     if (drawingMode === 'draw-line') {
       return (
         <>
-          <Handle
+          <EdgeHandle
             type="source"
-            position={Position.Bottom}
-            id="free-source"
-            style={{
-              background: 'transparent',
-              border: 'none',
-              width: '100%',
-              height: '100%',
-              top: '50%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-              pointerEvents: 'all',
-              zIndex: 10,
-            }}
+            id="source"
             isConnectable={isConnectable}
           />
-          <Handle
+          <EdgeHandle
             type="target"
-            position={Position.Top}
-            id="free-target"
-            style={{
-              background: 'transparent',
-              border: 'none',
-              width: '100%',
-              height: '100%',
-              top: '50%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-              pointerEvents: 'all',
-              zIndex: 10,
-            }}
+            id="target"
             isConnectable={isConnectable}
           />
         </>
@@ -107,12 +87,15 @@ const CustomNode = memo(({ data, id, isConnectable }: NodeProps) => {
   }
 
   const renderShape = () => {
+    const isConnecting = connectionNodeId === id
     const commonStyle = {
       backgroundColor: '#ffffff',
-      border: '2px solid #374151',
+      border: `2px solid ${isConnecting ? '#3b82f6' : '#374151'}`,
       fontSize: '14px',
       fontWeight: '500' as const,
       position: 'relative' as const,
+      transition: 'all 0.2s',
+      boxShadow: isConnecting ? '0 0 0 3px rgba(59, 130, 246, 0.3)' : undefined,
     }
 
     const innerContent = isEditing ? (
