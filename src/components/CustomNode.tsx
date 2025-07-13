@@ -3,7 +3,6 @@ import { Handle, Position, NodeProps, useStore } from 'reactflow'
 import { useSetAtom, useAtomValue } from 'jotai'
 import { nodesAtom } from '@/store/flowStore'
 import { drawingModeAtom } from '@/store/drawingStore'
-import { EdgeHandle } from './EdgeHandle'
 
 const CustomNode = memo(({ data, id, isConnectable }: NodeProps) => {
   const [isEditing, setIsEditing] = useState(false)
@@ -68,16 +67,43 @@ const CustomNode = memo(({ data, id, isConnectable }: NodeProps) => {
 
   const renderHandles = () => {
     if (drawingMode === 'draw-line') {
+      // Use a simpler approach with larger invisible handles
       return (
         <>
-          <EdgeHandle
+          {/* Source handle - covers entire node */}
+          <Handle
             type="source"
+            position={Position.Bottom}
             id="source"
+            style={{
+              background: 'transparent',
+              border: 'none',
+              width: '100%',
+              height: '100%',
+              top: '0',
+              left: '0',
+              transform: 'none',
+              cursor: 'crosshair',
+              pointerEvents: 'all',
+            }}
             isConnectable={isConnectable}
           />
-          <EdgeHandle
+          {/* Target handle - slightly smaller to allow source to work */}
+          <Handle
             type="target"
+            position={Position.Top}
             id="target"
+            style={{
+              background: 'transparent',
+              border: 'none',
+              width: '95%',
+              height: '95%',
+              top: '2.5%',
+              left: '2.5%',
+              transform: 'none',
+              cursor: 'crosshair',
+              pointerEvents: 'all',
+            }}
             isConnectable={isConnectable}
           />
         </>
@@ -96,6 +122,8 @@ const CustomNode = memo(({ data, id, isConnectable }: NodeProps) => {
       position: 'relative' as const,
       transition: 'all 0.2s',
       boxShadow: isConnecting ? '0 0 0 3px rgba(59, 130, 246, 0.3)' : undefined,
+      outline: drawingMode === 'draw-line' ? '2px dashed rgba(59, 130, 246, 0.2)' : 'none',
+      outlineOffset: '4px',
     }
 
     const innerContent = isEditing ? (
