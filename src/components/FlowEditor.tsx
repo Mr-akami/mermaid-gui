@@ -39,6 +39,9 @@ import SequenceEdge from './edges/SequenceEdge'
 import ClassEdge from './edges/ClassEdge'
 import EREdge from './edges/EREdge'
 
+// Import custom connection line
+import CustomConnectionLine from './CustomConnectionLine'
+
 const FlowCanvas = () => {
   const [nodes, setNodes] = useAtom(nodesAtom)
   const [edges, setEdges] = useAtom(edgesAtom)
@@ -194,6 +197,7 @@ const FlowCanvas = () => {
       onPaneClick={onPaneClick}
       nodeTypes={nodeTypes}
       edgeTypes={edgeTypes}
+      connectionLineComponent={CustomConnectionLine}
       multiSelectionKeyCode="Shift"
       deleteKeyCode={null} // Disable default delete handling
       connectionRadius={50} // Allow connections from anywhere within 50px of node

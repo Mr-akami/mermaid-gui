@@ -68,17 +68,18 @@ const CustomNode = memo(({ data, id, isConnectable }: NodeProps) => {
         <>
           <Handle
             type="source"
-            position={Position.Top}
+            position={Position.Bottom}
             id="free-source"
             style={{
               background: 'transparent',
               border: 'none',
               width: '100%',
               height: '100%',
-              top: 0,
-              left: 0,
-              transform: 'none',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
               pointerEvents: 'all',
+              zIndex: 10,
             }}
             isConnectable={isConnectable}
           />
@@ -91,10 +92,11 @@ const CustomNode = memo(({ data, id, isConnectable }: NodeProps) => {
               border: 'none',
               width: '100%',
               height: '100%',
-              top: 0,
-              left: 0,
-              transform: 'none',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
               pointerEvents: 'all',
+              zIndex: 10,
             }}
             isConnectable={isConnectable}
           />
