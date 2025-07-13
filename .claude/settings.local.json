@@ -1,0 +1,47 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find:*)",
+      "Bash(ls:*)",
+      "Bash(mkdir:*)",
+      "Bash(pnpm install:*)",
+      "Bash(pnpm dev:*)",
+      "Bash(rm:*)",
+      "Bash(pnpm search:*)",
+      "Bash(pnpm lint:*)",
+      "Bash(pnpm typecheck:*)",
+      "WebFetch(domain:github.com)",
+      "Bash(pnpm add:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "WebFetch(domain:mermaid.js.org)",
+      "Bash(git checkout:*)",
+      "Bash(grep:*)",
+      "mcp__playwright__browser_navigate",
+      "mcp__playwright__browser_click",
+      "mcp__playwright__browser_select_option",
+      "mcp__playwright__browser_snapshot",
+      "mcp__playwright__browser_drag",
+      "Bash(git reset:*)",
+      "Bash(git restore:*)",
+      "Bash(git merge:*)",
+      "Bash(git branch:*)",
+      "mcp__playwright__browser_type",
+      "mcp__playwright__browser_press_key",
+      "Bash(pnpm test:*)",
+      "Bash(pkill:*)",
+      "mcp__playwright__browser_take_screenshot",
+      "mcp__playwright__browser_close"
+    ],
+    "deny": []
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "github"
+  ],
+  "disabledMcpjsonServers": [
+    "readability",
+    "playwright"
+  ]
+}
