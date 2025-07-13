@@ -12,6 +12,8 @@ import 'reactflow/dist/style.css'
 import { useAtom, useAtomValue } from 'jotai'
 import { nodesAtom, edgesAtom } from '@/store/flowStore'
 import { diagramTypeAtom } from '@/store/diagramStore'
+import { placementModeAtom } from '@/store/drawingStore'
+import { pendingNodeAtom } from '@/store/pendingNodeStore'
 import Toolbar from './Toolbar'
 import CustomNode from './CustomNode'
 import DiagramTypeSelector from './DiagramTypeSelector'
@@ -40,6 +42,8 @@ const FlowCanvas = () => {
   const [nodes, setNodes] = useAtom(nodesAtom)
   const [edges, setEdges] = useAtom(edgesAtom)
   const diagramType = useAtomValue(diagramTypeAtom)
+  const placementMode = useAtomValue(placementModeAtom)
+  const [pendingNode, setPendingNode] = useAtom(pendingNodeAtom)
 
   const nodeTypes = useMemo(() => ({
     custom: CustomNode,
@@ -146,6 +150,37 @@ const FlowCanvas = () => {
     return () => document.removeEventListener('keydown', handleKeyDown)
   }, [nodes, edges, setNodes, setEdges])
 
+  // Handle click-to-place functionality
+  const onPaneClick = useCallback(
+    (event: React.MouseEvent) => {
+      if (placementMode === 'click' && pendingNode) {
+        // Get the React Flow instance to convert screen coordinates to flow coordinates
+        const reactFlowBounds = event.currentTarget.getBoundingClientRect()
+        const position = {
+          x: event.clientX - reactFlowBounds.left,
+          y: event.clientY - reactFlowBounds.top,
+        }
+
+        // Create a new node with unique ID
+        const id = `${pendingNode.type}_${Date.now()}`
+        const newNode = {
+          id,
+          type: pendingNode.type,
+          position,
+          data: pendingNode.data,
+        }
+
+        setNodes((nds) => [...nds, newNode])
+        setPendingNode(null) // Clear pending node after placement
+      }
+    },
+    [placementMode, pendingNode, setNodes, setPendingNode]
+  )
+
+  // Add cursor style when in click placement mode with pending node
+  const flowStyle = useMemo(() => ({
+    cursor: placementMode === 'click' && pendingNode ? 'crosshair' : undefined
+  }), [placementMode, pendingNode])
 
   return (
     <ReactFlow
@@ -154,11 +189,13 @@ const FlowCanvas = () => {
       onNodesChange={onNodesChange}
       onEdgesChange={onEdgesChange}
       onConnect={onConnect}
+      onPaneClick={onPaneClick}
       nodeTypes={nodeTypes}
       edgeTypes={edgeTypes}
       multiSelectionKeyCode="Shift"
       deleteKeyCode={null} // Disable default delete handling
       fitView
+      style={flowStyle}
     >
       <Background variant={BackgroundVariant.Dots} gap={12} size={1} />
       <Controls />

@@ -1,6 +1,8 @@
-import { useSetAtom, useAtomValue } from 'jotai'
+import { useSetAtom, useAtomValue, useAtom } from 'jotai'
 import { nodesAtom, edgesAtom, sequenceBlocksAtom } from '@/store/flowStore'
 import { diagramTypeAtom } from '@/store/diagramStore'
+import { drawingModeAtom, placementModeAtom } from '@/store/drawingStore'
+import { pendingNodeAtom } from '@/store/pendingNodeStore'
 import { Node } from 'reactflow'
 import {
   FlowchartNode,
@@ -34,7 +36,9 @@ import {
   GitMerge,
   Trash2,
   Workflow,
-  Tablet
+  Tablet,
+  MousePointer2,
+  PenTool
 } from 'lucide-react'
 
 const Toolbar = () => {
@@ -43,6 +47,9 @@ const Toolbar = () => {
   const setSequenceBlocks = useSetAtom(sequenceBlocksAtom)
   const nodes = useAtomValue(nodesAtom)
   const diagramType = useAtomValue(diagramTypeAtom)
+  const [drawingMode, setDrawingMode] = useAtom(drawingModeAtom)
+  const [placementMode, setPlacementMode] = useAtom(placementModeAtom)
+  const setPendingNode = useSetAtom(pendingNodeAtom)
 
   const getNextNodeId = (prefix: string) => {
     const existingIds = nodes.filter(n => n.id.startsWith(prefix))
@@ -50,7 +57,6 @@ const Toolbar = () => {
   }
 
   const addFlowchartNode = (shape: FlowchartNode['data']['shape']) => {
-    const id = getNextNodeId(shape.charAt(0).toUpperCase())
     const labels = {
       rectangle: 'Process',
       roundedRectangle: 'Process',
@@ -66,39 +72,62 @@ const Toolbar = () => {
       doubleCircle: 'Stop'
     }
     
-    const newNode: Node = {
-      id,
-      type: 'flowchart',
-      position: { 
-        x: 100 + (nodes.length * 150) % 600, 
-        y: 100 + Math.floor(nodes.length / 4) * 150 
-      },
-      data: {
-        label: labels[shape],
-        shape,
-      },
-    }
+    if (placementMode === 'click') {
+      // Set pending node for click placement
+      setPendingNode({
+        type: 'flowchart',
+        data: {
+          label: labels[shape],
+          shape,
+        },
+      })
+    } else {
+      // Auto placement
+      const id = getNextNodeId(shape.charAt(0).toUpperCase())
+      const newNode: Node = {
+        id,
+        type: 'flowchart',
+        position: { 
+          x: 100 + (nodes.length * 150) % 600, 
+          y: 100 + Math.floor(nodes.length / 4) * 150 
+        },
+        data: {
+          label: labels[shape],
+          shape,
+        },
+      }
 
-    setNodes((nodes) => [...nodes, newNode])
+      setNodes((nodes) => [...nodes, newNode])
+    }
   }
 
   const addSequenceNode = (type: SequenceNode['data']['type']) => {
-    const id = getNextNodeId(type === 'actor' ? 'Actor' : 'P')
-    
-    const newNode: Node = {
-      id,
-      type: 'sequence',
-      position: { 
-        x: 100 + (nodes.length * 150) % 600, 
-        y: 100
-      },
-      data: {
-        label: `${type === 'actor' ? 'Actor' : 'Participant'} ${nodes.length + 1}`,
-        type,
-      },
-    }
+    if (placementMode === 'click') {
+      setPendingNode({
+        type: 'sequence',
+        data: {
+          label: `${type === 'actor' ? 'Actor' : 'Participant'} ${nodes.length + 1}`,
+          type,
+        },
+      })
+    } else {
+      const id = getNextNodeId(type === 'actor' ? 'Actor' : 'P')
+      
+      const newNode: Node = {
+        id,
+        type: 'sequence',
+        position: { 
+          x: 100 + (nodes.length * 150) % 600, 
+          y: 100
+        },
+        data: {
+          label: `${type === 'actor' ? 'Actor' : 'Participant'} ${nodes.length + 1}`,
+          type,
+        },
+      }
 
-    setNodes((nodes) => [...nodes, newNode])
+      setNodes((nodes) => [...nodes, newNode])
+    }
   }
 
   const addSequenceBlock = (type: SequenceBlock['type']) => {
@@ -432,6 +461,62 @@ const Toolbar = () => {
         </div>
         <div className="grid grid-cols-3 gap-1">
           {renderToolbarButtons()}
+        </div>
+        <hr className="border-gray-300" />
+        <div className="text-xs font-semibold text-gray-600 uppercase tracking-wider">
+          Drawing Mode
+        </div>
+        <div className="flex gap-1">
+          <button
+            onClick={() => setDrawingMode('select')}
+            className={`p-2 rounded transition-colors ${
+              drawingMode === 'select' 
+                ? 'bg-gray-700 text-white' 
+                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+            }`}
+            title="Select Mode"
+          >
+            <MousePointer2 className="w-4 h-4" />
+          </button>
+          <button
+            onClick={() => setDrawingMode('draw-line')}
+            className={`p-2 rounded transition-colors ${
+              drawingMode === 'draw-line' 
+                ? 'bg-gray-700 text-white' 
+                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+            }`}
+            title="Draw Line"
+          >
+            <PenTool className="w-4 h-4" />
+          </button>
+        </div>
+        <hr className="border-gray-300" />
+        <div className="text-xs font-semibold text-gray-600 uppercase tracking-wider">
+          Placement Mode
+        </div>
+        <div className="flex gap-1">
+          <button
+            onClick={() => setPlacementMode('auto')}
+            className={`p-2 rounded transition-colors text-xs px-3 ${
+              placementMode === 'auto' 
+                ? 'bg-gray-700 text-white' 
+                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+            }`}
+            title="Auto Placement"
+          >
+            Auto
+          </button>
+          <button
+            onClick={() => setPlacementMode('click')}
+            className={`p-2 rounded transition-colors text-xs px-3 ${
+              placementMode === 'click' 
+                ? 'bg-gray-700 text-white' 
+                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+            }`}
+            title="Click Placement"
+          >
+            Click
+          </button>
         </div>
         <hr className="border-gray-300" />
         <div className="flex justify-center">
