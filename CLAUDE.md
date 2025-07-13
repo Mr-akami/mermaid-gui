@@ -79,11 +79,16 @@ The project follows a three-layer architecture:
 - Jotai atoms and state logic in `src/store/`
 - Utility functions in `src/utils/`
 
-## Get specification
+## Mermaid Syntax Reference
 
-- To get a specification from web site, you can use `readability` MCP.
-- Marmaid syntacs is here
-  - https://mermaid.js.org/intro/syntax-reference.html
+Compressed syntax data files are available for efficient token usage:
+
+- **Flowchart**: `src/data/mermaid/flowchart.json` - Node shapes, connections, directions, styling
+- **Sequence Diagram**: `src/data/mermaid/sequence.json` - Participants, messages, control flow, notes
+- **Class Diagram**: `src/data/mermaid/class.json` - Classes, relationships, visibility, annotations
+- **State Diagram**: `src/data/mermaid/state.json` - States, transitions, composite states, special states
+
+Each file contains compressed syntax patterns using short keys (e.g., `n` for nodes, `c` for connections) to minimize token usage while preserving all essential information for GUI implementation.
 
 ## Implementation policy
 

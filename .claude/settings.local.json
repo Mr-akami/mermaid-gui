@@ -34,16 +34,20 @@
       "mcp__playwright__browser_take_screenshot",
       "mcp__playwright__browser_close",
       "mcp__ide__executeCode",
-      "Bash(mcp call:*)"
+      "Bash(mcp call:*)",
+      "mcp__ide__getDiagnostics",
+      "Bash(pnpm list:*)",
+      "Bash(npx:*)",
+      "mcp__playwright__browser_install",
+      "Bash(curl:*)"
     ],
     "deny": []
   },
   "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": [
-    "github"
-  ],
-  "disabledMcpjsonServers": [
+    "github",
     "readability",
     "playwright"
-  ]
+  ],
+  "disabledMcpjsonServers": []
 }

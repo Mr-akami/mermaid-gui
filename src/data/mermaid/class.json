@@ -1,0 +1,51 @@
+{
+  "t": "classDiagram",
+  "cls": {
+    "decl": "class ClassName",
+    "generic": "class ClassName~T~",
+    "namespace": "class namespace.ClassName"
+  },
+  "vis": {
+    "pub": "+",
+    "priv": "-", 
+    "prot": "#",
+    "pkg": "~"
+  },
+  "mem": {
+    "attr": "attributeName dataType",
+    "method": "methodName(params) returnType",
+    "static": "methodName()$ returnType",
+    "abstract": "methodName()* returnType"
+  },
+  "rel": {
+    "inh": "<|--",
+    "comp": "*--",
+    "agg": "o--",
+    "assoc": "-->",
+    "dep": "..>",
+    "real": "..|>",
+    "link": "--"
+  },
+  "mult": {
+    "one": "\"1\"",
+    "opt": "\"0..1\"", 
+    "many": "\"1..*\"",
+    "zero": "\"*\""
+  },
+  "ann": {
+    "interface": "<<Interface>>",
+    "abstract": "<<Abstract>>",
+    "service": "<<Service>>",
+    "enum": "<<Enumeration>>",
+    "stereotype": "<<Custom>>"
+  },
+  "note": {
+    "syntax": "note for ClassName : Note text",
+    "multi": "note for ClassName\n  Line 1\n  Line 2\nend note"
+  },
+  "style": {
+    "css": "cssClass \"fill:#f9f,stroke:#333,stroke-width:2px\"",
+    "apply": "class ClassName cssClass"
+  },
+  "ex": "class Animal {\n  +int age\n  +String gender\n  +isMammal() bool\n  +mate(Animal partner)\n}"
+}

@@ -1,0 +1,48 @@
+{
+  "t": "sequenceDiagram",
+  "p": {
+    "impl": "auto",
+    "expl": "participant A",
+    "alias": "participant A as ActorA",
+    "order": "First appearance order"
+  },
+  "m": {
+    "sl": {"s": "->", "l": "Solid line"},
+    "dl": {"s": "-->", "l": "Dotted line"},
+    "sa": {"s": "->>", "l": "Solid arrow"},
+    "da": {"s": "-->>", "l": "Dotted arrow"},
+    "bi": {"s": "<<->>", "l": "Bidirectional"},
+    "bid": {"s": "<<-->>", "l": "BiDotted"},
+    "cr": {"s": "-x", "l": "Cross"},
+    "dxr": {"s": "--x", "l": "DottedCross"},
+    "as": {"s": "-)", "l": "Async"},
+    "das": {"s": "--)", "l": "DottedAsync"}
+  },
+  "act": {
+    "on": "activate A",
+    "off": "deactivate A",
+    "short": "A->>+B: Message",
+    "shortOff": "A->>-B: Message"
+  },
+  "ctrl": {
+    "loop": "loop Text\n  content\nend",
+    "alt": "alt Text\n  content\nelse\n  content\nend",
+    "opt": "opt Text\n  content\nend",
+    "par": "par Text\n  content\nand Text\n  content\nend",
+    "crit": "critical Text\n  content\nend",
+    "break": "break Text\n  content\nend"
+  },
+  "note": {
+    "right": "Note right of A: Text",
+    "left": "Note left of A: Text",
+    "over": "Note over A,B: Text"
+  },
+  "box": {
+    "syntax": "box Color Title\n  participant A\nend",
+    "colors": ["Aqua", "Blue", "Green", "Orange", "Red", "Yellow"]
+  },
+  "cfg": {
+    "autonumber": "autonumber",
+    "theme": "theme: base"
+  }
+}
