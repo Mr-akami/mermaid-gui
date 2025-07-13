@@ -7,6 +7,7 @@ import ReactFlow, {
   MiniMap,
   Connection,
   ReactFlowProvider,
+  useReactFlow,
 } from 'reactflow'
 import 'reactflow/dist/style.css'
 import { useAtom, useAtomValue } from 'jotai'
@@ -44,6 +45,7 @@ const FlowCanvas = () => {
   const diagramType = useAtomValue(diagramTypeAtom)
   const placementMode = useAtomValue(placementModeAtom)
   const [pendingNode, setPendingNode] = useAtom(pendingNodeAtom)
+  const { project } = useReactFlow()
 
   const nodeTypes = useMemo(() => ({
     custom: CustomNode,
@@ -156,10 +158,10 @@ const FlowCanvas = () => {
       if (placementMode === 'click' && pendingNode) {
         // Get the React Flow instance to convert screen coordinates to flow coordinates
         const reactFlowBounds = event.currentTarget.getBoundingClientRect()
-        const position = {
+        const position = project({
           x: event.clientX - reactFlowBounds.left,
           y: event.clientY - reactFlowBounds.top,
-        }
+        })
 
         // Create a new node with unique ID
         const id = `${pendingNode.type}_${Date.now()}`
@@ -174,7 +176,7 @@ const FlowCanvas = () => {
         setPendingNode(null) // Clear pending node after placement
       }
     },
-    [placementMode, pendingNode, setNodes, setPendingNode]
+    [placementMode, pendingNode, setNodes, setPendingNode, project]
   )
 
   // Add cursor style when in click placement mode with pending node
@@ -194,6 +196,7 @@ const FlowCanvas = () => {
       edgeTypes={edgeTypes}
       multiSelectionKeyCode="Shift"
       deleteKeyCode={null} // Disable default delete handling
+      connectionRadius={50} // Allow connections from anywhere within 50px of node
       fitView
       style={flowStyle}
     >
@@ -213,19 +216,19 @@ const FlowEditor = () => {
         <h2 className="text-lg font-semibold text-gray-800">Flow Editor</h2>
       </div>
       <DiagramTypeSelector />
-      <div className="flex-1 relative">
-        <Toolbar />
-        <UndoRedoButtons />
-        <EdgeStyleSelector />
-        <FlowchartDirectionSelector />
-        <SequenceControls />
-        <ClassControls />
-        <StateControls />
-        <ERControls />
-        <ReactFlowProvider>
+      <ReactFlowProvider>
+        <div className="flex-1 relative">
+          <Toolbar />
+          <UndoRedoButtons />
+          <EdgeStyleSelector />
+          <FlowchartDirectionSelector />
+          <SequenceControls />
+          <ClassControls />
+          <StateControls />
+          <ERControls />
           <FlowCanvas />
-        </ReactFlowProvider>
-      </div>
+        </div>
+      </ReactFlowProvider>
     </div>
   )
 }
