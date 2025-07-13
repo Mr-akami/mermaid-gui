@@ -12,16 +12,9 @@ import 'reactflow/dist/style.css'
 import { useAtom, useAtomValue } from 'jotai'
 import { nodesAtom, edgesAtom } from '@/store/flowStore'
 import { diagramTypeAtom } from '@/store/diagramStore'
-import Toolbar from './Toolbar'
 import CustomNode from './CustomNode'
 import DiagramTypeSelector from './DiagramTypeSelector'
-import UndoRedoButtons from './UndoRedoButtons'
-import EdgeStyleSelector from './EdgeStyleSelector'
-import FlowchartDirectionSelector from './FlowchartDirectionSelector'
-import SequenceControls from './SequenceControls'
-import ClassControls from './ClassControls'
-import StateControls from './StateControls'
-import ERControls from './ERControls'
+import ControlsContainer from './ControlsContainer'
 import { useHistory } from '@/hooks/useHistory'
 
 // Import custom nodes
@@ -177,14 +170,7 @@ const FlowEditor = () => {
       </div>
       <DiagramTypeSelector />
       <div className="flex-1 relative">
-        <Toolbar />
-        <UndoRedoButtons />
-        <EdgeStyleSelector />
-        <FlowchartDirectionSelector />
-        <SequenceControls />
-        <ClassControls />
-        <StateControls />
-        <ERControls />
+        <ControlsContainer />
         <ReactFlowProvider>
           <FlowCanvas />
         </ReactFlowProvider>

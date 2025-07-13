@@ -3,6 +3,14 @@ import { useAtomValue, useSetAtom } from 'jotai'
 import { edgesAtom } from '@/store/flowStore'
 import { diagramTypeAtom } from '@/store/diagramStore'
 import { FlowchartEdge } from '@/types/diagram'
+import Tooltip from './ui/Tooltip'
+import ControlPanel from './ui/ControlPanel'
+import { 
+  RiArrowRightLine, 
+  RiMoreLine, 
+  RiSubtractLine,
+  RiCheckLine 
+} from 'react-icons/ri'
 
 const EdgeStyleSelector = () => {
   const [selectedStyle, setSelectedStyle] = useState<FlowchartEdge['data']['style']>('solid')
@@ -31,46 +39,76 @@ const EdgeStyleSelector = () => {
     )
   }
 
+  const getStyleIcon = (style: FlowchartEdge['data']['style']) => {
+    switch (style) {
+      case 'solid':
+        return <RiArrowRightLine className="w-4 h-4" />
+      case 'dotted':
+        return <RiMoreLine className="w-4 h-4" />
+      case 'thick':
+        return <RiSubtractLine className="w-4 h-4" />
+      default:
+        return <RiArrowRightLine className="w-4 h-4" />
+    }
+  }
+
+  const getStyleLabel = (style: FlowchartEdge['data']['style']) => {
+    switch (style) {
+      case 'solid':
+        return 'Solid Line (→)'
+      case 'dotted':
+        return 'Dotted Line (-.-›)'
+      case 'thick':
+        return 'Thick Line (==›)'
+      default:
+        return 'Solid Line'
+    }
+  }
+
   return (
-    <div className="absolute top-4 right-4 z-10 bg-white rounded-lg shadow-lg p-4">
-      <div className="text-xs font-semibold text-gray-600 uppercase tracking-wider mb-2">
-        Edge Style
-      </div>
-      <div className="space-y-2">
-        <div>
-          <label className="text-sm text-gray-700">Style:</label>
-          <select
-            value={selectedStyle || 'solid'}
-            onChange={(e) => setSelectedStyle(e.target.value as FlowchartEdge['data']['style'])}
-            className="ml-2 px-2 py-1 text-sm border rounded"
+    <ControlPanel title="Edge Style" size="sm">
+      <div className="flex flex-col gap-2">
+        <div className="grid grid-cols-3 gap-1">
+          {(['solid', 'dotted', 'thick'] as const).map((style) => (
+            <Tooltip key={style} content={getStyleLabel(style)}>
+              <button
+                onClick={() => setSelectedStyle(style)}
+                className={`w-8 h-8 flex items-center justify-center rounded transition-colors ${
+                  selectedStyle === style
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
+                }`}
+              >
+                {getStyleIcon(style)}
+              </button>
+            </Tooltip>
+          ))}
+        </div>
+        
+        <Tooltip content={hasArrow ? 'Hide Arrow' : 'Show Arrow'}>
+          <button
+            onClick={() => setHasArrow(!hasArrow)}
+            className={`w-full h-8 flex items-center justify-center rounded transition-colors ${
+              hasArrow
+                ? 'bg-green-500 text-white'
+                : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
+            }`}
           >
-            <option value="solid">Solid (→)</option>
-            <option value="dotted">Dotted (-.-&gt;)</option>
-            <option value="thick">Thick (==&gt;)</option>
-          </select>
-        </div>
-        <div>
-          <label className="text-sm text-gray-700">
-            <input
-              type="checkbox"
-              checked={hasArrow}
-              onChange={(e) => setHasArrow(e.target.checked)}
-              className="mr-2"
-            />
-            Show Arrow
-          </label>
-        </div>
-        <button
-          onClick={updateSelectedEdges}
-          className="w-full px-3 py-2 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-        >
-          Apply to Selected
-        </button>
-        <div className="text-xs text-gray-500 mt-2">
-          Select edges and apply style
-        </div>
+            <RiArrowRightLine className="w-4 h-4" />
+            {!hasArrow && <span className="ml-1 text-xs">No</span>}
+          </button>
+        </Tooltip>
+        
+        <Tooltip content="Apply style to selected edges">
+          <button
+            onClick={updateSelectedEdges}
+            className="w-full h-8 flex items-center justify-center bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+          >
+            <RiCheckLine className="w-4 h-4" />
+          </button>
+        </Tooltip>
       </div>
-    </div>
+    </ControlPanel>
   )
 }
 
