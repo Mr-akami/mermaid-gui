@@ -1,13 +1,18 @@
 import { memo, useState, useCallback, useRef } from 'react'
-import { Handle, Position, NodeProps } from 'reactflow'
-import { useSetAtom } from 'jotai'
+import { Handle, Position, NodeProps, useStore } from 'reactflow'
+import { useSetAtom, useAtomValue } from 'jotai'
 import { nodesAtom } from '@/store/flowStore'
+import { drawingModeAtom } from '@/store/drawingStore'
 
-const CustomNode = memo(({ data, id }: NodeProps) => {
+const CustomNode = memo(({ data, id, isConnectable }: NodeProps) => {
   const [isEditing, setIsEditing] = useState(false)
   const [label, setLabel] = useState(data.label)
   const setNodes = useSetAtom(nodesAtom)
+  const drawingMode = useAtomValue(drawingModeAtom)
   const isComposingRef = useRef(false)
+  
+  // Check if this node is being connected to
+  const connectionNodeId = useStore((state) => state.connectionNodeId)
   
   // Reset label when not editing and data changes
   if (!isEditing && label !== data.label) {
@@ -60,12 +65,65 @@ const CustomNode = memo(({ data, id }: NodeProps) => {
     [id, setNodes]
   )
 
+  const renderHandles = () => {
+    if (drawingMode === 'draw-line') {
+      // Use a simpler approach with larger invisible handles
+      return (
+        <>
+          {/* Source handle - covers entire node */}
+          <Handle
+            type="source"
+            position={Position.Bottom}
+            id="source"
+            style={{
+              background: 'transparent',
+              border: 'none',
+              width: '100%',
+              height: '100%',
+              top: '0',
+              left: '0',
+              transform: 'none',
+              cursor: 'crosshair',
+              pointerEvents: 'all',
+            }}
+            isConnectable={isConnectable}
+          />
+          {/* Target handle - slightly smaller to allow source to work */}
+          <Handle
+            type="target"
+            position={Position.Top}
+            id="target"
+            style={{
+              background: 'transparent',
+              border: 'none',
+              width: '95%',
+              height: '95%',
+              top: '2.5%',
+              left: '2.5%',
+              transform: 'none',
+              cursor: 'crosshair',
+              pointerEvents: 'all',
+            }}
+            isConnectable={isConnectable}
+          />
+        </>
+      )
+    }
+    return null
+  }
+
   const renderShape = () => {
+    const isConnecting = connectionNodeId === id
     const commonStyle = {
       backgroundColor: '#ffffff',
-      border: '2px solid #374151',
+      border: `2px solid ${isConnecting ? '#3b82f6' : '#374151'}`,
       fontSize: '14px',
       fontWeight: '500' as const,
+      position: 'relative' as const,
+      transition: 'all 0.2s',
+      boxShadow: isConnecting ? '0 0 0 3px rgba(59, 130, 246, 0.3)' : undefined,
+      outline: drawingMode === 'draw-line' ? '2px dashed rgba(59, 130, 246, 0.2)' : 'none',
+      outlineOffset: '4px',
     }
 
     const innerContent = isEditing ? (
@@ -102,9 +160,14 @@ const CustomNode = memo(({ data, id }: NodeProps) => {
             }}
             onContextMenu={handleContextMenu}
           >
-            <Handle type="target" position={Position.Top} />
+            {renderHandles()}
+            {drawingMode !== 'draw-line' && (
+              <>
+                <Handle type="target" position={Position.Top} />
+                <Handle type="source" position={Position.Bottom} />
+              </>
+            )}
             {innerContent}
-            <Handle type="source" position={Position.Bottom} />
           </div>
         )
 
@@ -123,9 +186,14 @@ const CustomNode = memo(({ data, id }: NodeProps) => {
             }}
             onContextMenu={handleContextMenu}
           >
-            <Handle type="target" position={Position.Top} />
+            {renderHandles()}
+            {drawingMode !== 'draw-line' && (
+              <>
+                <Handle type="target" position={Position.Top} />
+                <Handle type="source" position={Position.Bottom} />
+              </>
+            )}
             {innerContent}
-            <Handle type="source" position={Position.Bottom} />
           </div>
         )
 
@@ -144,9 +212,14 @@ const CustomNode = memo(({ data, id }: NodeProps) => {
             }}
             onContextMenu={handleContextMenu}
           >
-            <Handle type="target" position={Position.Top} />
+            {renderHandles()}
+            {drawingMode !== 'draw-line' && (
+              <>
+                <Handle type="target" position={Position.Top} />
+                <Handle type="source" position={Position.Bottom} />
+              </>
+            )}
             {innerContent}
-            <Handle type="source" position={Position.Bottom} />
           </div>
         )
 
@@ -185,9 +258,14 @@ const CustomNode = memo(({ data, id }: NodeProps) => {
                 backgroundColor: '#374151',
               }}
             />
-            <Handle type="target" position={Position.Top} />
+            {renderHandles()}
+            {drawingMode !== 'draw-line' && (
+              <>
+                <Handle type="target" position={Position.Top} />
+                <Handle type="source" position={Position.Bottom} />
+              </>
+            )}
             {innerContent}
-            <Handle type="source" position={Position.Bottom} />
           </div>
         )
 
@@ -207,9 +285,14 @@ const CustomNode = memo(({ data, id }: NodeProps) => {
             }}
             onContextMenu={handleContextMenu}
           >
-            <Handle type="target" position={Position.Top} />
+            {renderHandles()}
+            {drawingMode !== 'draw-line' && (
+              <>
+                <Handle type="target" position={Position.Top} />
+                <Handle type="source" position={Position.Bottom} />
+              </>
+            )}
             {innerContent}
-            <Handle type="source" position={Position.Bottom} />
           </div>
         )
 
@@ -228,9 +311,14 @@ const CustomNode = memo(({ data, id }: NodeProps) => {
             }}
             onContextMenu={handleContextMenu}
           >
-            <Handle type="target" position={Position.Top} />
+            {renderHandles()}
+            {drawingMode !== 'draw-line' && (
+              <>
+                <Handle type="target" position={Position.Top} />
+                <Handle type="source" position={Position.Bottom} />
+              </>
+            )}
             {innerContent}
-            <Handle type="source" position={Position.Bottom} />
           </div>
         )
 
@@ -249,9 +337,14 @@ const CustomNode = memo(({ data, id }: NodeProps) => {
             }}
             onContextMenu={handleContextMenu}
           >
-            <Handle type="target" position={Position.Top} />
+            {renderHandles()}
+            {drawingMode !== 'draw-line' && (
+              <>
+                <Handle type="target" position={Position.Top} />
+                <Handle type="source" position={Position.Bottom} />
+              </>
+            )}
             {innerContent}
-            <Handle type="source" position={Position.Bottom} />
           </div>
         )
 
@@ -269,26 +362,31 @@ const CustomNode = memo(({ data, id }: NodeProps) => {
             }}
             onContextMenu={handleContextMenu}
           >
-            <Handle 
-              type="target" 
-              position={Position.Top}
-              style={{ top: '-5px' }}
-            />
+            {renderHandles()}
+            {drawingMode !== 'draw-line' && (
+              <>
+                <Handle 
+                  type="target" 
+                  position={Position.Top}
+                  style={{ top: '-5px' }}
+                />
+                <Handle 
+                  type="source" 
+                  position={Position.Left}
+                  style={{ left: '-5px' }}
+                  id="source-left"
+                />
+                <Handle 
+                  type="source" 
+                  position={Position.Right}
+                  style={{ right: '-5px' }}
+                  id="source-right"
+                />
+              </>
+            )}
             <div style={{ transform: 'rotate(-45deg)' }}>
               {innerContent}
             </div>
-            <Handle 
-              type="source" 
-              position={Position.Left}
-              style={{ left: '-5px' }}
-              id="source-left"
-            />
-            <Handle 
-              type="source" 
-              position={Position.Right}
-              style={{ right: '-5px' }}
-              id="source-right"
-            />
           </div>
         )
 
@@ -307,9 +405,14 @@ const CustomNode = memo(({ data, id }: NodeProps) => {
             }}
             onContextMenu={handleContextMenu}
           >
-            <Handle type="target" position={Position.Top} />
+            {renderHandles()}
+            {drawingMode !== 'draw-line' && (
+              <>
+                <Handle type="target" position={Position.Top} />
+                <Handle type="source" position={Position.Bottom} />
+              </>
+            )}
             {innerContent}
-            <Handle type="source" position={Position.Bottom} />
           </div>
         )
 
@@ -351,9 +454,14 @@ const CustomNode = memo(({ data, id }: NodeProps) => {
             }}
             onContextMenu={handleContextMenu}
           >
-            <Handle type="target" position={Position.Top} />
+            {renderHandles()}
+            {drawingMode !== 'draw-line' && (
+              <>
+                <Handle type="target" position={Position.Top} />
+                <Handle type="source" position={Position.Bottom} />
+              </>
+            )}
             {innerContent}
-            <Handle type="source" position={Position.Bottom} />
           </div>
         )
 
@@ -373,6 +481,7 @@ const CustomNode = memo(({ data, id }: NodeProps) => {
             }}
             onContextMenu={handleContextMenu}
           >
+            {renderHandles()}
             <div
               style={{
                 position: 'absolute',
@@ -382,11 +491,15 @@ const CustomNode = memo(({ data, id }: NodeProps) => {
                 height: '90px',
               }}
             />
-            <Handle type="target" position={Position.Top} />
+            {drawingMode !== 'draw-line' && (
+              <>
+                <Handle type="target" position={Position.Top} />
+                <Handle type="source" position={Position.Bottom} />
+              </>
+            )}
             <div style={{ fontSize: '14px', fontWeight: '500', zIndex: 1 }}>
               {innerContent}
             </div>
-            <Handle type="source" position={Position.Bottom} />
           </div>
         )
 
@@ -404,9 +517,14 @@ const CustomNode = memo(({ data, id }: NodeProps) => {
             }}
             onContextMenu={handleContextMenu}
           >
-            <Handle type="target" position={Position.Top} />
+            {renderHandles()}
+            {drawingMode !== 'draw-line' && (
+              <>
+                <Handle type="target" position={Position.Top} />
+                <Handle type="source" position={Position.Bottom} />
+              </>
+            )}
             {innerContent}
-            <Handle type="source" position={Position.Bottom} />
           </div>
         )
     }

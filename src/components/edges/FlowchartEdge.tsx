@@ -1,6 +1,9 @@
-import { EdgeProps, getBezierPath, EdgeLabelRenderer, BaseEdge } from 'reactflow'
+import { EdgeProps, getBezierPath, EdgeLabelRenderer, BaseEdge, useNodes } from 'reactflow'
 import { FlowchartEdge as FlowchartEdgeType } from '../../types/diagram'
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
+import { useAtomValue } from 'jotai'
+import { drawingModeAtom } from '../../store/drawingStore'
+import { getEdgeAnchors } from '../../utils/edgeUtils'
 
 export default function FlowchartEdge({
   id,
@@ -12,16 +15,34 @@ export default function FlowchartEdge({
   targetPosition,
   data,
   markerEnd,
+  source,
+  target,
 }: EdgeProps<FlowchartEdgeType['data']>) {
   const [isEditing, setIsEditing] = useState(false)
   const [label, setLabel] = useState(data?.label || '')
+  const drawingMode = useAtomValue(drawingModeAtom)
+  const nodes = useNodes()
+
+  // Calculate custom anchor points if in draw-line mode
+  const [actualSourceX, actualSourceY, actualTargetX, actualTargetY] = useMemo(() => {
+    if (drawingMode === 'draw-line' && source && target) {
+      const sourceNode = nodes.find(n => n.id === source)
+      const targetNode = nodes.find(n => n.id === target)
+      
+      if (sourceNode && targetNode) {
+        const anchors = getEdgeAnchors(sourceNode, targetNode)
+        return [anchors.source.x, anchors.source.y, anchors.target.x, anchors.target.y]
+      }
+    }
+    return [sourceX, sourceY, targetX, targetY]
+  }, [drawingMode, source, target, nodes, sourceX, sourceY, targetX, targetY])
 
   const [edgePath, labelX, labelY] = getBezierPath({
-    sourceX,
-    sourceY,
+    sourceX: actualSourceX,
+    sourceY: actualSourceY,
     sourcePosition,
-    targetX,
-    targetY,
+    targetX: actualTargetX,
+    targetY: actualTargetY,
     targetPosition,
   })
 
