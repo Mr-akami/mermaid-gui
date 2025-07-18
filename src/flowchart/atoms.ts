@@ -1,11 +1,12 @@
-import {
-  atom,
-  nanoid,
-  buildFlowchartCode,
-  Node,
-  Edge,
-  FlowchartData,
-} from './deps'
+import { atom, buildFlowchartCode, Node, Edge, FlowchartData } from './deps'
+
+// Counter atoms for sequential IDs
+const nodeCountersAtom = atom<Record<string, number>>({
+  rectangle: 0,
+  circle: 0,
+  diamond: 0,
+  subgraph: 0,
+})
 
 // Base atoms for nodes and edges
 export const nodesAtom = atom<Node[]>([])
@@ -37,8 +38,26 @@ export const addNodeAtom = atom(
     },
   ) => {
     const nodes = get(nodesAtom)
+    const counters = get(nodeCountersAtom)
+
+    // Generate sequential ID based on node type
+    const typePrefix = {
+      rectangle: 'Rect',
+      circle: 'Circle',
+      diamond: 'Diamond',
+      subgraph: 'Subgraph',
+    }
+    const nextCount = counters[newNode.type] + 1
+    const nodeId = `${typePrefix[newNode.type]}${nextCount}`
+
+    // Update counters
+    set(nodeCountersAtom, {
+      ...counters,
+      [newNode.type]: nextCount,
+    })
+
     const node: Node = {
-      id: nanoid(),
+      id: nodeId,
       type: newNode.type,
       parentId: newNode.parentId,
       childIds: [],
@@ -111,6 +130,9 @@ export const updateNodeAtom = atom(
   },
 )
 
+// Counter atom for edges
+const edgeCounterAtom = atom(0)
+
 // Write atom for adding an edge
 export const addEdgeAtom = atom(
   null,
@@ -125,14 +147,45 @@ export const addEdgeAtom = atom(
     },
   ) => {
     const edges = get(edgesAtom)
+    const edgeCounter = get(edgeCounterAtom)
+    const nextCount = edgeCounter + 1
+
+    set(edgeCounterAtom, nextCount)
+
     const edge: Edge = {
-      id: nanoid(),
+      id: `Edge${nextCount}`,
       source: newEdge.source,
       target: newEdge.target,
       type: newEdge.type,
       ...(newEdge.label && { data: { label: newEdge.label } }),
     }
     set(edgesAtom, [...edges, edge])
+  },
+)
+
+// Write atom for updating an edge
+export const updateEdgeAtom = atom(
+  null,
+  (
+    get,
+    set,
+    update: {
+      id: string
+      data?: { label?: string }
+      type?: Edge['type']
+    },
+  ) => {
+    const edges = get(edgesAtom)
+    const updatedEdges = edges.map((edge) =>
+      edge.id === update.id
+        ? {
+            ...edge,
+            ...(update.data && { data: { ...edge.data, ...update.data } }),
+            ...(update.type && { type: update.type }),
+          }
+        : edge,
+    )
+    set(edgesAtom, updatedEdges)
   },
 )
 

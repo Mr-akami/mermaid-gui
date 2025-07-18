@@ -3,35 +3,30 @@ import {
   editorCodeAtom,
   parseErrorAtom,
   applyCodeToFlowchartAtom,
-  syncWithFlowchartAtom,
+  mermaidCodeAtom,
 } from './atoms'
-import { autoSyncEnabledAtom } from './atoms'
 import { useEffect, useRef } from 'react'
 
 export function CodeEditor() {
   const [editorCode, setEditorCode] = useAtom(editorCodeAtom)
+  const mermaidCode = useAtomValue(mermaidCodeAtom)
   const parseError = useAtomValue(parseErrorAtom)
   const applyCode = useSetAtom(applyCodeToFlowchartAtom)
-  const syncWithFlowchart = useSetAtom(syncWithFlowchartAtom)
-  const autoSyncEnabled = useAtomValue(autoSyncEnabledAtom)
 
   const textareaRef = useRef<HTMLTextAreaElement>(null)
-  const timerRef = useRef<NodeJS.Timeout>()
+  const timerRef = useRef<ReturnType<typeof setTimeout>>()
+  const isUserTyping = useRef(false)
 
-  // Initial sync on mount
+  // Sync from GUI to code when GUI changes
   useEffect(() => {
-    syncWithFlowchart()
-
-    // Cleanup on unmount
-    return () => {
-      if (timerRef.current) {
-        clearTimeout(timerRef.current)
-      }
+    if (!isUserTyping.current) {
+      setEditorCode(mermaidCode)
     }
-  }, [])
+  }, [mermaidCode, setEditorCode])
 
   // Handle code changes
   const handleCodeChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    isUserTyping.current = true
     setEditorCode(e.target.value)
 
     // Clear existing timer
@@ -42,6 +37,7 @@ export function CodeEditor() {
     // Debounce parsing
     timerRef.current = setTimeout(() => {
       applyCode()
+      isUserTyping.current = false
     }, 500)
   }
 
@@ -72,21 +68,6 @@ export function CodeEditor() {
             <div>{parseError}</div>
           </div>
         )}
-      </div>
-
-      <div className="px-4 py-2 bg-gray-800 border-t border-gray-700 flex items-center justify-between">
-        <button
-          onClick={() => applyCode()}
-          className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors"
-        >
-          Apply Changes
-        </button>
-        <button
-          onClick={() => syncWithFlowchart()}
-          className="px-3 py-1 bg-gray-700 text-gray-300 text-sm rounded hover:bg-gray-600 transition-colors"
-        >
-          Sync from Diagram
-        </button>
       </div>
     </div>
   )

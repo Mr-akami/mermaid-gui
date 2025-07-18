@@ -1,4 +1,4 @@
-import type { FlowchartData, Node, Edge, MermaidParseResult } from './deps'
+import type { Node, Edge, MermaidParseResult } from './deps'
 import { nanoid } from './deps'
 import { parseNode } from './nodeParser'
 import { parseEdge } from './edgeParser'
@@ -33,42 +33,37 @@ export function parseFlowchart(code: string): MermaidParseResult {
       }
 
       // Try to parse as node
-      try {
-        const parsedNode = parseNode(line)
-        if (parsedNode) {
-          const node: Node = {
-            id: parsedNode.id,
-            type: parsedNode.type,
-            parentId:
-              subgraphStack.length > 0
-                ? subgraphStack[subgraphStack.length - 1].id
-                : undefined,
-            childIds: [],
-            position: { x: 0, y: 0 }, // Position will be determined by layout engine
-            data: { label: parsedNode.label },
-          }
-
-          nodes.push(node)
-          nodeMap.set(node.id, node)
-
-          // Update parent's childIds
-          if (node.parentId) {
-            const parent = nodeMap.get(node.parentId)
-            if (parent) {
-              parent.childIds.push(node.id)
-            }
-          }
-
-          // If it's a subgraph, add to stack
-          if (node.type === 'subgraph') {
-            subgraphStack.push(node)
-          }
-
-          continue
+      const parsedNode = parseNode(line)
+      if (parsedNode) {
+        const node: Node = {
+          id: parsedNode.id,
+          type: parsedNode.type,
+          parentId:
+            subgraphStack.length > 0
+              ? subgraphStack[subgraphStack.length - 1].id
+              : undefined,
+          childIds: [],
+          position: { x: 0, y: 0 }, // Position will be determined by layout engine
+          data: { label: parsedNode.label },
         }
-      } catch (error) {
-        // Node parsing error, rethrow to be caught by outer try-catch
-        throw error
+
+        nodes.push(node)
+        nodeMap.set(node.id, node)
+
+        // Update parent's childIds
+        if (node.parentId) {
+          const parent = nodeMap.get(node.parentId)
+          if (parent) {
+            parent.childIds.push(node.id)
+          }
+        }
+
+        // If it's a subgraph, add to stack
+        if (node.type === 'subgraph') {
+          subgraphStack.push(node)
+        }
+
+        continue
       }
 
       // Try to parse as edge

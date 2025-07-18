@@ -5,7 +5,7 @@ export { atom } from 'jotai'
 export { parseFlowchart } from '../core/mermaid-parser/index'
 
 // Common types
-export type { MermaidParseResult } from '../common/types/index'
+export type { MermaidParseResult, Node } from '../common/types/index'
 
 // Flowchart atoms
 export {

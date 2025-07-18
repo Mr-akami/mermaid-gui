@@ -1,6 +1,5 @@
 // External dependencies
 export { atom } from 'jotai'
-export { nanoid } from 'nanoid'
 
 // Core dependencies
 export { buildFlowchartCode } from '../core/mermaid-code-builder/index'

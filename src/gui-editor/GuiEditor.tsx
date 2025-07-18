@@ -16,12 +16,18 @@ import {
   updateNodeAtom,
   removeNodeAtom,
   removeEdgeAtom,
+  addNodeAtom,
   FlowchartNode,
   FlowchartEdge,
+  selectedElementAtom,
 } from './deps'
-import { reactFlowNodesAtom, reactFlowEdgesAtom } from './atoms'
+import {
+  reactFlowNodesAtom,
+  reactFlowEdgesAtom,
+  selectedNodeTypeAtom,
+} from './atoms'
 import { Toolbar } from './Toolbar'
-import { useCallback } from 'react'
+import { useCallback, useRef } from 'react'
 
 // Node types configuration
 const nodeTypes = {
@@ -40,6 +46,9 @@ export function GuiEditor() {
   // Get atoms
   const nodes = useAtomValue(reactFlowNodesAtom)
   const edges = useAtomValue(reactFlowEdgesAtom)
+  const selectedNodeType = useAtomValue(selectedNodeTypeAtom)
+  const setSelectedElement = useSetAtom(selectedElementAtom)
+  const addNode = useSetAtom(addNodeAtom)
   const addEdge = useSetAtom(addEdgeAtom)
   const updateNode = useSetAtom(updateNodeAtom)
   const removeNode = useSetAtom(removeNodeAtom)
@@ -48,6 +57,10 @@ export function GuiEditor() {
   // Use ReactFlow hooks for internal state management
   const [, , onNodesChange] = useNodesState(nodes)
   const [, , onEdgesChange] = useEdgesState(edges)
+
+  // Ref for ReactFlow instance
+  const reactFlowWrapper = useRef<HTMLDivElement>(null)
+  const reactFlowInstance = useRef<any>(null)
 
   // Handle node position changes
   const handleNodesChange: OnNodesChange = useCallback(
@@ -98,8 +111,47 @@ export function GuiEditor() {
     [addEdge],
   )
 
+  // Handle canvas click to add nodes
+  const onPaneClick = useCallback(
+    (event: React.MouseEvent) => {
+      if (!reactFlowInstance.current) return
+
+      // Get the position relative to the ReactFlow canvas
+      const bounds = reactFlowWrapper.current?.getBoundingClientRect()
+      if (!bounds) return
+
+      const position = reactFlowInstance.current.project({
+        x: event.clientX - bounds.left,
+        y: event.clientY - bounds.top,
+      })
+
+      addNode({
+        type: selectedNodeType,
+        position,
+        label: `New ${selectedNodeType}`,
+      })
+    },
+    [addNode, selectedNodeType],
+  )
+
+  // Handle node click for selection
+  const onNodeClick = useCallback(
+    (_: React.MouseEvent, node: any) => {
+      setSelectedElement({ id: node.id, type: 'node' })
+    },
+    [setSelectedElement],
+  )
+
+  // Handle edge click for selection
+  const onEdgeClick = useCallback(
+    (_: React.MouseEvent, edge: any) => {
+      setSelectedElement({ id: edge.id, type: 'edge' })
+    },
+    [setSelectedElement],
+  )
+
   return (
-    <div className="h-full relative">
+    <div className="h-full relative" ref={reactFlowWrapper}>
       <Toolbar />
       <ReactFlow
         nodes={nodes}
@@ -107,6 +159,12 @@ export function GuiEditor() {
         onNodesChange={handleNodesChange}
         onEdgesChange={handleEdgesChange}
         onConnect={onConnect}
+        onPaneClick={onPaneClick}
+        onNodeClick={onNodeClick}
+        onEdgeClick={onEdgeClick}
+        onInit={(instance) => {
+          reactFlowInstance.current = instance
+        }}
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
         fitView

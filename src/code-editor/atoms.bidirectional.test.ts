@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { createStore } from 'jotai'
 import { editorCodeAtom, syncWithFlowchartAtom } from './atoms'
-import { nodesAtom, edgesAtom, mermaidCodeAtom, addNodeAtom } from './deps'
+import { nodesAtom, mermaidCodeAtom, addNodeAtom } from './deps'
 import type { Node } from './deps'
 
 describe('bidirectional sync', () => {

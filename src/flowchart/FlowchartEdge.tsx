@@ -19,7 +19,7 @@ interface FlowchartEdgeData {
 
 export const FlowchartEdge = memo(
   ({
-    id,
+    id: _id,
     sourceX,
     sourceY,
     targetX,
@@ -28,7 +28,7 @@ export const FlowchartEdge = memo(
     targetPosition,
     style = {},
     data,
-    markerEnd,
+    markerEnd: _markerEnd,
   }: EdgeProps<FlowchartEdgeData>) => {
     const [edgePath, labelX, labelY] = getBezierPath({
       sourceX,

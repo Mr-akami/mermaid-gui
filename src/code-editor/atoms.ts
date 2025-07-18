@@ -3,9 +3,12 @@ import {
   parseFlowchart,
   nodesAtom,
   edgesAtom,
-  mermaidCodeAtom,
+  mermaidCodeAtom as baseMermaidCodeAtom,
   MermaidParseResult,
 } from './deps'
+
+// Re-export mermaidCodeAtom for use in CodeEditor
+export const mermaidCodeAtom = baseMermaidCodeAtom
 
 // Editor code state
 export const editorCodeAtom = atom<string>('')
@@ -31,8 +34,23 @@ export const applyCodeToFlowchartAtom = atom(null, (get, set) => {
   const parseResult: MermaidParseResult = parseFlowchart(code)
 
   if (parseResult.success && parseResult.data) {
+    // Get existing nodes to preserve positions
+    const existingNodes = get(nodesAtom)
+    const positionMap = new Map(
+      existingNodes.map((node) => [node.id, node.position]),
+    )
+
+    // Update parsed nodes with existing positions
+    const nodesWithPositions = parseResult.data.nodes.map((node) => ({
+      ...node,
+      position: positionMap.get(node.id) || {
+        x: 100 + Math.random() * 400,
+        y: 100 + Math.random() * 300,
+      },
+    }))
+
     // Update flowchart with parsed data
-    set(nodesAtom, parseResult.data.nodes)
+    set(nodesAtom, nodesWithPositions)
     set(edgesAtom, parseResult.data.edges)
     set(parseErrorAtom, null)
   } else {

@@ -1,4 +1,4 @@
-import type { FlowchartData, Node } from './deps'
+import type { FlowchartData } from './deps'
 import { buildNodeCode } from './nodeCodeBuilder'
 import { buildEdgeCode } from './edgeCodeBuilder'
 

@@ -1,4 +1,4 @@
-import { atom, Node, Edge } from './deps'
+import { atom } from './deps'
 
 // Selected element ID
 export const selectedElementIdAtom = atom<string | null>(null)
@@ -14,7 +14,7 @@ export const selectedElementAtom = atom(
 
     return id && type ? { id, type } : null
   },
-  (get, set, value: { id: string; type: 'node' | 'edge' } | null) => {
+  (_get, set, value: { id: string; type: 'node' | 'edge' } | null) => {
     if (value) {
       set(selectedElementIdAtom, value.id)
       set(selectedElementTypeAtom, value.type)

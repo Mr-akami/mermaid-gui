@@ -10,6 +10,11 @@ export function MainLayout() {
       </header>
 
       <div className="flex-1 flex overflow-hidden">
+        {/* Property Panel - Left side */}
+        <div className="w-64 bg-white border-r border-gray-200">
+          <PropertyPanel />
+        </div>
+
         <div className="flex-1 flex">
           {/* GUI Editor Panel */}
           <div className="flex-1 bg-white border-r border-gray-200">
@@ -20,11 +25,6 @@ export function MainLayout() {
           <div className="w-1/3 min-w-[300px] bg-gray-900">
             <CodeEditor />
           </div>
-        </div>
-
-        {/* Property Panel */}
-        <div className="w-64 bg-white border-l border-gray-200">
-          <PropertyPanel />
         </div>
       </div>
     </div>

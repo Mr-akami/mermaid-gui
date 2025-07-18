@@ -1,14 +1,7 @@
-import { Handle, Position } from 'reactflow'
+import { Handle, Position, NodeProps } from 'reactflow'
 import { memo } from 'react'
 
-interface FlowchartNodeProps {
-  data: {
-    label: string
-  }
-  type: 'rectangle' | 'circle' | 'diamond' | 'subgraph'
-}
-
-export const FlowchartNode = memo(({ data, type }: FlowchartNodeProps) => {
+export const FlowchartNode = memo(({ data, type }: NodeProps) => {
   const getNodeContent = () => {
     switch (type) {
       case 'rectangle':
@@ -50,9 +43,19 @@ export const FlowchartNode = memo(({ data, type }: FlowchartNodeProps) => {
 
   return (
     <>
-      <Handle type="target" position={Position.Top} className="w-3 h-3" />
+      <Handle
+        type="target"
+        position={Position.Top}
+        className="w-3 h-3 !bg-green-500 !border-green-700"
+        title="Input"
+      />
       {getNodeContent()}
-      <Handle type="source" position={Position.Bottom} className="w-3 h-3" />
+      <Handle
+        type="source"
+        position={Position.Bottom}
+        className="w-3 h-3 !bg-red-500 !border-red-700"
+        title="Output"
+      />
     </>
   )
 })

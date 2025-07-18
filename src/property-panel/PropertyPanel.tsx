@@ -1,6 +1,6 @@
 import { useAtomValue, useSetAtom, atom } from './deps'
 import { selectedElementAtom } from './atoms'
-import { nodesAtom, edgesAtom, updateNodeAtom } from './deps'
+import { nodesAtom, edgesAtom, updateNodeAtom, updateEdgeAtom } from './deps'
 
 // Computed atom for selected node
 const selectedNodeAtom = atom((get) => {
@@ -28,12 +28,10 @@ export function PropertyPanel() {
   const selectedNode = useAtomValue(selectedNodeAtom)
   const selectedEdge = useAtomValue(selectedEdgeAtom)
   const updateNode = useSetAtom(updateNodeAtom)
+  const updateEdge = useSetAtom(updateEdgeAtom)
 
-  // Derive label from selected element
-  const label = selectedNode?.data.label || selectedEdge?.data?.label || ''
-
-  // Handle label update directly
-  const handleLabelChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Handle node label change
+  const handleNodeLabelChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newLabel = e.target.value
     if (selectedNode) {
       updateNode({
@@ -41,7 +39,17 @@ export function PropertyPanel() {
         data: { label: newLabel },
       })
     }
-    // TODO: Add edge update functionality
+  }
+
+  // Handle edge label change
+  const handleEdgeLabelChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newLabel = e.target.value
+    if (selectedEdge) {
+      updateEdge({
+        id: selectedEdge.id,
+        data: { label: newLabel },
+      })
+    }
   }
 
   return (
@@ -77,8 +85,8 @@ export function PropertyPanel() {
               </label>
               <input
                 type="text"
-                value={label}
-                onChange={handleLabelChange}
+                value={selectedNode.data.label || ''}
+                onChange={handleNodeLabelChange}
                 className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
@@ -108,10 +116,26 @@ export function PropertyPanel() {
         ) : selectedEdge ? (
           <div className="space-y-4">
             <div>
-              <h3 className="text-xs font-medium text-gray-500 uppercase mb-1">
+              <label className="block text-xs font-medium text-gray-500 uppercase mb-1">
                 Edge Type
-              </h3>
-              <p className="text-sm text-gray-900">{selectedEdge.type}</p>
+              </label>
+              <select
+                value={selectedEdge.type}
+                onChange={(e) =>
+                  updateEdge({
+                    id: selectedEdge.id,
+                    type: e.target.value as any,
+                  })
+                }
+                className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="normal">Normal</option>
+                <option value="normal-arrow">Normal with Arrow</option>
+                <option value="thick">Thick</option>
+                <option value="thick-arrow">Thick with Arrow</option>
+                <option value="dotted">Dotted</option>
+                <option value="dotted-arrow">Dotted with Arrow</option>
+              </select>
             </div>
 
             <div>
@@ -129,14 +153,10 @@ export function PropertyPanel() {
               </label>
               <input
                 type="text"
-                value={label}
-                onChange={handleLabelChange}
+                value={selectedEdge.data?.label || ''}
+                onChange={handleEdgeLabelChange}
                 className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                disabled
               />
-              <p className="text-xs text-gray-500 mt-1">
-                Edge label editing coming soon
-              </p>
             </div>
           </div>
         ) : (

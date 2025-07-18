@@ -8,6 +8,7 @@ export {
   removeNodeAtom,
   updateNodeAtom,
   addEdgeAtom,
+  updateEdgeAtom,
   removeEdgeAtom,
 } from './atoms'
 

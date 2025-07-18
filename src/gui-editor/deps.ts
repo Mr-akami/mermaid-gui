@@ -10,14 +10,14 @@ export {
   useNodesState,
   useEdgesState,
   addEdge,
-  Connection,
-  Edge as ReactFlowEdge,
-  Node as ReactFlowNode,
-  NodeTypes,
-  EdgeTypes,
-  OnConnect,
-  OnNodesChange,
-  OnEdgesChange,
+  type Connection,
+  type Edge as ReactFlowEdge,
+  type Node as ReactFlowNode,
+  type NodeTypes,
+  type EdgeTypes,
+  type OnConnect,
+  type OnNodesChange,
+  type OnEdgesChange,
 } from 'reactflow'
 
 // Flowchart components and atoms
@@ -35,6 +35,9 @@ export {
 
 // Common types
 export type { Node, Edge } from '../common/types/index'
+
+// Property panel atoms
+export { selectedElementAtom } from '../property-panel/index'
 
 // Import ReactFlow CSS
 import 'reactflow/dist/style.css'
