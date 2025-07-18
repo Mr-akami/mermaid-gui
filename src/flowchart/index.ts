@@ -15,3 +15,4 @@ export {
 // Export components
 export { FlowchartNode } from './FlowchartNode'
 export { FlowchartEdge } from './FlowchartEdge'
+export { ResizableSubgraph } from './ResizableSubgraph'

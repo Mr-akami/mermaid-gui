@@ -23,6 +23,7 @@ export {
 // Flowchart components and atoms
 export { FlowchartNode } from '../flowchart/index'
 export { FlowchartEdge } from '../flowchart/index'
+export { ResizableSubgraph } from '../flowchart/index'
 export {
   nodesAtom,
   edgesAtom,
@@ -32,6 +33,15 @@ export {
   addEdgeAtom,
   removeEdgeAtom,
 } from '../flowchart/index'
+
+// History atoms and hooks
+export {
+  undoAtom,
+  redoAtom,
+  canUndoAtom,
+  canRedoAtom,
+  useUndoRedo,
+} from '../history/index'
 
 // Common types
 export type { Node, Edge } from '../common/types/index'

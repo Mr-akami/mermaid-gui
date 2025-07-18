@@ -19,6 +19,7 @@ import {
   addNodeAtom,
   FlowchartNode,
   FlowchartEdge,
+  ResizableSubgraph,
   selectedElementAtom,
 } from './deps'
 import {
@@ -34,7 +35,7 @@ const nodeTypes = {
   rectangle: FlowchartNode,
   circle: FlowchartNode,
   diamond: FlowchartNode,
-  subgraph: FlowchartNode,
+  subgraph: ResizableSubgraph,
 }
 
 // Edge types configuration
@@ -150,8 +151,22 @@ export function GuiEditor() {
     [setSelectedElement],
   )
 
+  // Handle right click on nodes
+  const onNodeContextMenu = useCallback(
+    (event: React.MouseEvent, node: any) => {
+      event.preventDefault()
+      setSelectedElement({ id: node.id, type: 'node' })
+      // TODO: Show context menu for z-order
+    },
+    [setSelectedElement],
+  )
+
   return (
-    <div className="h-full relative" ref={reactFlowWrapper}>
+    <div
+      className="h-full relative"
+      ref={reactFlowWrapper}
+      onContextMenu={(e) => e.preventDefault()}
+    >
       <Toolbar />
       <ReactFlow
         nodes={nodes}
@@ -162,6 +177,7 @@ export function GuiEditor() {
         onPaneClick={onPaneClick}
         onNodeClick={onNodeClick}
         onEdgeClick={onEdgeClick}
+        onNodeContextMenu={onNodeContextMenu}
         onInit={(instance) => {
           reactFlowInstance.current = instance
         }}

@@ -44,16 +44,17 @@ export const FlowchartEdge = memo(
     // Determine edge styling based on type
     const getEdgeStyle = () => {
       const baseStyle = { ...style }
+      const hasArrow = edgeType.includes('arrow')
 
       switch (edgeType) {
         case 'normal':
           return { ...baseStyle, strokeWidth: 2 }
         case 'normal-arrow':
-          return { ...baseStyle, strokeWidth: 2, markerEnd: 'url(#arrowhead)' }
+          return { ...baseStyle, strokeWidth: 2 }
         case 'thick':
           return { ...baseStyle, strokeWidth: 4 }
         case 'thick-arrow':
-          return { ...baseStyle, strokeWidth: 4, markerEnd: 'url(#arrowhead)' }
+          return { ...baseStyle, strokeWidth: 4 }
         case 'dotted':
           return { ...baseStyle, strokeWidth: 2, strokeDasharray: '5,5' }
         case 'dotted-arrow':
@@ -61,29 +62,22 @@ export const FlowchartEdge = memo(
             ...baseStyle,
             strokeWidth: 2,
             strokeDasharray: '5,5',
-            markerEnd: 'url(#arrowhead)',
           }
         default:
           return baseStyle
       }
     }
 
+    const hasArrow = edgeType.includes('arrow')
+    const edgeStyle = getEdgeStyle()
+
     return (
       <>
-        <defs>
-          <marker
-            id="arrowhead"
-            markerWidth="10"
-            markerHeight="10"
-            refX="9"
-            refY="3"
-            orient="auto"
-            markerUnits="strokeWidth"
-          >
-            <path d="M0,0 L0,6 L9,3 z" fill="#b1b1b7" />
-          </marker>
-        </defs>
-        <BaseEdge path={edgePath} style={getEdgeStyle()} />
+        <BaseEdge
+          path={edgePath}
+          style={edgeStyle}
+          markerEnd={hasArrow ? 'url(#react-flow__arrowclosed)' : undefined}
+        />
         {data?.label && (
           <EdgeLabelRenderer>
             <div

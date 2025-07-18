@@ -1,4 +1,11 @@
-import { atom, buildFlowchartCode, Node, Edge, FlowchartData } from './deps'
+import {
+  atom,
+  buildFlowchartCode,
+  Node,
+  Edge,
+  FlowchartData,
+  saveToHistoryAtom,
+} from './deps'
 
 // Counter atoms for sequential IDs
 const nodeCountersAtom = atom<Record<string, number>>({
@@ -76,6 +83,9 @@ export const addNodeAtom = atom(
     } else {
       set(nodesAtom, [...nodes, node])
     }
+
+    // Save to history
+    set(saveToHistoryAtom)
   },
 )
 
@@ -102,6 +112,7 @@ export const removeNodeAtom = atom(null, (get, set, nodeId: string) => {
 
   set(nodesAtom, filteredNodes)
   set(edgesAtom, filteredEdges)
+  set(saveToHistoryAtom)
 })
 
 // Write atom for updating a node

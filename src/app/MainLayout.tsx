@@ -1,6 +1,20 @@
-import { GuiEditor, CodeEditor, PropertyPanel } from './deps'
+import {
+  GuiEditor,
+  CodeEditor,
+  PropertyPanel,
+  useSetAtom,
+  useEffect,
+  initializeHistoryAtom,
+} from './deps'
 
 export function MainLayout() {
+  const initializeHistory = useSetAtom(initializeHistoryAtom)
+
+  // Initialize history on mount
+  useEffect(() => {
+    initializeHistory()
+  }, [initializeHistory])
+
   return (
     <div className="h-screen flex flex-col bg-gray-50">
       <header className="h-12 bg-white border-b border-gray-200 flex items-center px-4">
