@@ -41,22 +41,70 @@ export const FlowchartNode = memo(({ data, type }: NodeProps) => {
     }
   }
 
-  // For circle and diamond, we need special handle positioning
+  // For circle, position handles on the circle boundary
   if (type === 'circle') {
     return (
       <>
         <div className="relative">
+          {/* Top handles */}
           <Handle
+            id="target-top"
             type="target"
             position={Position.Top}
             className="w-3 h-3"
-            style={{ left: '50%', top: '0' }}
+            style={{ left: '50%', top: '-5px' }}
           />
           <Handle
+            id="source-top"
+            type="source"
+            position={Position.Top}
+            className="w-3 h-3"
+            style={{ left: '50%', top: '-5px' }}
+          />
+          {/* Right handles */}
+          <Handle
+            id="target-right"
+            type="target"
+            position={Position.Right}
+            className="w-3 h-3"
+            style={{ right: '-5px', top: '50%' }}
+          />
+          <Handle
+            id="source-right"
+            type="source"
+            position={Position.Right}
+            className="w-3 h-3"
+            style={{ right: '-5px', top: '50%' }}
+          />
+          {/* Bottom handles */}
+          <Handle
+            id="target-bottom"
+            type="target"
+            position={Position.Bottom}
+            className="w-3 h-3"
+            style={{ left: '50%', bottom: '-5px' }}
+          />
+          <Handle
+            id="source-bottom"
             type="source"
             position={Position.Bottom}
             className="w-3 h-3"
-            style={{ left: '50%', bottom: '0' }}
+            style={{ left: '50%', bottom: '-5px' }}
+          />
+          {/* Left handles */}
+          <Handle
+            id="target-left"
+            type="target"
+            position={Position.Left}
+            className="w-3 h-3"
+            style={{ left: '-5px', top: '50%' }}
+          />
+          <Handle
+            id="source-left"
+            type="source"
+            position={Position.Left}
+            className="w-3 h-3"
+            style={{ left: '-5px', top: '50%' }}
           />
           {getNodeContent()}
         </div>
@@ -65,21 +113,143 @@ export const FlowchartNode = memo(({ data, type }: NodeProps) => {
   }
 
   if (type === 'diamond') {
+    // Diamond is 80x80 rotated 45 degrees
+    // Calculate positions for 8 handles (4 vertices + 4 edge midpoints)
+    const size = 80
+    const halfSize = size / 2
+    const offset = 5 // Handle offset from edge
+    
     return (
       <>
         <div className="relative">
+          {/* Top vertex (actually top corner when rotated) */}
           <Handle
+            id="target-top"
             type="target"
             position={Position.Top}
             className="w-3 h-3"
-            style={{ left: '50%', top: '10px' }}
+            style={{ left: '50%', top: `-${offset}px` }}
           />
           <Handle
+            id="source-top"
+            type="source"
+            position={Position.Top}
+            className="w-3 h-3"
+            style={{ left: '50%', top: `-${offset}px` }}
+          />
+          
+          {/* Top-right edge midpoint - offset perpendicular to edge */}
+          <Handle
+            id="target-topright"
+            type="target"
+            position={Position.Top}
+            className="w-3 h-3"
+            style={{ left: `${halfSize * 1.5 + offset/Math.sqrt(2)}px`, top: `${halfSize/2 - offset/Math.sqrt(2)}px` }}
+          />
+          <Handle
+            id="source-topright"
+            type="source"
+            position={Position.Top}
+            className="w-3 h-3"
+            style={{ left: `${halfSize * 1.5 + offset/Math.sqrt(2)}px`, top: `${halfSize/2 - offset/Math.sqrt(2)}px` }}
+          />
+          
+          {/* Right vertex */}
+          <Handle
+            id="target-right"
+            type="target"
+            position={Position.Right}
+            className="w-3 h-3"
+            style={{ right: `-${offset}px`, top: '50%' }}
+          />
+          <Handle
+            id="source-right"
+            type="source"
+            position={Position.Right}
+            className="w-3 h-3"
+            style={{ right: `-${offset}px`, top: '50%' }}
+          />
+          
+          {/* Bottom-right edge midpoint - offset perpendicular to edge */}
+          <Handle
+            id="target-bottomright"
+            type="target"
+            position={Position.Right}
+            className="w-3 h-3"
+            style={{ right: `${halfSize/2 - offset/Math.sqrt(2)}px`, bottom: `${halfSize/2 - offset/Math.sqrt(2)}px` }}
+          />
+          <Handle
+            id="source-bottomright"
+            type="source"
+            position={Position.Right}
+            className="w-3 h-3"
+            style={{ right: `${halfSize/2 - offset/Math.sqrt(2)}px`, bottom: `${halfSize/2 - offset/Math.sqrt(2)}px` }}
+          />
+          
+          {/* Bottom vertex */}
+          <Handle
+            id="target-bottom"
+            type="target"
+            position={Position.Bottom}
+            className="w-3 h-3"
+            style={{ left: '50%', bottom: `-${offset}px` }}
+          />
+          <Handle
+            id="source-bottom"
             type="source"
             position={Position.Bottom}
             className="w-3 h-3"
-            style={{ left: '50%', bottom: '10px' }}
+            style={{ left: '50%', bottom: `-${offset}px` }}
           />
+          
+          {/* Bottom-left edge midpoint - offset perpendicular to edge */}
+          <Handle
+            id="target-bottomleft"
+            type="target"
+            position={Position.Bottom}
+            className="w-3 h-3"
+            style={{ left: `${halfSize/2 - offset/Math.sqrt(2)}px`, bottom: `${halfSize/2 - offset/Math.sqrt(2)}px` }}
+          />
+          <Handle
+            id="source-bottomleft"
+            type="source"
+            position={Position.Bottom}
+            className="w-3 h-3"
+            style={{ left: `${halfSize/2 - offset/Math.sqrt(2)}px`, bottom: `${halfSize/2 - offset/Math.sqrt(2)}px` }}
+          />
+          
+          {/* Left vertex */}
+          <Handle
+            id="target-left"
+            type="target"
+            position={Position.Left}
+            className="w-3 h-3"
+            style={{ left: `-${offset}px`, top: '50%' }}
+          />
+          <Handle
+            id="source-left"
+            type="source"
+            position={Position.Left}
+            className="w-3 h-3"
+            style={{ left: `-${offset}px`, top: '50%' }}
+          />
+          
+          {/* Top-left edge midpoint - offset perpendicular to edge */}
+          <Handle
+            id="target-topleft"
+            type="target"
+            position={Position.Left}
+            className="w-3 h-3"
+            style={{ left: `${halfSize/2 - offset/Math.sqrt(2)}px`, top: `${halfSize/2 - offset/Math.sqrt(2)}px` }}
+          />
+          <Handle
+            id="source-topleft"
+            type="source"
+            position={Position.Left}
+            className="w-3 h-3"
+            style={{ left: `${halfSize/2 - offset/Math.sqrt(2)}px`, top: `${halfSize/2 - offset/Math.sqrt(2)}px` }}
+          />
+          
           {getNodeContent()}
         </div>
       </>
@@ -89,14 +259,56 @@ export const FlowchartNode = memo(({ data, type }: NodeProps) => {
   // Default for rectangle - wrap in relative div for consistent structure
   return (
     <div className="relative">
+      {/* Top handles */}
       <Handle
+        id="target-top"
         type="target"
         position={Position.Top}
         className="w-3 h-3"
       />
       <Handle
+        id="source-top"
+        type="source"
+        position={Position.Top}
+        className="w-3 h-3"
+      />
+      {/* Right handles */}
+      <Handle
+        id="target-right"
+        type="target"
+        position={Position.Right}
+        className="w-3 h-3"
+      />
+      <Handle
+        id="source-right"
+        type="source"
+        position={Position.Right}
+        className="w-3 h-3"
+      />
+      {/* Bottom handles */}
+      <Handle
+        id="target-bottom"
+        type="target"
+        position={Position.Bottom}
+        className="w-3 h-3"
+      />
+      <Handle
+        id="source-bottom"
         type="source"
         position={Position.Bottom}
+        className="w-3 h-3"
+      />
+      {/* Left handles */}
+      <Handle
+        id="target-left"
+        type="target"
+        position={Position.Left}
+        className="w-3 h-3"
+      />
+      <Handle
+        id="source-left"
+        type="source"
+        position={Position.Left}
         className="w-3 h-3"
       />
       {getNodeContent()}

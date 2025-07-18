@@ -21,6 +21,7 @@ import {
   FlowchartEdge,
   ResizableSubgraph,
   selectedElementAtom,
+  setNodeParentAtom,
 } from './deps'
 import {
   reactFlowNodesAtom,
@@ -28,7 +29,7 @@ import {
   selectedNodeTypeAtom,
 } from './atoms'
 import { Toolbar } from './Toolbar'
-import { useCallback, useRef, useEffect } from 'react'
+import { useCallback, useRef, useEffect, useState } from 'react'
 import './GuiEditor.css'
 
 // Node types configuration
@@ -55,6 +56,7 @@ export function GuiEditor() {
   const updateNode = useSetAtom(updateNodeAtom)
   const removeNode = useSetAtom(removeNodeAtom)
   const removeEdge = useSetAtom(removeEdgeAtom)
+  const setNodeParent = useSetAtom(setNodeParentAtom)
 
   // Use React Flow's state management
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes)
@@ -63,6 +65,10 @@ export function GuiEditor() {
   // Ref for ReactFlow instance
   const reactFlowWrapper = useRef<HTMLDivElement>(null)
   const reactFlowInstance = useRef<any>(null)
+  
+  // State for drag-drop
+  const [draggedNodeId, setDraggedNodeId] = useState<string | null>(null)
+  const [dropTargetId, setDropTargetId] = useState<string | null>(null)
 
   // Sync React Flow state changes with Jotai atoms
   const handleNodesChange: OnNodesChange = useCallback(
@@ -223,17 +229,88 @@ export function GuiEditor() {
     [setSelectedElement],
   )
 
-  // Handle drag stop to maintain selection
-  const onNodeDragStop = useCallback(
+  // Handle node drag start
+  const onNodeDragStart = useCallback(
     (_event: React.MouseEvent, node: any) => {
-      // Find the node in the current nodes array and ensure it's still selected
-      setNodes((nds) => 
-        nds.map((n) => 
-          n.id === node.id ? { ...n, selected: true } : n
+      setDraggedNodeId(node.id)
+    },
+    [],
+  )
+
+  // Handle node drag
+  const onNodeDrag = useCallback(
+    (_event: React.MouseEvent, node: any) => {
+      if (!draggedNodeId) return
+
+      // Find potential drop targets (subgraphs)
+      const potentialTarget = nodes.find(n => {
+        if (n.type !== 'subgraph' || n.id === draggedNodeId) return false
+        
+        // Check if the dragged node is within the bounds of the subgraph
+        const subgraphBounds = {
+          x: n.position.x,
+          y: n.position.y,
+          width: n.width || 600,
+          height: n.height || 200,
+        }
+        
+        const nodeBounds = {
+          x: node.position.x,
+          y: node.position.y,
+          width: node.width || 150,
+          height: node.height || 50,
+        }
+        
+        // Check if node center is within subgraph bounds
+        const nodeCenterX = nodeBounds.x + nodeBounds.width / 2
+        const nodeCenterY = nodeBounds.y + nodeBounds.height / 2
+        
+        return (
+          nodeCenterX >= subgraphBounds.x &&
+          nodeCenterX <= subgraphBounds.x + subgraphBounds.width &&
+          nodeCenterY >= subgraphBounds.y &&
+          nodeCenterY <= subgraphBounds.y + subgraphBounds.height
         )
+      })
+      
+      setDropTargetId(potentialTarget?.id || null)
+      
+      // Update visual feedback for drop target
+      setNodes((nds) =>
+        nds.map((n) => ({
+          ...n,
+          className: n.id === potentialTarget?.id ? 'drop-target' : '',
+        }))
       )
     },
-    [setNodes],
+    [draggedNodeId, nodes, setNodes],
+  )
+
+  // Handle drag stop to maintain selection and handle parent-child relationship
+  const onNodeDragStop = useCallback(
+    (_event: React.MouseEvent, node: any) => {
+      // Handle parent-child relationship
+      if (draggedNodeId && dropTargetId && draggedNodeId !== dropTargetId) {
+        setNodeParent({ nodeId: draggedNodeId, parentId: dropTargetId })
+      } else if (draggedNodeId && !dropTargetId) {
+        // Remove parent if dragged outside any subgraph
+        setNodeParent({ nodeId: draggedNodeId, parentId: null })
+      }
+      
+      // Clear drop target styling
+      setNodes((nds) =>
+        nds.map((n) => ({
+          ...n,
+          className: '',
+          selected: n.id === node.id ? true : n.selected,
+        }))
+      )
+      
+      // Clear drag state
+      setDraggedNodeId(null)
+      setDropTargetId(null)
+    },
+    [draggedNodeId, dropTargetId, setNodes, setNodeParent],
   )
 
   // Sync Jotai atom changes to React Flow state
@@ -263,6 +340,8 @@ export function GuiEditor() {
         onNodeClick={onNodeClick}
         onEdgeClick={onEdgeClick}
         onNodeContextMenu={onNodeContextMenu}
+        onNodeDragStart={onNodeDragStart}
+        onNodeDrag={onNodeDrag}
         onNodeDragStop={onNodeDragStop}
         onInit={(instance) => {
           reactFlowInstance.current = instance
@@ -277,11 +356,76 @@ export function GuiEditor() {
         <Controls />
         <MiniMap />
         <Background variant={BackgroundVariant.Dots} gap={12} size={1} />
-        {/* Define arrow markers */}
+        {/* Define arrow markers for all directions */}
         <svg style={{ position: 'absolute', width: 0, height: 0 }}>
           <defs>
+            {/* Default/Down arrow */}
             <marker
               id="react-flow__arrow-closed"
+              viewBox="0 0 20 20"
+              refX="20"
+              refY="10"
+              markerWidth="10"
+              markerHeight="10"
+              orient="auto"
+            >
+              <path
+                d="M 0 0 L 20 10 L 0 20 z"
+                fill="#333"
+                stroke="#333"
+              />
+            </marker>
+            {/* Down arrow */}
+            <marker
+              id="react-flow__arrow-down"
+              viewBox="0 0 20 20"
+              refX="20"
+              refY="10"
+              markerWidth="10"
+              markerHeight="10"
+              orient="auto"
+            >
+              <path
+                d="M 0 0 L 20 10 L 0 20 z"
+                fill="#333"
+                stroke="#333"
+              />
+            </marker>
+            {/* Up arrow */}
+            <marker
+              id="react-flow__arrow-up"
+              viewBox="0 0 20 20"
+              refX="20"
+              refY="10"
+              markerWidth="10"
+              markerHeight="10"
+              orient="auto"
+            >
+              <path
+                d="M 0 0 L 20 10 L 0 20 z"
+                fill="#333"
+                stroke="#333"
+              />
+            </marker>
+            {/* Right arrow */}
+            <marker
+              id="react-flow__arrow-right"
+              viewBox="0 0 20 20"
+              refX="20"
+              refY="10"
+              markerWidth="10"
+              markerHeight="10"
+              orient="auto"
+            >
+              <path
+                d="M 0 0 L 20 10 L 0 20 z"
+                fill="#333"
+                stroke="#333"
+              />
+            </marker>
+            {/* Left arrow */}
+            <marker
+              id="react-flow__arrow-left"
               viewBox="0 0 20 20"
               refX="20"
               refY="10"

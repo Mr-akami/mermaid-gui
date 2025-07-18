@@ -37,19 +37,57 @@ export const ResizableSubgraph = memo(({ data, selected, id }: NodeProps) => {
           setIsResizing(false)
         }}
       />
-      {/* Standard connection handles */}
+      {/* Bidirectional connection handles on all sides */}
       <Handle
+        id="target-top"
         type="target"
         position={Position.Top}
         className="w-3 h-3"
       />
       <Handle
+        id="source-top"
+        type="source"
+        position={Position.Top}
+        className="w-3 h-3"
+      />
+      <Handle
+        id="target-right"
+        type="target"
+        position={Position.Right}
+        className="w-3 h-3"
+      />
+      <Handle
+        id="source-right"
+        type="source"
+        position={Position.Right}
+        className="w-3 h-3"
+      />
+      <Handle
+        id="target-bottom"
+        type="target"
+        position={Position.Bottom}
+        className="w-3 h-3"
+      />
+      <Handle
+        id="source-bottom"
         type="source"
         position={Position.Bottom}
         className="w-3 h-3"
       />
+      <Handle
+        id="target-left"
+        type="target"
+        position={Position.Left}
+        className="w-3 h-3"
+      />
+      <Handle
+        id="source-left"
+        type="source"
+        position={Position.Left}
+        className="w-3 h-3"
+      />
       <div 
-        className="px-4 py-2 bg-purple-100 border-2 border-purple-500 border-dashed rounded-lg"
+        className="px-4 py-2 bg-purple-100/20 border-2 border-purple-500 border-dashed rounded-lg"
         style={{ width: '100%', height: '100%' }}
       >
         <div className="text-sm font-medium text-gray-900">

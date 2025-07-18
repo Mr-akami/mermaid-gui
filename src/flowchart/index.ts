@@ -7,6 +7,7 @@ export {
   addNodeAtom,
   removeNodeAtom,
   updateNodeAtom,
+  setNodeParentAtom,
   addEdgeAtom,
   updateEdgeAtom,
   removeEdgeAtom,

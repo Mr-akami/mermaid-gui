@@ -1,6 +1,6 @@
 import { useAtomValue, useSetAtom, atom } from './deps'
 import { selectedElementAtom } from './atoms'
-import { nodesAtom, edgesAtom, updateNodeAtom, updateEdgeAtom } from './deps'
+import { nodesAtom, edgesAtom, updateNodeAtom, updateEdgeAtom, setNodeParentAtom } from './deps'
 
 // Computed atom for selected node
 const selectedNodeAtom = atom((get) => {
@@ -27,8 +27,10 @@ const selectedEdgeAtom = atom((get) => {
 export function PropertyPanel() {
   const selectedNode = useAtomValue(selectedNodeAtom)
   const selectedEdge = useAtomValue(selectedEdgeAtom)
+  const nodes = useAtomValue(nodesAtom)
   const updateNode = useSetAtom(updateNodeAtom)
   const updateEdge = useSetAtom(updateEdgeAtom)
+  const setNodeParent = useSetAtom(setNodeParentAtom)
 
   // Handle node label change
   const handleNodeLabelChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -91,16 +93,28 @@ export function PropertyPanel() {
               />
             </div>
 
-            {selectedNode.parentId && (
-              <div>
-                <h3 className="text-xs font-medium text-gray-500 uppercase mb-1">
-                  Parent
-                </h3>
-                <p className="text-sm text-gray-900 font-mono">
-                  {selectedNode.parentId}
-                </p>
-              </div>
-            )}
+            <div>
+              <label className="block text-xs font-medium text-gray-500 uppercase mb-1">
+                Parent
+              </label>
+              <select
+                value={selectedNode.parentId || ''}
+                onChange={(e) => {
+                  const newParentId = e.target.value || null
+                  setNodeParent({ nodeId: selectedNode.id, parentId: newParentId })
+                }}
+                className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">None</option>
+                {nodes
+                  .filter(n => n.type === 'subgraph' && n.id !== selectedNode.id)
+                  .map(n => (
+                    <option key={n.id} value={n.id}>
+                      {n.id} - {n.data.label}
+                    </option>
+                  ))}
+              </select>
+            </div>
 
             {selectedNode.childIds.length > 0 && (
               <div>

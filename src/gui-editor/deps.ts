@@ -31,6 +31,7 @@ export {
   addNodeAtom,
   updateNodeAtom,
   removeNodeAtom,
+  setNodeParentAtom,
   addEdgeAtom,
   removeEdgeAtom,
 } from '../flowchart/index'

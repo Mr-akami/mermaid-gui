@@ -17,6 +17,27 @@ interface FlowchartEdgeData {
   label?: string
 }
 
+// Calculate arrow angle based on source and target positions
+const calculateArrowAngle = (sourceX: number, sourceY: number, targetX: number, targetY: number) => {
+  const dx = targetX - sourceX
+  const dy = targetY - sourceY
+  const angle = Math.atan2(dy, dx) * (180 / Math.PI)
+  
+  // Normalize angle to 0-360 range
+  const normalizedAngle = (angle + 360) % 360
+  
+  // Determine which arrow marker to use based on direction
+  if (normalizedAngle >= 315 || normalizedAngle < 45) {
+    return 'arrow-right'
+  } else if (normalizedAngle >= 45 && normalizedAngle < 135) {
+    return 'arrow-down'
+  } else if (normalizedAngle >= 135 && normalizedAngle < 225) {
+    return 'arrow-left'
+  } else {
+    return 'arrow-up'
+  }
+}
+
 export const FlowchartEdge = memo(
   ({
     id: _id,
@@ -69,13 +90,16 @@ export const FlowchartEdge = memo(
 
     const hasArrow = edgeType.includes('arrow')
     const edgeStyle = getEdgeStyle()
+    
+    // Calculate arrow direction
+    const arrowDirection = hasArrow ? calculateArrowAngle(sourceX, sourceY, targetX, targetY) : null
 
     return (
       <>
         <BaseEdge
           path={edgePath}
           style={edgeStyle}
-          markerEnd={hasArrow ? 'url(#react-flow__arrow-closed)' : undefined}
+          markerEnd={hasArrow ? `url(#react-flow__${arrowDirection})` : undefined}
         />
         {data?.label && (
           <EdgeLabelRenderer>

@@ -36,7 +36,7 @@ describe('FlowchartNode - Selection Outline', () => {
     
     // Check that the content div is properly positioned within the node
     const handles = container.querySelectorAll('.react-flow__handle')
-    expect(handles.length).toBe(2) // top and bottom handles
+    expect(handles.length).toBe(8) // 4 positions × 2 types (source and target)
   })
 
   it('should render rectangle node with proper structure', () => {

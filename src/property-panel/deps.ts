@@ -8,6 +8,7 @@ export {
   edgesAtom,
   updateNodeAtom,
   updateEdgeAtom,
+  setNodeParentAtom,
 } from '../flowchart/index'
 
 // Common types

@@ -153,6 +153,86 @@ export const updateNodeAtom = atom(
   },
 )
 
+// Write atom for setting a node's parent
+export const setNodeParentAtom = atom(
+  null,
+  (get, set, { nodeId, parentId }: { nodeId: string; parentId: string | null }) => {
+    const nodes = get(nodesAtom)
+    
+    // Find the node to update
+    const nodeToUpdate = nodes.find(n => n.id === nodeId)
+    if (!nodeToUpdate) return
+    
+    // Don't allow a node to be its own parent
+    if (nodeId === parentId) return
+    
+    // Don't allow subgraph to be child of another node
+    if (nodeToUpdate.type === 'subgraph' && parentId) {
+      // Check if the parent is also a subgraph
+      const parentNode = nodes.find(n => n.id === parentId)
+      if (parentNode && parentNode.type !== 'subgraph') {
+        return
+      }
+    }
+    
+    // Calculate position adjustment
+    let positionUpdate = { ...nodeToUpdate.position }
+    
+    // When adding to a parent, convert to relative position
+    if (parentId) {
+      const newParent = nodes.find(n => n.id === parentId)
+      if (newParent) {
+        positionUpdate = {
+          x: nodeToUpdate.position.x - newParent.position.x,
+          y: nodeToUpdate.position.y - newParent.position.y
+        }
+      }
+    }
+    
+    // When removing from a parent, convert to absolute position
+    const oldParentId = nodeToUpdate.parentId
+    if (oldParentId && !parentId) {
+      const oldParent = nodes.find(n => n.id === oldParentId)
+      if (oldParent) {
+        positionUpdate = {
+          x: nodeToUpdate.position.x + oldParent.position.x,
+          y: nodeToUpdate.position.y + oldParent.position.y
+        }
+      }
+    }
+    
+    // Remove from old parent if exists
+    let updatedNodes = nodes
+    
+    if (oldParentId) {
+      updatedNodes = updatedNodes.map(n => 
+        n.id === oldParentId 
+          ? { ...n, childIds: n.childIds.filter(id => id !== nodeId) }
+          : n
+      )
+    }
+    
+    // Add to new parent if provided
+    if (parentId) {
+      updatedNodes = updatedNodes.map(n => 
+        n.id === parentId 
+          ? { ...n, childIds: [...n.childIds, nodeId] }
+          : n
+      )
+    }
+    
+    // Update the node's parentId and position
+    updatedNodes = updatedNodes.map(n => 
+      n.id === nodeId 
+        ? { ...n, parentId: parentId || undefined, position: positionUpdate }
+        : n
+    )
+    
+    set(nodesAtom, updatedNodes)
+    set(saveToHistoryAtom)
+  }
+)
+
 // Counter atom for edges
 const edgeCounterAtom = atom(0)
 

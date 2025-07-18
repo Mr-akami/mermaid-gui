@@ -59,13 +59,25 @@ describe('ResizableSubgraph', () => {
       wrapper: Wrapper,
     })
     const handles = container.querySelectorAll('.react-flow__handle')
-    expect(handles.length).toBe(2)
+    expect(handles.length).toBe(8) // 4 positions × 2 types
 
-    const targetHandle = container.querySelector('.react-flow__handle-top')
-    const sourceHandle = container.querySelector('.react-flow__handle-bottom')
-
-    expect(targetHandle).toBeTruthy()
-    expect(sourceHandle).toBeTruthy()
+    // Check all four sides have handles
+    const topHandle = container.querySelector('.react-flow__handle-top')
+    const rightHandle = container.querySelector('.react-flow__handle-right')
+    const bottomHandle = container.querySelector('.react-flow__handle-bottom')
+    const leftHandle = container.querySelector('.react-flow__handle-left')
+    
+    expect(topHandle).toBeTruthy()
+    expect(rightHandle).toBeTruthy()
+    expect(bottomHandle).toBeTruthy()
+    expect(leftHandle).toBeTruthy()
+    
+    // Each handle should be either source or target
+    handles.forEach(handle => {
+      const isSource = handle.classList.contains('source')
+      const isTarget = handle.classList.contains('target')
+      expect(isSource || isTarget).toBe(true)
+    })
   })
 })
 
