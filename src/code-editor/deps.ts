@@ -1,11 +1,16 @@
 // External dependencies
-export { atom } from 'jotai';
+export { atom } from 'jotai'
 
 // Core dependencies
-export { parseFlowchart } from '../core/mermaid-parser/index';
+export { parseFlowchart } from '../core/mermaid-parser/index'
 
 // Common types
-export type { MermaidParseResult } from '../common/types/index';
+export type { MermaidParseResult } from '../common/types/index'
 
 // Flowchart atoms
-export { nodesAtom, edgesAtom, mermaidCodeAtom } from '../flowchart/index';
+export {
+  nodesAtom,
+  edgesAtom,
+  mermaidCodeAtom,
+  addNodeAtom,
+} from '../flowchart/index'

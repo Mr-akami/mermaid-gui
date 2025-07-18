@@ -40,15 +40,12 @@
       "Bash(npx:*)",
       "mcp__playwright__browser_install",
       "Bash(curl:*)",
-      "Bash(mv:*)"
+      "Bash(mv:*)",
+      "Bash(pnpm format:*)"
     ],
     "deny": []
   },
   "enableAllProjectMcpServers": true,
-  "enabledMcpjsonServers": [
-    "github",
-    "readability",
-    "playwright"
-  ],
+  "enabledMcpjsonServers": ["github", "readability", "playwright", "context7"],
   "disabledMcpjsonServers": []
 }

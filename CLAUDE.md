@@ -156,3 +156,10 @@ Use context7 via mcp. Before you use library first in a session, you should use 
 ### Comment rule
 
 Use English
+
+## React Best Practices
+
+### useEffect Usage
+- **Only use useEffect for mount/unmount operations**
+- For all other state synchronization, use Jotai atoms
+- This prevents unnecessary re-renders and maintains cleaner state management

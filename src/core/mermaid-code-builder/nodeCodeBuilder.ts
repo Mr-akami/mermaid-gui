@@ -1,20 +1,20 @@
-import type { Node } from './deps';
+import type { Node } from './deps'
 
 export function buildNodeCode(node: Node): string {
-  const label = node.data.label || ' ';
-  const escapedLabel = escapeLabel(label);
+  const label = node.data.label || ' '
+  const escapedLabel = escapeLabel(label)
 
   switch (node.type) {
     case 'rectangle':
-      return `${node.id}[${escapedLabel}]`;
+      return `${node.id}[${escapedLabel}]`
     case 'circle':
-      return `${node.id}((${escapedLabel}))`;
+      return `${node.id}((${escapedLabel}))`
     case 'diamond':
-      return `${node.id}{${escapedLabel}}`;
+      return `${node.id}{${escapedLabel}}`
     case 'subgraph':
-      return `subgraph ${node.id} [${escapedLabel}]`;
+      return `subgraph ${node.id} [${escapedLabel}]`
     default:
-      throw new Error(`Unknown node type: ${node.type}`);
+      throw new Error(`Unknown node type: ${node.type}`)
   }
 }
 
@@ -26,5 +26,5 @@ function escapeLabel(label: string): string {
     .replace(/\{/g, '\\{')
     .replace(/\}/g, '\\}')
     .replace(/\(/g, '\\(')
-    .replace(/\)/g, '\\)');
+    .replace(/\)/g, '\\)')
 }
