@@ -39,7 +39,8 @@
       "Bash(pnpm list:*)",
       "Bash(npx:*)",
       "mcp__playwright__browser_install",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(mv:*)"
     ],
     "deny": []
   },
