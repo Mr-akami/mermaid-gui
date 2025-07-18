@@ -7,9 +7,10 @@ export {
   Controls,
   Background,
   BackgroundVariant,
+  ConnectionMode,
+  addEdge,
   useNodesState,
   useEdgesState,
-  addEdge,
   type Connection,
   type Edge as ReactFlowEdge,
   type Node as ReactFlowNode,
@@ -18,7 +19,7 @@ export {
   type OnConnect,
   type OnNodesChange,
   type OnEdgesChange,
-} from 'reactflow'
+} from '@xyflow/react'
 
 // Flowchart components and atoms
 export { FlowchartNode } from '../flowchart/index'
@@ -50,4 +51,4 @@ export type { Node, Edge } from '../common/types/index'
 export { selectedElementAtom } from '../property-panel/index'
 
 // Import ReactFlow CSS
-import 'reactflow/dist/style.css'
+import '@xyflow/react/dist/style.css'

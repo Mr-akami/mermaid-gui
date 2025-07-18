@@ -138,5 +138,54 @@ describe('flowchartParser', () => {
       const nodeA = result.data!.nodes.find((n) => n.id === 'A')
       expect(nodeA!.parentId).toBe('inner')
     })
+
+    it('should parse flowchart with & operator', () => {
+      const code = `flowchart TB
+    A & B --> C & D`
+
+      const result = parseFlowchart(code)
+
+      expect(result.success).toBe(true)
+      expect(result.data!.nodes).toHaveLength(4) // A, B, C, D
+      expect(result.data!.edges).toHaveLength(4) // A->C, A->D, B->C, B->D
+
+      // Check all connections
+      const edges = result.data!.edges
+      expect(edges).toContainEqual(expect.objectContaining({
+        source: 'A',
+        target: 'C',
+        type: 'normal-arrow',
+      }))
+      expect(edges).toContainEqual(expect.objectContaining({
+        source: 'A',
+        target: 'D',
+        type: 'normal-arrow',
+      }))
+      expect(edges).toContainEqual(expect.objectContaining({
+        source: 'B',
+        target: 'C',
+        type: 'normal-arrow',
+      }))
+      expect(edges).toContainEqual(expect.objectContaining({
+        source: 'B',
+        target: 'D',
+        type: 'normal-arrow',
+      }))
+    })
+
+    it('should parse flowchart with & operator and labels', () => {
+      const code = `flowchart TB
+    A & B -->|Process| C & D`
+
+      const result = parseFlowchart(code)
+
+      expect(result.success).toBe(true)
+      expect(result.data!.edges).toHaveLength(4)
+      
+      // All edges should have the same label
+      result.data!.edges.forEach(edge => {
+        expect(edge.data).toEqual({ label: 'Process' })
+      })
+    })
   })
 })

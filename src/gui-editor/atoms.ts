@@ -13,6 +13,9 @@ export const reactFlowNodesAtom = atom((get) => {
       type: node.type,
       position: node.position,
       data: node.data,
+      width: node.width,
+      height: node.height,
+      // Don't set selected property - let React Flow manage it
     }),
   )
 })

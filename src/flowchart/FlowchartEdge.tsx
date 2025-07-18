@@ -3,7 +3,7 @@ import {
   getBezierPath,
   EdgeLabelRenderer,
   BaseEdge,
-} from 'reactflow'
+} from '@xyflow/react'
 import { memo } from 'react'
 
 interface FlowchartEdgeData {
@@ -44,7 +44,6 @@ export const FlowchartEdge = memo(
     // Determine edge styling based on type
     const getEdgeStyle = () => {
       const baseStyle = { ...style }
-      const hasArrow = edgeType.includes('arrow')
 
       switch (edgeType) {
         case 'normal':

@@ -7,6 +7,8 @@ export interface Node {
   data: {
     label: string
   }
+  width?: number
+  height?: number
 }
 
 export interface Edge {

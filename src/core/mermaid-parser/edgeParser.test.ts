@@ -117,5 +117,53 @@ describe('edgeParser', () => {
         label: undefined,
       })
     })
+
+    it('should parse edge with & operator for multiple sources', () => {
+      const line = 'A & B --> C'
+      const result = parseEdge(line)
+
+      expect(result).toEqual({
+        sources: ['A', 'B'],
+        targets: ['C'],
+        type: 'normal-arrow',
+        label: undefined,
+      })
+    })
+
+    it('should parse edge with & operator for multiple targets', () => {
+      const line = 'A --> B & C'
+      const result = parseEdge(line)
+
+      expect(result).toEqual({
+        sources: ['A'],
+        targets: ['B', 'C'],
+        type: 'normal-arrow',
+        label: undefined,
+      })
+    })
+
+    it('should parse edge with & operator for both sources and targets', () => {
+      const line = 'A & B --> C & D'
+      const result = parseEdge(line)
+
+      expect(result).toEqual({
+        sources: ['A', 'B'],
+        targets: ['C', 'D'],
+        type: 'normal-arrow',
+        label: undefined,
+      })
+    })
+
+    it('should parse edge with & operator and label', () => {
+      const line = 'A & B -->|Label| C & D'
+      const result = parseEdge(line)
+
+      expect(result).toEqual({
+        sources: ['A', 'B'],
+        targets: ['C', 'D'],
+        type: 'normal-arrow',
+        label: 'Label',
+      })
+    })
   })
 })

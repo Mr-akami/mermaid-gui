@@ -1,4 +1,4 @@
-import { Handle, Position, NodeProps } from 'reactflow'
+import { Handle, Position, NodeProps } from '@xyflow/react'
 import { memo } from 'react'
 
 export const FlowchartNode = memo(({ data, type }: NodeProps) => {
@@ -43,19 +43,32 @@ export const FlowchartNode = memo(({ data, type }: NodeProps) => {
 
   return (
     <>
+      {/* Connection handles on all sides */}
       <Handle
         type="target"
         position={Position.Top}
-        className="w-3 h-3 !bg-green-500 !border-green-700"
-        title="Input"
+        className="w-16 h-2 !bg-transparent !border-0"
+        style={{ top: -1 }}
       />
-      {getNodeContent()}
+      <Handle
+        type="target"
+        position={Position.Left}
+        className="w-2 h-16 !bg-transparent !border-0"
+        style={{ left: -1 }}
+      />
       <Handle
         type="source"
         position={Position.Bottom}
-        className="w-3 h-3 !bg-red-500 !border-red-700"
-        title="Output"
+        className="w-16 h-2 !bg-transparent !border-0"
+        style={{ bottom: -1 }}
       />
+      <Handle
+        type="source"
+        position={Position.Right}
+        className="w-2 h-16 !bg-transparent !border-0"
+        style={{ right: -1 }}
+      />
+      {getNodeContent()}
     </>
   )
 })

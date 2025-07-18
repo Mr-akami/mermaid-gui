@@ -42,7 +42,15 @@
       "Bash(curl:*)",
       "Bash(mv:*)",
       "Bash(pnpm format:*)",
-      "mcp__playwright__browser_hover"
+      "mcp__playwright__browser_hover",
+      "mcp__context7__resolve-library-id",
+      "mcp__context7__get-library-docs",
+      "mcp__context7__resolve-library-id",
+      "mcp__context7__get-library-docs",
+      "Bash(pnpm exec:*)",
+      "Bash(pnpm remove:*)",
+      "WebFetch(domain:reactflow.dev)",
+      "Bash(pnpm build:*)"
     ],
     "deny": []
   },

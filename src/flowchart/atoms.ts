@@ -63,6 +63,11 @@ export const addNodeAtom = atom(
       [newNode.type]: nextCount,
     })
 
+    // Default sizes - subgraph is 4x normal node size
+    const defaultNodeSize = { width: 150, height: 50 }
+    const defaultSubgraphSize = { width: 600, height: 200 }
+    const nodeSize = newNode.type === 'subgraph' ? defaultSubgraphSize : defaultNodeSize
+
     const node: Node = {
       id: nodeId,
       type: newNode.type,
@@ -70,6 +75,8 @@ export const addNodeAtom = atom(
       childIds: [],
       position: newNode.position,
       data: { label: newNode.label },
+      width: nodeSize.width,
+      height: nodeSize.height,
     }
 
     // Update parent's childIds if parentId is provided
@@ -125,6 +132,8 @@ export const updateNodeAtom = atom(
       id: string
       position?: { x: number; y: number }
       data?: { label: string }
+      width?: number
+      height?: number
     },
   ) => {
     const nodes = get(nodesAtom)
@@ -134,10 +143,13 @@ export const updateNodeAtom = atom(
             ...node,
             ...(update.position && { position: update.position }),
             ...(update.data && { data: { ...node.data, ...update.data } }),
+            ...(update.width !== undefined && { width: update.width }),
+            ...(update.height !== undefined && { height: update.height }),
           }
         : node,
     )
     set(nodesAtom, updatedNodes)
+    set(saveToHistoryAtom)
   },
 )
 
