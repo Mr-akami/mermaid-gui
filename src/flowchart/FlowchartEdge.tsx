@@ -75,7 +75,7 @@ export const FlowchartEdge = memo(
         <BaseEdge
           path={edgePath}
           style={edgeStyle}
-          markerEnd={hasArrow ? 'url(#react-flow__arrowclosed)' : undefined}
+          markerEnd={hasArrow ? 'url(#react-flow__arrow-closed)' : undefined}
         />
         {data?.label && (
           <EdgeLabelRenderer>

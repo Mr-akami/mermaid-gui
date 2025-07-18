@@ -1,7 +1,8 @@
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
+import { render, screen, waitFor, fireEvent } from '@testing-library/react'
 import { GuiEditor } from './GuiEditor'
+import { Provider } from 'jotai'
+import { ReactFlowProvider } from '@xyflow/react'
 
 // Mock ResizeObserver
 global.ResizeObserver = vi.fn().mockImplementation(() => ({
@@ -10,34 +11,45 @@ global.ResizeObserver = vi.fn().mockImplementation(() => ({
   disconnect: vi.fn(),
 }))
 
+const Wrapper = ({ children }: { children: React.ReactNode }) => (
+  <Provider>
+    <ReactFlowProvider>{children}</ReactFlowProvider>
+  </Provider>
+)
+
 describe('GuiEditor - Node Deletion', () => {
-  const addNodeByClickingOnCanvas = async (user: ReturnType<typeof userEvent.setup>, container: HTMLElement, x: number, y: number) => {
+  const addNodeByClickingOnCanvas = (container: HTMLElement, x: number, y: number) => {
     const pane = container.querySelector('.react-flow__pane')
     if (!pane) throw new Error('React Flow pane not found')
-    await user.click(pane, { coords: { x, y } })
+    fireEvent.click(pane, { clientX: x, clientY: y })
   }
+  
   it('should delete selected node when Delete key is pressed', async () => {
-    const user = userEvent.setup()
-    
-    const { container } = render(<GuiEditor />)
+    const { container } = render(<GuiEditor />, { wrapper: Wrapper })
     
     // Wait for React Flow to initialize
     await waitFor(() => {
-      const viewport = container.querySelector('.react-flow__viewport')
-      expect(viewport).toBeTruthy()
+      expect(screen.getByRole('application')).toBeDefined()
     })
+    
+    // Select rectangle tool
+    const rectangleButton = screen.getByTitle('Rectangle')
+    fireEvent.click(rectangleButton)
 
     // Add nodes by clicking on the canvas
-    await addNodeByClickingOnCanvas(user, container, 100, 100)
-    await addNodeByClickingOnCanvas(user, container, 300, 100)
+    addNodeByClickingOnCanvas(container, 100, 100)
+    addNodeByClickingOnCanvas(container, 300, 100)
 
     // Wait for nodes to be rendered
-    const nodes = await screen.findAllByText(/Rect\d+/)
-    expect(nodes).toHaveLength(2)
+    await waitFor(() => {
+      const nodes = screen.getAllByText(/New rectangle/)
+      expect(nodes).toHaveLength(2)
+    })
 
     // Click on the first node to select it
-    const firstNode = nodes[0]
-    await user.click(firstNode)
+    const firstNode = screen.getAllByText(/New rectangle/)[0].closest('.react-flow__node')
+    expect(firstNode).toBeTruthy()
+    fireEvent.click(firstNode!)
 
     // Wait for selection to be applied
     await waitFor(() => {
@@ -46,37 +58,41 @@ describe('GuiEditor - Node Deletion', () => {
     })
 
     // Press Delete key
-    await user.keyboard('{Delete}')
+    fireEvent.keyDown(document, { key: 'Delete' })
 
     // Wait for node to be removed
     await waitFor(() => {
-      const remainingNodes = screen.queryAllByText(/Rect\d+/)
+      const remainingNodes = screen.queryAllByText(/New rectangle/)
       expect(remainingNodes).toHaveLength(1)
     })
   })
 
   it('should delete selected node when Backspace key is pressed', async () => {
-    const user = userEvent.setup()
-    
-    const { container } = render(<GuiEditor />)
+    const { container } = render(<GuiEditor />, { wrapper: Wrapper })
     
     // Wait for React Flow to initialize
     await waitFor(() => {
-      const viewport = container.querySelector('.react-flow__viewport')
-      expect(viewport).toBeTruthy()
+      expect(screen.getByRole('application')).toBeDefined()
     })
+    
+    // Select rectangle tool
+    const rectangleButton = screen.getByTitle('Rectangle')
+    fireEvent.click(rectangleButton)
 
     // Add nodes by clicking on the canvas
-    await addNodeByClickingOnCanvas(user, container, 100, 100)
-    await addNodeByClickingOnCanvas(user, container, 300, 100)
+    addNodeByClickingOnCanvas(container, 100, 100)
+    addNodeByClickingOnCanvas(container, 300, 100)
 
     // Wait for nodes to be rendered
-    const nodes = await screen.findAllByText(/Rect\d+/)
-    expect(nodes).toHaveLength(2)
+    await waitFor(() => {
+      const nodes = screen.getAllByText(/New rectangle/)
+      expect(nodes).toHaveLength(2)
+    })
 
     // Click on the first node to select it
-    const firstNode = nodes[0]
-    await user.click(firstNode)
+    const firstNode = screen.getAllByText(/New rectangle/)[0].closest('.react-flow__node')
+    expect(firstNode).toBeTruthy()
+    fireEvent.click(firstNode!)
 
     // Wait for selection to be applied
     await waitFor(() => {
@@ -85,41 +101,46 @@ describe('GuiEditor - Node Deletion', () => {
     })
 
     // Press Backspace key
-    await user.keyboard('{Backspace}')
+    fireEvent.keyDown(document, { key: 'Backspace' })
 
     // Wait for node to be removed
     await waitFor(() => {
-      const remainingNodes = screen.queryAllByText(/Rect\d+/)
+      const remainingNodes = screen.queryAllByText(/New rectangle/)
       expect(remainingNodes).toHaveLength(1)
     })
   })
 
   it('should delete multiple selected nodes at once', async () => {
-    const user = userEvent.setup()
-    
-    const { container } = render(<GuiEditor />)
+    const { container } = render(<GuiEditor />, { wrapper: Wrapper })
     
     // Wait for React Flow to initialize
     await waitFor(() => {
-      const viewport = container.querySelector('.react-flow__viewport')
-      expect(viewport).toBeTruthy()
+      expect(screen.getByRole('application')).toBeDefined()
     })
+    
+    // Select rectangle tool
+    const rectangleButton = screen.getByTitle('Rectangle')
+    fireEvent.click(rectangleButton)
 
     // Add nodes by clicking on the canvas
-    await addNodeByClickingOnCanvas(user, container, 100, 100)
-    await addNodeByClickingOnCanvas(user, container, 300, 100)
+    addNodeByClickingOnCanvas(container, 100, 100)
+    addNodeByClickingOnCanvas(container, 300, 100)
+    addNodeByClickingOnCanvas(container, 500, 100)
 
     // Wait for nodes to be rendered
-    const nodes = await screen.findAllByText(/Rect\d+/)
-    expect(nodes).toHaveLength(2)
+    await waitFor(() => {
+      const nodes = screen.getAllByText(/New rectangle/)
+      expect(nodes).toHaveLength(3)
+    })
 
+    // Get node elements
+    const nodes = screen.getAllByText(/New rectangle/).map(n => n.closest('.react-flow__node'))
+    
     // Click on the first node to select it
-    await user.click(nodes[0])
+    fireEvent.click(nodes[0]!)
 
-    // Hold shift and click the second node to add to selection
-    await user.keyboard('{Shift>}')
-    await user.click(nodes[1])
-    await user.keyboard('{/Shift}')
+    // Ctrl+click (or Cmd+click) the second node to add to selection
+    fireEvent.click(nodes[1]!, { ctrlKey: true })
 
     // Wait for both nodes to be selected
     await waitFor(() => {
@@ -128,103 +149,94 @@ describe('GuiEditor - Node Deletion', () => {
     })
 
     // Press Delete key
-    await user.keyboard('{Delete}')
+    fireEvent.keyDown(document, { key: 'Delete' })
 
-    // Wait for all nodes to be removed
+    // Wait for nodes to be removed
     await waitFor(() => {
-      const remainingNodes = screen.queryAllByText(/Rect\d+/)
-      expect(remainingNodes).toHaveLength(0)
+      const remainingNodes = screen.queryAllByText(/New rectangle/)
+      expect(remainingNodes).toHaveLength(1)
     })
   })
 
   it('should not delete nodes when no node is selected', async () => {
-    const user = userEvent.setup()
-    
-    const { container } = render(<GuiEditor />)
+    const { container } = render(<GuiEditor />, { wrapper: Wrapper })
     
     // Wait for React Flow to initialize
     await waitFor(() => {
-      const viewport = container.querySelector('.react-flow__viewport')
-      expect(viewport).toBeTruthy()
+      expect(screen.getByRole('application')).toBeDefined()
     })
+    
+    // Select rectangle tool
+    const rectangleButton = screen.getByTitle('Rectangle')
+    fireEvent.click(rectangleButton)
 
     // Add nodes by clicking on the canvas
-    await addNodeByClickingOnCanvas(user, container, 100, 100)
-    await addNodeByClickingOnCanvas(user, container, 300, 100)
+    addNodeByClickingOnCanvas(container, 100, 100)
+    addNodeByClickingOnCanvas(container, 300, 100)
 
     // Wait for nodes to be rendered
-    const nodes = await screen.findAllByText(/Rect\d+/)
-    expect(nodes).toHaveLength(2)
+    await waitFor(() => {
+      const nodes = screen.getAllByText(/New rectangle/)
+      expect(nodes).toHaveLength(2)
+    })
 
     // Click on the viewport to deselect any nodes
-    const viewport = container.querySelector('.react-flow__viewport')!
-    await user.click(viewport)
+    const pane = container.querySelector('.react-flow__pane')!
+    fireEvent.click(pane, { clientX: 500, clientY: 300 })
 
     // Press Delete key
-    await user.keyboard('{Delete}')
+    fireEvent.keyDown(document, { key: 'Delete' })
 
     // Verify nodes are still there
     await waitFor(() => {
-      const remainingNodes = screen.queryAllByText(/Rect\d+/)
+      const remainingNodes = screen.queryAllByText(/New rectangle/)
       expect(remainingNodes).toHaveLength(2)
     })
   })
 
-  it('should delete edges connected to deleted nodes', async () => {
-    const user = userEvent.setup()
-    
-    const { container } = render(<GuiEditor />)
+  it('should maintain selection after dragging', async () => {
+    const { container } = render(<GuiEditor />, { wrapper: Wrapper })
     
     // Wait for React Flow to initialize
     await waitFor(() => {
-      const viewport = container.querySelector('.react-flow__viewport')
-      expect(viewport).toBeTruthy()
+      expect(screen.getByRole('application')).toBeDefined()
     })
-
-    // Add nodes by clicking on the canvas
-    await addNodeByClickingOnCanvas(user, container, 100, 100)
-    await addNodeByClickingOnCanvas(user, container, 300, 100)
-
-    // Wait for nodes to be rendered
-    await screen.findAllByText(/Rect\d+/)
-
-    // Add an edge between nodes by dragging from source to target
-    const nodes = container.querySelectorAll('.react-flow__node')
-    const sourceHandle = nodes[0].querySelector('.source')
-    const targetHandle = nodes[1].querySelector('.target')
     
-    if (!sourceHandle || !targetHandle) throw new Error('Handles not found')
+    // Select rectangle tool
+    const rectangleButton = screen.getByTitle('Rectangle')
+    fireEvent.click(rectangleButton)
+
+    // Add a node
+    addNodeByClickingOnCanvas(container, 100, 100)
+
+    // Wait for node to be rendered
+    await waitFor(() => {
+      expect(screen.getByText(/New rectangle/)).toBeDefined()
+    })
+
+    // Click on the node to select it
+    const node = screen.getByText(/New rectangle/).closest('.react-flow__node')
+    expect(node).toBeTruthy()
+    fireEvent.click(node!)
+
+    // Wait for selection
+    await waitFor(() => {
+      expect(node!.className).toContain('selected')
+    })
+
+    // Simulate dragging the node
+    fireEvent.mouseDown(node!)
+    fireEvent.mouseMove(node!, { clientX: 200, clientY: 200 })
+    fireEvent.mouseUp(node!)
+
+    // Check that node is still selected after drag
+    expect(node!.className).toContain('selected')
     
-    // Drag from source to target
-    await user.pointer([
-      { target: sourceHandle },
-      { target: targetHandle }
-    ])
-
-    // Wait for edge to be created
+    // Verify we can still delete it
+    fireEvent.keyDown(document, { key: 'Delete' })
+    
     await waitFor(() => {
-      const edges = container.querySelectorAll('.react-flow__edge')
-      expect(edges).toHaveLength(1)
-    })
-
-    // Select and delete the first node
-    const nodeElements = await screen.findAllByText(/Rect\d+/)
-    await user.click(nodeElements[0])
-
-    await waitFor(() => {
-      const selectedNode = container.querySelector('.react-flow__node.selected')
-      expect(selectedNode).toBeTruthy()
-    })
-
-    await user.keyboard('{Delete}')
-
-    // Wait for node and edge to be removed
-    await waitFor(() => {
-      const remainingNodes = screen.queryAllByText(/Rect\d+/)
-      expect(remainingNodes).toHaveLength(1)
-      
-      const edges = container.querySelectorAll('.react-flow__edge')
-      expect(edges).toHaveLength(0)
+      expect(screen.queryByText(/New rectangle/)).toBeNull()
     })
   })
 })

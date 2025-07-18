@@ -4,7 +4,6 @@ import {
   Controls,
   Background,
   BackgroundVariant,
-  ConnectionMode,
   useNodesState,
   useEdgesState,
   Connection,
@@ -30,6 +29,7 @@ import {
 } from './atoms'
 import { Toolbar } from './Toolbar'
 import { useCallback, useRef, useEffect } from 'react'
+import './GuiEditor.css'
 
 // Node types configuration
 const nodeTypes = {
@@ -223,6 +223,19 @@ export function GuiEditor() {
     [setSelectedElement],
   )
 
+  // Handle drag stop to maintain selection
+  const onNodeDragStop = useCallback(
+    (_event: React.MouseEvent, node: any) => {
+      // Find the node in the current nodes array and ensure it's still selected
+      setNodes((nds) => 
+        nds.map((n) => 
+          n.id === node.id ? { ...n, selected: true } : n
+        )
+      )
+    },
+    [setNodes],
+  )
+
   // Sync Jotai atom changes to React Flow state
   useEffect(() => {
     setNodes(initialNodes)
@@ -250,14 +263,14 @@ export function GuiEditor() {
         onNodeClick={onNodeClick}
         onEdgeClick={onEdgeClick}
         onNodeContextMenu={onNodeContextMenu}
+        onNodeDragStop={onNodeDragStop}
         onInit={(instance) => {
           reactFlowInstance.current = instance
         }}
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
         deleteKeyCode={['Delete', 'Backspace']}
-        connectionMode={ConnectionMode.Loose}
-        selectionOnDrag={false}
+        selectionOnDrag={true}
         selectNodesOnDrag={false}
         fitView
       >
@@ -268,7 +281,7 @@ export function GuiEditor() {
         <svg style={{ position: 'absolute', width: 0, height: 0 }}>
           <defs>
             <marker
-              id="react-flow__arrowclosed"
+              id="react-flow__arrow-closed"
               viewBox="0 0 20 20"
               refX="20"
               refY="10"
@@ -278,8 +291,8 @@ export function GuiEditor() {
             >
               <path
                 d="M 0 0 L 20 10 L 0 20 z"
-                fill="currentColor"
-                stroke="currentColor"
+                fill="#333"
+                stroke="#333"
               />
             </marker>
           </defs>

@@ -1,0 +1,83 @@
+/* Enhanced selection state styles for nodes - shape specific */
+/* Rectangle nodes - override the default selection */
+.react-flow__node-rectangle.selected {
+  box-shadow: none !important;
+}
+
+.react-flow__node-rectangle.selected .bg-blue-100 {
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5), 0 0 10px rgba(59, 130, 246, 0.5) !important;
+}
+
+/* Circle nodes - override the default selection */
+.react-flow__node-circle.selected {
+  box-shadow: none !important;
+}
+
+.react-flow__node-circle.selected .rounded-full {
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5), 0 0 10px rgba(59, 130, 246, 0.5) !important;
+}
+
+/* Diamond nodes - override the default selection */
+.react-flow__node-diamond.selected {
+  box-shadow: none !important;
+}
+
+.react-flow__node-diamond.selected .rotate-45 {
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5), 0 0 10px rgba(59, 130, 246, 0.5) !important;
+}
+
+.react-flow__node.selected .react-flow__handle {
+  background: #3b82f6 !important;
+  border: 2px solid white !important;
+  width: 10px !important;
+  height: 10px !important;
+}
+
+/* Circle node handle positioning - place on the actual circle border */
+.react-flow__node-circle .react-flow__handle-top {
+  top: -5px !important;
+}
+
+.react-flow__node-circle .react-flow__handle-bottom {
+  bottom: -5px !important;
+}
+
+/* Diamond node handle positioning - adjust for the rotated shape */
+.react-flow__node-diamond .react-flow__handle {
+  /* Handles positioned to appear on the diamond edges */
+}
+
+/* Enhanced selection state for edges */
+.react-flow__edge.selected .react-flow__edge-path {
+  stroke: #3b82f6 !important;
+  stroke-width: 3 !important;
+}
+
+/* Subgraph specific selection styles */
+.react-flow__node-subgraph.selected {
+  box-shadow: none !important;
+}
+
+.react-flow__node-subgraph.selected .bg-purple-100 {
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5), 0 0 10px rgba(59, 130, 246, 0.5) !important;
+}
+
+/* Prevent subgraph from moving when dragging resize handles */
+.react-flow__resize-control {
+  position: absolute !important;
+}
+
+.react-flow__resize-control .react-flow__handle {
+  cursor: nwse-resize !important;
+}
+
+/* Make resize handles more visible */
+.react-flow__resize-control .react-flow__handle-se,
+.react-flow__resize-control .react-flow__handle-sw,
+.react-flow__resize-control .react-flow__handle-ne,
+.react-flow__resize-control .react-flow__handle-nw {
+  width: 10px !important;
+  height: 10px !important;
+  border: 2px solid #3b82f6 !important;
+  background: white !important;
+}

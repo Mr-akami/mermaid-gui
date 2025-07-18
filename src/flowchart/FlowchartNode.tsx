@@ -41,35 +41,66 @@ export const FlowchartNode = memo(({ data, type }: NodeProps) => {
     }
   }
 
+  // For circle and diamond, we need special handle positioning
+  if (type === 'circle') {
+    return (
+      <>
+        <div className="relative">
+          <Handle
+            type="target"
+            position={Position.Top}
+            className="w-3 h-3"
+            style={{ left: '50%', top: '0' }}
+          />
+          <Handle
+            type="source"
+            position={Position.Bottom}
+            className="w-3 h-3"
+            style={{ left: '50%', bottom: '0' }}
+          />
+          {getNodeContent()}
+        </div>
+      </>
+    )
+  }
+
+  if (type === 'diamond') {
+    return (
+      <>
+        <div className="relative">
+          <Handle
+            type="target"
+            position={Position.Top}
+            className="w-3 h-3"
+            style={{ left: '50%', top: '10px' }}
+          />
+          <Handle
+            type="source"
+            position={Position.Bottom}
+            className="w-3 h-3"
+            style={{ left: '50%', bottom: '10px' }}
+          />
+          {getNodeContent()}
+        </div>
+      </>
+    )
+  }
+
+  // Default for rectangle - wrap in relative div for consistent structure
   return (
-    <>
-      {/* Connection handles on all sides */}
+    <div className="relative">
       <Handle
         type="target"
         position={Position.Top}
-        className="w-16 h-2 !bg-transparent !border-0"
-        style={{ top: -1 }}
-      />
-      <Handle
-        type="target"
-        position={Position.Left}
-        className="w-2 h-16 !bg-transparent !border-0"
-        style={{ left: -1 }}
+        className="w-3 h-3"
       />
       <Handle
         type="source"
         position={Position.Bottom}
-        className="w-16 h-2 !bg-transparent !border-0"
-        style={{ bottom: -1 }}
-      />
-      <Handle
-        type="source"
-        position={Position.Right}
-        className="w-2 h-16 !bg-transparent !border-0"
-        style={{ right: -1 }}
+        className="w-3 h-3"
       />
       {getNodeContent()}
-    </>
+    </div>
   )
 })
 
