@@ -11,24 +11,17 @@ global.ResizeObserver = vi.fn().mockImplementation(() => ({
   disconnect: vi.fn(),
 }))
 
-// Mock d3 modules that cause issues in tests
-vi.mock('d3-drag', () => ({
-  drag: () => ({
-    on: () => ({}),
-    container: () => ({}),
-    filter: () => ({}),
-    subject: () => ({}),
-    touchable: () => ({}),
-    clickDistance: () => ({}),
+// Add better DOM environment setup for d3-drag
+Object.defineProperty(window, 'getComputedStyle', {
+  value: () => ({
+    getPropertyValue: () => '',
   }),
-}))
+})
 
-vi.mock('d3-selection', () => ({
-  select: () => ({
-    on: () => ({}),
-    call: () => ({}),
-  }),
-}))
+// Add SVGElement if not present
+if (typeof SVGElement === 'undefined') {
+  global.SVGElement = class SVGElement extends Element {}
+}
 
 const Wrapper = ({ children }: { children: React.ReactNode }) => (
   <Provider>

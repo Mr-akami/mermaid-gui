@@ -10,6 +10,7 @@
     "test": "vitest",
     "test:watch": "vitest --watch",
     "test:browser": "vitest -c vitest.browser.config.ts",
+    "test:d3": "vitest -c vitest.d3.config.ts",
     "typecheck": "tsgo --noEmit",
     "lint": "oxlint",
     "format": "prettier --write \"src/**/*.{ts,tsx,css,md}\""
