@@ -1,10 +1,9 @@
-import { Provider } from './deps'
-import { MainLayout } from './MainLayout'
+import { NodeEditor } from '../editor/node'
 
 export function App() {
   return (
-    <Provider>
-      <MainLayout />
-    </Provider>
+    <div style={{ width: '100vw', height: '100vh' }}>
+      <NodeEditor />
+    </div>
   )
 }

@@ -6,17 +6,6 @@ import {
 } from '@xyflow/react'
 import { memo } from 'react'
 
-interface FlowchartEdgeData {
-  edgeType:
-    | 'normal'
-    | 'normal-arrow'
-    | 'thick'
-    | 'thick-arrow'
-    | 'dotted'
-    | 'dotted-arrow'
-  label?: string
-}
-
 export const FlowchartEdge = memo(
   ({
     id: _id,
@@ -29,7 +18,7 @@ export const FlowchartEdge = memo(
     style = {},
     data,
     markerEnd: _markerEnd,
-  }: EdgeProps<FlowchartEdgeData>) => {
+  }: EdgeProps) => {
     const [edgePath, labelX, labelY] = getBezierPath({
       sourceX,
       sourceY,
@@ -39,7 +28,7 @@ export const FlowchartEdge = memo(
       targetPosition,
     })
 
-    const edgeType = data?.edgeType || 'normal-arrow'
+    const edgeType = (data as any)?.edgeType || 'normal-arrow'
 
     // Determine edge styling based on type
     const getEdgeStyle = () => {
@@ -77,7 +66,7 @@ export const FlowchartEdge = memo(
           style={edgeStyle}
           markerEnd={hasArrow ? 'url(#react-flow__arrowclosed)' : undefined}
         />
-        {data?.label && (
+        {(data as any)?.label && (
           <EdgeLabelRenderer>
             <div
               style={{
@@ -88,7 +77,7 @@ export const FlowchartEdge = memo(
               }}
               className="px-2 py-1 bg-white border border-gray-300 rounded"
             >
-              {data.label}
+              {(data as any).label}
             </div>
           </EdgeLabelRenderer>
         )}

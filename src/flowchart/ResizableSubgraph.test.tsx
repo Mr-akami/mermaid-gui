@@ -14,15 +14,12 @@ describe('ResizableSubgraph', () => {
     id: 'subgraph1',
     type: 'subgraph',
     data: { label: 'Test Subgraph' },
-    xPos: 0,
-    yPos: 0,
     selected: false,
-    zIndex: 0,
     isConnectable: true,
     targetPosition: undefined,
     sourcePosition: undefined,
     dragging: false,
-  }
+  } as NodeProps
 
   it('should render with label', () => {
     render(<ResizableSubgraph {...defaultProps} />, { wrapper: Wrapper })

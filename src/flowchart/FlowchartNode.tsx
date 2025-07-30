@@ -8,7 +8,7 @@ export const FlowchartNode = memo(({ data, type }: NodeProps) => {
         return (
           <div className="px-4 py-2 bg-blue-100 border-2 border-blue-500 rounded">
             <div className="text-sm font-medium text-gray-900">
-              {data.label || 'Rectangle'}
+              {data?.label || 'Rectangle'}
             </div>
           </div>
         )
@@ -16,7 +16,7 @@ export const FlowchartNode = memo(({ data, type }: NodeProps) => {
         return (
           <div className="w-20 h-20 bg-green-100 border-2 border-green-500 rounded-full flex items-center justify-center">
             <div className="text-sm font-medium text-gray-900 text-center">
-              {data.label || 'Circle'}
+              {data?.label || 'Circle'}
             </div>
           </div>
         )
@@ -24,7 +24,7 @@ export const FlowchartNode = memo(({ data, type }: NodeProps) => {
         return (
           <div className="w-20 h-20 bg-yellow-100 border-2 border-yellow-500 transform rotate-45 flex items-center justify-center">
             <div className="transform -rotate-45 text-sm font-medium text-gray-900 text-center">
-              {data.label || 'Diamond'}
+              {data?.label || 'Diamond'}
             </div>
           </div>
         )
@@ -32,7 +32,7 @@ export const FlowchartNode = memo(({ data, type }: NodeProps) => {
         return (
           <div className="px-4 py-2 bg-purple-100 border-2 border-purple-500 border-dashed rounded-lg min-w-[200px] min-h-[100px]">
             <div className="text-sm font-medium text-gray-900">
-              {data.label || 'Subgraph'}
+              {data?.label || 'Subgraph'}
             </div>
           </div>
         )

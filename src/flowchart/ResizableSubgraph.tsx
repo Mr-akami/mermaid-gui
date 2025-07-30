@@ -55,7 +55,7 @@ export const ResizableSubgraph = memo(({ data, selected, id }: NodeProps) => {
         style={{ width: '100%', height: '100%' }}
       >
         <div className="text-sm font-medium text-gray-900">
-          {data.label || 'Subgraph'}
+          {data?.label || 'Subgraph'}
         </div>
       </div>
     </div>
