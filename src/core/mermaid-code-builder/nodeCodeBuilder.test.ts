@@ -81,5 +81,121 @@ describe('nodeCodeBuilder', () => {
       const result = buildNodeCode(node)
       expect(result).toBe('node5[Process \\[with brackets\\]]')
     })
+
+    it('should build code for roundEdges node', () => {
+      const node: Node = {
+        id: 'node6',
+        type: 'roundEdges',
+        childIds: [],
+        position: { x: 0, y: 0 },
+        data: { label: 'Round Edges' },
+      }
+
+      const result = buildNodeCode(node)
+      expect(result).toBe('node6(Round Edges)')
+    })
+
+    it('should build code for stadium node', () => {
+      const node: Node = {
+        id: 'node7',
+        type: 'stadium',
+        childIds: [],
+        position: { x: 0, y: 0 },
+        data: { label: 'Stadium' },
+      }
+
+      const result = buildNodeCode(node)
+      expect(result).toBe('node7([Stadium])')
+    })
+
+    it('should build code for subroutine node', () => {
+      const node: Node = {
+        id: 'node8',
+        type: 'subroutine',
+        childIds: [],
+        position: { x: 0, y: 0 },
+        data: { label: 'Subroutine' },
+      }
+
+      const result = buildNodeCode(node)
+      expect(result).toBe('node8[[Subroutine]]')
+    })
+
+    it('should build code for cylindrical node', () => {
+      const node: Node = {
+        id: 'node9',
+        type: 'cylindrical',
+        childIds: [],
+        position: { x: 0, y: 0 },
+        data: { label: 'Database' },
+      }
+
+      const result = buildNodeCode(node)
+      expect(result).toBe('node9[(Database)]')
+    })
+
+    it('should build code for parallelogram node', () => {
+      const node: Node = {
+        id: 'node10',
+        type: 'parallelogram',
+        childIds: [],
+        position: { x: 0, y: 0 },
+        data: { label: 'Input/Output' },
+      }
+
+      const result = buildNodeCode(node)
+      expect(result).toBe('node10[/Input/Output/]')
+    })
+
+    it('should build code for trapezoid node', () => {
+      const node: Node = {
+        id: 'node11',
+        type: 'trapezoid',
+        childIds: [],
+        position: { x: 0, y: 0 },
+        data: { label: 'Manual Process' },
+      }
+
+      const result = buildNodeCode(node)
+      expect(result).toBe('node11[\\Manual Process\\]')
+    })
+
+    it('should build code for hexagon node', () => {
+      const node: Node = {
+        id: 'node12',
+        type: 'hexagon',
+        childIds: [],
+        position: { x: 0, y: 0 },
+        data: { label: 'Preparation' },
+      }
+
+      const result = buildNodeCode(node)
+      expect(result).toBe('node12{{Preparation}}')
+    })
+
+    it('should build code for doubleCircle node', () => {
+      const node: Node = {
+        id: 'node13',
+        type: 'doubleCircle',
+        childIds: [],
+        position: { x: 0, y: 0 },
+        data: { label: 'Terminator' },
+      }
+
+      const result = buildNodeCode(node)
+      expect(result).toBe('node13(((Terminator)))')
+    })
+
+    it('should throw error for unknown node type', () => {
+      const node: Node = {
+        id: 'node14',
+        type: 'unknown' as any,
+        childIds: [],
+        position: { x: 0, y: 0 },
+        data: { label: 'Unknown' },
+      }
+
+      expect(() => buildNodeCode(node)).toThrow('Unknown node type: unknown')
+    })
   })
 })

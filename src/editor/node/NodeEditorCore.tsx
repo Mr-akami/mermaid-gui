@@ -116,6 +116,12 @@ export function NodeEditorCore() {
       return
     }
     
+    // Skip if nodes/edges are empty (initial state)
+    if (flowchartNodes.length === 0 && flowchartEdges.length === 0) {
+      return
+    }
+    
+    
     // Preserve existing node positions when syncing from code editor
     setNodes(currentNodes => {
       const reactFlowNodes = toReactFlowNodes(flowchartNodes).map(newNode => {
@@ -145,7 +151,8 @@ export function NodeEditorCore() {
     setFlowchartNodes(customNodes)
     setFlowchartEdges([])
     saveToHistory({ nodes: customNodes, edges: [] })
-  }, [saveToHistory, setFlowchartNodes, setFlowchartEdges])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []) // Only run once on mount
 
   // Sync changes to history (debounced to avoid too many history entries)
   useEffect(() => {
@@ -159,17 +166,25 @@ export function NodeEditorCore() {
       if (nodes.length > 0 || edges.length > 0) {
         const customNodes = toCustomNodes(nodes)
         const customEdges = toCustomEdges(edges)
-        saveToHistory({ nodes: customNodes, edges: customEdges })
         
-        // Also sync to flowchart atoms (prevent code editor loop)
-        isCodeUpdateRef.current = true
-        setFlowchartNodes(customNodes)
-        setFlowchartEdges(customEdges)
+        // Check if there are actual changes before updating
+        const nodesChanged = JSON.stringify(customNodes) !== JSON.stringify(flowchartNodes)
+        const edgesChanged = JSON.stringify(customEdges) !== JSON.stringify(flowchartEdges)
+        
+        
+        if (nodesChanged || edgesChanged) {
+          saveToHistory({ nodes: customNodes, edges: customEdges })
+          
+          // Also sync to flowchart atoms (prevent code editor loop)
+          isCodeUpdateRef.current = true
+          setFlowchartNodes(customNodes)
+          setFlowchartEdges(customEdges)
+        }
       }
     }, 500)
 
     return () => clearTimeout(timeoutId)
-  }, [nodes, edges, saveToHistory, setFlowchartNodes, setFlowchartEdges])
+  }, [nodes, edges, saveToHistory, setFlowchartNodes, setFlowchartEdges, flowchartNodes, flowchartEdges])
 
   const onConnect = useCallback(
     (params: Connection) => {

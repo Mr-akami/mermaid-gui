@@ -11,6 +11,22 @@ export function buildNodeCode(node: Node): string {
       return `${node.id}((${escapedLabel}))`
     case 'diamond':
       return `${node.id}{${escapedLabel}}`
+    case 'roundEdges':
+      return `${node.id}(${escapedLabel})`
+    case 'stadium':
+      return `${node.id}([${escapedLabel}])`
+    case 'subroutine':
+      return `${node.id}[[${escapedLabel}]]`
+    case 'cylindrical':
+      return `${node.id}[(${escapedLabel})]`
+    case 'parallelogram':
+      return `${node.id}[/${escapedLabel}/]`
+    case 'trapezoid':
+      return `${node.id}[\\${escapedLabel}\\]`
+    case 'hexagon':
+      return `${node.id}{{${escapedLabel}}}`
+    case 'doubleCircle':
+      return `${node.id}(((${escapedLabel})))`
     case 'subgraph':
       return `subgraph ${node.id} [${escapedLabel}]`
     default:
