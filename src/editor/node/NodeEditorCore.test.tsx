@@ -1,14 +1,15 @@
 import { describe, it, expect, vi } from 'vitest'
-import { render, waitFor, fireEvent } from '@testing-library/react'
+import { render, waitFor } from '@testing-library/react'
 import { NodeEditorCore } from './NodeEditorCore'
 import { ReactFlowProvider } from '@xyflow/react'
-import { Provider as JotaiProvider, atom } from 'jotai'
+import { Provider as JotaiProvider } from 'jotai'
 
 // Mock FlowchartNode
 vi.mock('../../flowchart', () => {
   const { atom } = require('jotai')
   return {
     FlowchartNode: vi.fn(() => <div data-testid="flowchart-node">FlowchartNode</div>),
+    FlowchartEdge: vi.fn(() => <div data-testid="flowchart-edge">FlowchartEdge</div>),
     MERMAID_NODE_TYPES: ['rectangle', 'circle', 'diamond'],
     NODE_TYPE_CONFIG: {
       rectangle: { defaultLabel: 'Rectangle' },
@@ -85,18 +86,6 @@ describe('NodeEditorCore', () => {
     // Simulate onConnectEnd event
     const pane = container.querySelector('.react-flow__pane')
     expect(pane).toBeTruthy()
-
-    // Mock connection state
-    const mockConnectionState = {
-      isValid: false,
-      fromNode: { id: '0' },
-    }
-
-    // Create mock event
-    const mockEvent = new MouseEvent('mouseup', {
-      clientX: 100,
-      clientY: 100,
-    })
 
     // We can't directly trigger onConnectEnd as it's internal to ReactFlow
     // Instead, we test that the node configuration is correct

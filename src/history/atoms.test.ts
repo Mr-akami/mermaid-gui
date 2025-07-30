@@ -8,13 +8,29 @@ import {
   canUndoAtom,
   canRedoAtom 
 } from './atoms'
+import { Node } from '../common/types'
+
+// Helper to create a valid node
+const createNode = (id: string): Node => ({
+  id,
+  type: 'rectangle',
+  childIds: [],
+  position: { x: 0, y: 0 },
+  data: { label: `Node ${id}` }
+})
 
 describe('history atoms', () => {
   test('should save initial state', () => {
     const store = createStore()
     
     const initialState = {
-      nodes: [{ id: '1', type: 'rectangle', position: { x: 0, y: 0 }, data: { label: 'Node 1' } }],
+      nodes: [{ 
+        id: '1', 
+        type: 'rectangle' as const, 
+        childIds: [],
+        position: { x: 0, y: 0 }, 
+        data: { label: 'Node 1' } 
+      }],
       edges: []
     }
     
@@ -29,9 +45,9 @@ describe('history atoms', () => {
   test('should add multiple states to history', () => {
     const store = createStore()
     
-    const state1 = { nodes: [{ id: '1' }], edges: [] }
-    const state2 = { nodes: [{ id: '1' }, { id: '2' }], edges: [] }
-    const state3 = { nodes: [{ id: '1' }, { id: '2' }, { id: '3' }], edges: [] }
+    const state1 = { nodes: [createNode('1')], edges: [] }
+    const state2 = { nodes: [createNode('1'), createNode('2')], edges: [] }
+    const state3 = { nodes: [createNode('1'), createNode('2'), createNode('3')], edges: [] }
     
     store.set(saveToHistoryAtom, state1)
     store.set(saveToHistoryAtom, state2)
@@ -45,8 +61,8 @@ describe('history atoms', () => {
   test('should perform undo', () => {
     const store = createStore()
     
-    const state1 = { nodes: [{ id: '1' }], edges: [] }
-    const state2 = { nodes: [{ id: '1' }, { id: '2' }], edges: [] }
+    const state1 = { nodes: [createNode('1')], edges: [] }
+    const state2 = { nodes: [createNode('1'), createNode('2')], edges: [] }
     
     store.set(saveToHistoryAtom, state1)
     store.set(saveToHistoryAtom, state2)
@@ -60,8 +76,8 @@ describe('history atoms', () => {
   test('should perform redo after undo', () => {
     const store = createStore()
     
-    const state1 = { nodes: [{ id: '1' }], edges: [] }
-    const state2 = { nodes: [{ id: '1' }, { id: '2' }], edges: [] }
+    const state1 = { nodes: [createNode('1')], edges: [] }
+    const state2 = { nodes: [createNode('1'), createNode('2')], edges: [] }
     
     store.set(saveToHistoryAtom, state1)
     store.set(saveToHistoryAtom, state2)
@@ -80,8 +96,8 @@ describe('history atoms', () => {
   test('should not break redo when saving the same state after undo', () => {
     const store = createStore()
     
-    const state1 = { nodes: [{ id: '1' }], edges: [] }
-    const state2 = { nodes: [{ id: '1' }, { id: '2' }], edges: [] }
+    const state1 = { nodes: [createNode('1')], edges: [] }
+    const state2 = { nodes: [createNode('1'), createNode('2')], edges: [] }
     
     store.set(saveToHistoryAtom, state1)
     store.set(saveToHistoryAtom, state2)
@@ -101,9 +117,9 @@ describe('history atoms', () => {
   test('should clear redo history when saving a different state after undo', () => {
     const store = createStore()
     
-    const state1 = { nodes: [{ id: '1' }], edges: [] }
-    const state2 = { nodes: [{ id: '1' }, { id: '2' }], edges: [] }
-    const state3 = { nodes: [{ id: '1' }, { id: '3' }], edges: [] }
+    const state1 = { nodes: [createNode('1')], edges: [] }
+    const state2 = { nodes: [createNode('1'), createNode('2')], edges: [] }
+    const state3 = { nodes: [createNode('1'), createNode('3')], edges: [] }
     
     store.set(saveToHistoryAtom, state1)
     store.set(saveToHistoryAtom, state2)
@@ -128,7 +144,7 @@ describe('history atoms', () => {
     store.set(saveToHistoryAtom, { nodes: [], edges: [] })
     expect(store.get(canUndoAtom)).toBe(false)
     
-    store.set(saveToHistoryAtom, { nodes: [{ id: '1' }], edges: [] })
+    store.set(saveToHistoryAtom, { nodes: [createNode('1')], edges: [] })
     expect(store.get(canUndoAtom)).toBe(true)
   })
 
@@ -138,7 +154,7 @@ describe('history atoms', () => {
     expect(store.get(canRedoAtom)).toBe(false)
     
     store.set(saveToHistoryAtom, { nodes: [], edges: [] })
-    store.set(saveToHistoryAtom, { nodes: [{ id: '1' }], edges: [] })
+    store.set(saveToHistoryAtom, { nodes: [createNode('1')], edges: [] })
     
     expect(store.get(canRedoAtom)).toBe(false)
     

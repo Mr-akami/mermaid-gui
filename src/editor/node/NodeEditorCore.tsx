@@ -10,20 +10,37 @@ import {
   useState,
   useEffect,
   type Node,
+  type Edge,
   type Connection,
   FlowchartNode,
   useAtom,
+  MarkerType,
 } from './deps'
 import { NodeToolbar } from './NodeToolbar'
 import { UndoRedoButtons } from './UndoRedoButtons'
-import { MERMAID_NODE_TYPES, NODE_TYPE_CONFIG, nodesAtom, edgesAtom } from '../../flowchart'
+import {
+  MERMAID_NODE_TYPES,
+  NODE_TYPE_CONFIG,
+  nodesAtom,
+  edgesAtom,
+  FlowchartEdge,
+} from '../../flowchart'
 import { saveToHistoryAtom } from '../../history'
+import { toCustomNodes, toReactFlowNodes, toCustomEdges, toReactFlowEdges } from './nodeTypeUtils'
 
 // Create nodeTypes object dynamically from MERMAID_NODE_TYPES
-const nodeTypes = MERMAID_NODE_TYPES.reduce((acc, type) => {
-  acc[type] = FlowchartNode
-  return acc
-}, {} as Record<string, typeof FlowchartNode>)
+const nodeTypes = MERMAID_NODE_TYPES.reduce(
+  (acc, type) => {
+    acc[type] = FlowchartNode
+    return acc
+  },
+  {} as Record<string, typeof FlowchartNode>,
+)
+
+// Define edge types
+const edgeTypes = {
+  default: FlowchartEdge,
+}
 
 const initialNodes: Node[] = [
   {
@@ -44,22 +61,23 @@ export function NodeEditorCore() {
   const [edges, setEdges, onEdgesChange] = useEdgesState([])
   const [selectedNodeType, setSelectedNodeType] = useState<string | null>(null)
   const { screenToFlowPosition } = useReactFlow()
-  
+
   // Connect to flowchart atoms
-  const [flowchartNodes, setFlowchartNodes] = useAtom(nodesAtom)
-  const [flowchartEdges, setFlowchartEdges] = useAtom(edgesAtom)
+  const [, setFlowchartNodes] = useAtom(nodesAtom)
+  const [, setFlowchartEdges] = useAtom(edgesAtom)
   const [, saveToHistory] = useAtom(saveToHistoryAtom)
-  
+
   // Track if we're in an undo/redo operation
   const isUndoRedoRef = useRef(false)
-  
+
   // Initialize history with initial state
   useEffect(() => {
-    setFlowchartNodes(initialNodes)
+    const customNodes = toCustomNodes(initialNodes)
+    setFlowchartNodes(customNodes)
     setFlowchartEdges([])
-    saveToHistory({ nodes: initialNodes, edges: [] })
+    saveToHistory({ nodes: customNodes, edges: [] })
   }, [saveToHistory, setFlowchartNodes, setFlowchartEdges])
-  
+
   // Sync changes to history (debounced to avoid too many history entries)
   useEffect(() => {
     // Skip saving to history if we're in an undo/redo operation
@@ -67,18 +85,36 @@ export function NodeEditorCore() {
       isUndoRedoRef.current = false
       return
     }
-    
+
     const timeoutId = setTimeout(() => {
       if (nodes.length > 0 || edges.length > 0) {
-        saveToHistory({ nodes, edges })
+        const customNodes = toCustomNodes(nodes)
+        const customEdges = toCustomEdges(edges)
+        saveToHistory({ nodes: customNodes, edges: customEdges })
       }
     }, 500)
-    
+
     return () => clearTimeout(timeoutId)
   }, [nodes, edges, saveToHistory])
-  
+
   const onConnect = useCallback(
-    (params: Connection) => setEdges((eds) => addEdge(params, eds)),
+    (params: Connection) =>
+      setEdges((eds) =>
+        addEdge(
+          {
+            ...params,
+            type: 'default',
+            data: { edgeType: 'normal-arrow' },
+            markerEnd: {
+              type: MarkerType.ArrowClosed,
+              width: 20,
+              height: 20,
+              color: '#333',
+            },
+          },
+          eds,
+        ),
+      ),
     [setEdges],
   )
 
@@ -102,7 +138,21 @@ export function NodeEditorCore() {
 
         setNodes((nds) => nds.concat(newNode))
         setEdges((eds) =>
-          eds.concat([{ id, source: connectionState.fromNode.id, target: id }]),
+          eds.concat([
+            {
+              id,
+              source: connectionState.fromNode.id,
+              target: id,
+              type: 'default',
+              data: { edgeType: 'normal-arrow' },
+              markerEnd: {
+                type: 'arrowclosed',
+                width: 20,
+                height: 20,
+                color: '#333',
+              },
+            },
+          ]),
         )
       }
     },
@@ -116,14 +166,19 @@ export function NodeEditorCore() {
           x: event.clientX,
           y: event.clientY,
         })
-        
+
         const newNode: Node = {
           id: getId(),
           type: selectedNodeType,
           position,
-          data: { label: NODE_TYPE_CONFIG[selectedNodeType as keyof typeof NODE_TYPE_CONFIG]?.defaultLabel || selectedNodeType },
+          data: {
+            label:
+              NODE_TYPE_CONFIG[
+                selectedNodeType as keyof typeof NODE_TYPE_CONFIG
+              ]?.defaultLabel || selectedNodeType,
+          },
         }
-        
+
         setNodes((nds) => nds.concat(newNode))
         setSelectedNodeType(null) // Clear selection after adding
       }
@@ -132,25 +187,33 @@ export function NodeEditorCore() {
   )
 
   return (
-    <div className="wrapper" ref={reactFlowWrapper} style={{ 
-      width: '100%', 
-      height: '100%', 
-      position: 'relative',
-      cursor: selectedNodeType ? 'crosshair' : 'default'
-    }}>
-      <UndoRedoButtons 
+    <div
+      className="wrapper"
+      ref={reactFlowWrapper}
+      style={{
+        width: '100%',
+        height: '100%',
+        position: 'relative',
+        cursor: selectedNodeType ? 'crosshair' : 'default',
+      }}
+    >
+      <UndoRedoButtons
         onUndo={(state) => {
           isUndoRedoRef.current = true
-          setNodes(state.nodes)
-          setEdges(state.edges)
+          const rfNodes = toReactFlowNodes(state.nodes)
+          const rfEdges = toReactFlowEdges(state.edges)
+          setNodes(rfNodes)
+          setEdges(rfEdges)
         }}
         onRedo={(state) => {
           isUndoRedoRef.current = true
-          setNodes(state.nodes)
-          setEdges(state.edges)
+          const rfNodes = toReactFlowNodes(state.nodes)
+          const rfEdges = toReactFlowEdges(state.edges)
+          setNodes(rfNodes)
+          setEdges(rfEdges)
         }}
       />
-      <NodeToolbar 
+      <NodeToolbar
         onNodeTypeSelect={setSelectedNodeType}
         selectedNodeType={selectedNodeType}
       />
@@ -166,6 +229,7 @@ export function NodeEditorCore() {
         fitViewOptions={{ padding: 2 }}
         nodeOrigin={nodeOrigin}
         nodeTypes={nodeTypes}
+        edgeTypes={edgeTypes}
       >
         <Background />
       </ReactFlow>

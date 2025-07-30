@@ -10,7 +10,9 @@ export {
   type Node,
   type Edge,
   type Connection,
+  MarkerType,
 } from '@xyflow/react'
+
 
 export { useCallback, useRef, useState, useEffect } from 'react'
 
@@ -22,3 +24,15 @@ export { useAtom, useAtomValue } from 'jotai'
 
 // Import React Flow CSS
 import '@xyflow/react/dist/style.css'
+
+// Node type utilities
+export { 
+  toCustomNode, 
+  toReactFlowNode, 
+  toCustomNodes, 
+  toReactFlowNodes,
+  toCustomEdge,
+  toReactFlowEdge,
+  toCustomEdges,
+  toReactFlowEdges 
+} from './nodeTypeUtils'

@@ -17,7 +17,7 @@ export const FlowchartEdge = memo(
     targetPosition,
     style = {},
     data,
-    markerEnd: _markerEnd,
+    markerEnd,
   }: EdgeProps) => {
     const [edgePath, labelX, labelY] = getBezierPath({
       sourceX,
@@ -59,12 +59,15 @@ export const FlowchartEdge = memo(
     const hasArrow = edgeType.includes('arrow')
     const edgeStyle = getEdgeStyle()
 
+    // Use provided markerEnd or default based on edge type
+    const finalMarkerEnd = markerEnd || (hasArrow ? 'url(#react-flow__arrowclosed)' : undefined)
+
     return (
       <>
         <BaseEdge
           path={edgePath}
           style={edgeStyle}
-          markerEnd={hasArrow ? 'url(#react-flow__arrowclosed)' : undefined}
+          markerEnd={finalMarkerEnd}
         />
         {(data as any)?.label && (
           <EdgeLabelRenderer>

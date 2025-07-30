@@ -8,6 +8,16 @@ import {
   canUndoAtom,
   canRedoAtom 
 } from './atoms'
+import { Node } from '../common/types'
+
+// Helper to create a valid node
+const createNode = (id: string, type: Node['type'] = 'rectangle', label?: string): Node => ({
+  id,
+  type,
+  childIds: [],
+  position: { x: parseInt(id) * 100, y: parseInt(id) * 100 },
+  data: { label: label || `Node ${id}` }
+})
 
 describe('history atoms integration - redo persistence', () => {
   test('redo should work correctly with debounced saves', async () => {
@@ -15,15 +25,15 @@ describe('history atoms integration - redo persistence', () => {
     
     // Initial state
     const state1 = { 
-      nodes: [{ id: '1', type: 'rectangle' as const, position: { x: 0, y: 0 }, data: { label: 'Node 1' } }],
+      nodes: [createNode('1', 'rectangle', 'Node 1')],
       edges: [] 
     }
     
     // Add second node
     const state2 = { 
       nodes: [
-        { id: '1', type: 'rectangle' as const, position: { x: 0, y: 0 }, data: { label: 'Node 1' } },
-        { id: '2', type: 'circle' as const, position: { x: 100, y: 100 }, data: { label: 'Node 2' } }
+        createNode('1', 'rectangle', 'Node 1'),
+        createNode('2', 'circle', 'Node 2')
       ],
       edges: [] 
     }
@@ -62,17 +72,17 @@ describe('history atoms integration - redo persistence', () => {
     const store = createStore()
     
     const state1 = { 
-      nodes: [{ id: '1' }],
+      nodes: [createNode('1')],
       edges: [] 
     }
     
     const state2 = { 
-      nodes: [{ id: '1' }, { id: '2' }],
+      nodes: [createNode('1'), createNode('2')],
       edges: [] 
     }
     
     const state3 = { 
-      nodes: [{ id: '1' }, { id: '3' }], // Different from state2
+      nodes: [createNode('1'), createNode('3')], // Different from state2
       edges: [] 
     }
     
