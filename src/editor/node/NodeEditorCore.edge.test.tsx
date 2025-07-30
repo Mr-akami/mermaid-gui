@@ -14,6 +14,11 @@ vi.mock('../../flowchart', () => {
         FlowchartEdge
       </div>
     )),
+    BiDirectionalEdge: vi.fn(({ markerEnd }) => (
+      <div data-testid="bidirectional-edge" data-marker-end={markerEnd}>
+        BiDirectionalEdge
+      </div>
+    )),
     MERMAID_NODE_TYPES: ['rectangle', 'circle', 'diamond'],
     NODE_TYPE_CONFIG: {
       rectangle: { defaultLabel: 'Rectangle' },

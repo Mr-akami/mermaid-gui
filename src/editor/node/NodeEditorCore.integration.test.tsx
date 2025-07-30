@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { render, waitFor, fireEvent, screen } from '@testing-library/react'
+import { render, waitFor, screen } from '@testing-library/react'
 import { NodeEditorCore } from './NodeEditorCore'
 import { ReactFlowProvider } from '@xyflow/react'
 import { Provider as JotaiProvider } from 'jotai'
@@ -18,6 +18,7 @@ vi.mock('../../flowchart', () => {
       </div>
     )),
     FlowchartEdge: vi.fn(() => <div data-testid="flowchart-edge">FlowchartEdge</div>),
+    BiDirectionalEdge: vi.fn(() => <div data-testid="bidirectional-edge">BiDirectionalEdge</div>),
     MERMAID_NODE_TYPES: ['rectangle', 'circle', 'diamond'],
     NODE_TYPE_CONFIG: {
       rectangle: { defaultLabel: 'Rectangle' },
@@ -82,7 +83,7 @@ describe('NodeEditorCore - PropertyPanel Integration', () => {
   })
 
   it('should update node when PropertyPanel changes are made', async () => {
-    const { getByTestId } = render(<NodeEditorCore />, { wrapper: Wrapper })
+    render(<NodeEditorCore />, { wrapper: Wrapper })
     
     await waitFor(() => {
       const reactFlow = document.querySelector('.react-flow')

@@ -15,6 +15,7 @@ export {
 // Export components
 export { FlowchartNode } from './FlowchartNode'
 export { FlowchartEdge } from './FlowchartEdge'
+export { BiDirectionalEdge } from './BiDirectionalEdge'
 export { ResizableSubgraph } from './ResizableSubgraph'
 
 // Export types and constants

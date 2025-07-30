@@ -18,7 +18,7 @@ export function toCustomNode(rfNode: ReactFlowNode): CustomNode {
 
 // Convert our custom node to React Flow node
 export function toReactFlowNode(customNode: CustomNode): ReactFlowNode {
-  const { childIds, ...rfNodeProps } = customNode
+  const { childIds: _childIds, ...rfNodeProps } = customNode
   return rfNodeProps as ReactFlowNode
 }
 

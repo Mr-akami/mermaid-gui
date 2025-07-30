@@ -11,6 +11,7 @@ export {
   type Edge,
   type Connection,
   MarkerType,
+  ConnectionMode,
 } from '@xyflow/react'
 
 

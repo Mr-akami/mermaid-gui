@@ -129,7 +129,8 @@ export const FlowchartNode = memo(({ data, type }: NodeProps) => {
     <>
       {/* Top vertex */}
       <Handle
-        type="target"
+        type="source"
+        id="top"
         position={Position.Top}
         className="!w-2 !h-2 !bg-blue-500 !border !border-white rounded-full"
         style={{
@@ -141,7 +142,8 @@ export const FlowchartNode = memo(({ data, type }: NodeProps) => {
       />
       {/* Left vertex */}
       <Handle
-        type="target"
+        type="source"
+        id="left"
         position={Position.Left}
         className="!w-2 !h-2 !bg-blue-500 !border !border-white rounded-full"
         style={{
@@ -154,6 +156,7 @@ export const FlowchartNode = memo(({ data, type }: NodeProps) => {
       {/* Bottom vertex */}
       <Handle
         type="source"
+        id="bottom"
         position={Position.Bottom}
         className="!w-2 !h-2 !bg-blue-500 !border !border-white rounded-full"
         style={{
@@ -166,6 +169,7 @@ export const FlowchartNode = memo(({ data, type }: NodeProps) => {
       {/* Right vertex */}
       <Handle
         type="source"
+        id="right"
         position={Position.Right}
         className="!w-2 !h-2 !bg-blue-500 !border !border-white rounded-full"
         style={{
@@ -182,25 +186,29 @@ export const FlowchartNode = memo(({ data, type }: NodeProps) => {
   const getDefaultHandles = () => (
     <>
       <Handle
-        type="target"
+        type="source"
+        id="top"
         position={Position.Top}
         className="w-2 h-2 !bg-blue-500 !border !border-white rounded-full"
         style={{ top: -4, left: '50%', transform: 'translateX(-50%)' }}
       />
       <Handle
-        type="target"
+        type="source"
+        id="left"
         position={Position.Left}
         className="w-2 h-2 !bg-blue-500 !border !border-white rounded-full"
         style={{ left: -4, top: '50%', transform: 'translateY(-50%)' }}
       />
       <Handle
         type="source"
+        id="bottom"
         position={Position.Bottom}
         className="w-2 h-2 !bg-blue-500 !border !border-white rounded-full"
         style={{ bottom: -4, left: '50%', transform: 'translateX(-50%)' }}
       />
       <Handle
         type="source"
+        id="right"
         position={Position.Right}
         className="w-2 h-2 !bg-blue-500 !border !border-white rounded-full"
         style={{ right: -4, top: '50%', transform: 'translateY(-50%)' }}

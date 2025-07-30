@@ -9,12 +9,13 @@ import {
   useRef,
   useState,
   useEffect,
-  type Node,
-  type Edge,
+  type Node as ReactFlowNode,
+  type Edge as ReactFlowEdge,
   type Connection,
   FlowchartNode,
   useAtom,
   MarkerType,
+  ConnectionMode,
 } from './deps'
 import { NodeToolbar } from './NodeToolbar'
 import { UndoRedoButtons } from './UndoRedoButtons'
@@ -25,13 +26,14 @@ import {
   NODE_TYPE_CONFIG,
   nodesAtom,
   edgesAtom,
-  FlowchartEdge,
+  BiDirectionalEdge,
   updateNodeAtom,
   updateEdgeAtom,
 } from '../../flowchart'
 import { saveToHistoryAtom } from '../../history'
 import { toCustomNodes, toReactFlowNodes, toCustomEdges, toReactFlowEdges } from './nodeTypeUtils'
 import { focusPropertyPanelAtom } from './atoms'
+import type { Edge } from '../../common/types'
 
 // Create nodeTypes object dynamically from MERMAID_NODE_TYPES
 const nodeTypes = MERMAID_NODE_TYPES.reduce(
@@ -44,10 +46,10 @@ const nodeTypes = MERMAID_NODE_TYPES.reduce(
 
 // Define edge types
 const edgeTypes = {
-  default: FlowchartEdge,
+  default: BiDirectionalEdge,
 }
 
-const initialNodes: Node[] = [
+const initialNodes: ReactFlowNode[] = [
   {
     id: '0',
     type: 'rectangle',
@@ -63,7 +65,7 @@ const nodeOrigin: [number, number] = [0.5, 0]
 export function NodeEditorCore() {
   const reactFlowWrapper = useRef<HTMLDivElement>(null)
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes)
-  const [edges, setEdges, onEdgesChange] = useEdgesState([])
+  const [edges, setEdges, onEdgesChange] = useEdgesState<ReactFlowEdge[]>([])
   const [selectedNodeType, setSelectedNodeType] = useState<string | null>(null)
   const { screenToFlowPosition } = useReactFlow()
 
@@ -168,10 +170,12 @@ export function NodeEditorCore() {
               id,
               source: connectionState.fromNode.id,
               target: id,
+              sourceHandle: connectionState.fromHandle?.id || undefined,
+              targetHandle: 'left', // Default to left handle for new nodes
               type: 'default',
               data: { edgeType: 'normal-arrow' },
               markerEnd: {
-                type: 'arrowclosed',
+                type: MarkerType.ArrowClosed,
                 width: 20,
                 height: 20,
                 color: '#333',
@@ -192,7 +196,7 @@ export function NodeEditorCore() {
           y: event.clientY,
         })
 
-        const newNode: Node = {
+        const newNode: ReactFlowNode = {
           id: getId(),
           type: selectedNodeType,
           position,
@@ -212,21 +216,21 @@ export function NodeEditorCore() {
   )
 
   const onNodeDoubleClick = useCallback(
-    (_event: React.MouseEvent, node: Node) => {
+    (_event: React.MouseEvent, _node: ReactFlowNode) => {
       setShouldFocusPropertyPanel(true)
     },
     [setShouldFocusPropertyPanel],
   )
 
   const onEdgeDoubleClick = useCallback(
-    (_event: React.MouseEvent, edge: Edge) => {
+    (_event: React.MouseEvent, _edge: ReactFlowEdge) => {
       setShouldFocusPropertyPanel(true)
     },
     [setShouldFocusPropertyPanel],
   )
 
   const onSelectionChange = useCallback(
-    ({ nodes: selectedNodes, edges: selectedEdges }: { nodes: Node[]; edges: Edge[] }) => {
+    ({ nodes: _selectedNodes, edges: _selectedEdges }: { nodes: ReactFlowNode[]; edges: ReactFlowEdge[] }) => {
       // React Flow calls this with arrays of selected items
       // Don't reset focus flag here as it interferes with double-click
     },
@@ -269,7 +273,12 @@ export function NodeEditorCore() {
   const handleEdgeUpdate = useCallback(
     (update: { id: string; data?: { label: string }; type?: string }) => {
       // Update edge in atoms
-      updateEdge(update)
+      const edgeUpdate: Parameters<typeof updateEdge>[0] = {
+        id: update.id,
+        ...(update.data && { data: update.data }),
+        ...(update.type && { type: update.type as Edge['type'] }),
+      }
+      updateEdge(edgeUpdate)
       
       // Update React Flow edges immediately
       setEdges((eds) =>
@@ -355,6 +364,7 @@ export function NodeEditorCore() {
         nodeOrigin={nodeOrigin}
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
+        connectionMode={ConnectionMode.Loose}
       >
         <Background />
       </ReactFlow>

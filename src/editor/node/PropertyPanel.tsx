@@ -6,7 +6,7 @@ interface PropertyPanelProps {
   selectedNode: Node | null
   selectedEdge: Edge | null
   onNodeUpdate: (update: { id: string; data?: { label: string }; type?: string }) => void
-  onEdgeUpdate: (update: { id: string; data?: { label: string }; type?: string }) => void
+  onEdgeUpdate: (update: { id: string; data?: { label: string }; type?: Edge['type'] }) => void
   autoFocus?: boolean
 }
 

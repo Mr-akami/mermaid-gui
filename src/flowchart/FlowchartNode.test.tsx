@@ -181,7 +181,7 @@ describe('FlowchartNode', () => {
     it('should have connection handles on all sides', () => {
       const { container } = render(<FlowchartNode {...defaultProps} />, { wrapper: Wrapper })
       const handles = container.querySelectorAll('.react-flow__handle')
-      expect(handles.length).toBe(4)
+      expect(handles.length).toBe(4) // 4 sides, all source handles
     })
 
     it('should have visible handles with blue background', () => {
@@ -201,7 +201,7 @@ describe('FlowchartNode', () => {
       )
       
       const handles = container.querySelectorAll('.react-flow__handle')
-      expect(handles).toHaveLength(4)
+      expect(handles).toHaveLength(4) // 4 sides, all source handles
       
       // Check that handles have special styling for diamond
       handles.forEach(handle => {
