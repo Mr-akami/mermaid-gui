@@ -54,7 +54,7 @@ const edgeTypes = {
 
 const initialNodes: ReactFlowNode[] = [
   {
-    id: '0',
+    id: 'N0',
     type: 'rectangle',
     data: { label: NODE_TYPE_CONFIG.rectangle.defaultLabel },
     position: { x: 0, y: 50 },
@@ -62,7 +62,7 @@ const initialNodes: ReactFlowNode[] = [
 ]
 
 let id = 1
-const getId = () => `${id++}`
+const getId = () => `N${id++}`
 const nodeOrigin: [number, number] = [0.5, 0]
 
 // Helper function to get appropriate handles based on layout direction
