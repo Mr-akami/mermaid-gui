@@ -74,7 +74,6 @@ export function NodeEditorCore() {
         fitView
         fitViewOptions={{ padding: 2 }}
         nodeOrigin={nodeOrigin}
-        selectNodesOnDrag={false}
       >
         <Background />
       </ReactFlow>
