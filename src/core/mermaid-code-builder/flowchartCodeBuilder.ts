@@ -1,34 +1,47 @@
 import type { FlowchartData } from './deps'
 import { buildNodeCode } from './nodeCodeBuilder'
 import { buildEdgeCode } from './edgeCodeBuilder'
+import { topologicalSort } from './topologicalSort'
 
-export function buildFlowchartCode(data: FlowchartData, direction: 'TB' | 'LR' = 'TB'): string {
+export function buildFlowchartCode(data: FlowchartData, direction: 'TD' | 'TB' | 'LR' = 'TD'): string {
   const lines: string[] = [`flowchart ${direction}`]
 
   // Separate subgraphs from regular nodes
   const subgraphs = data.nodes.filter((node) => node.type === 'subgraph')
   const regularNodes = data.nodes.filter((node) => node.type !== 'subgraph')
 
-  // Process top-level nodes (nodes without parent)
-  const topLevelNodes = regularNodes.filter((node) => !node.parentId)
-
-  // Process subgraphs
+  // Process subgraphs first
   subgraphs.forEach((subgraph) => {
     lines.push(`    ${buildNodeCode(subgraph)}`)
 
-    // Process nodes within the subgraph
+    // Process nodes within the subgraph using topological order
     const childNodes = regularNodes.filter(
       (node) => node.parentId === subgraph.id,
     )
-    childNodes.forEach((node) => {
+    const subgraphEdges = data.edges.filter(
+      (edge) => 
+        childNodes.some(n => n.id === edge.source) && 
+        childNodes.some(n => n.id === edge.target)
+    )
+    
+    const orderedChildNodes = topologicalSort(childNodes, subgraphEdges)
+    orderedChildNodes.forEach((node) => {
       lines.push(`        ${buildNodeCode(node)}`)
     })
 
     lines.push('    end')
   })
 
-  // Process top-level nodes
-  topLevelNodes.forEach((node) => {
+  // Process top-level nodes using topological order
+  const topLevelNodes = regularNodes.filter((node) => !node.parentId)
+  const topLevelEdges = data.edges.filter(
+    (edge) => 
+      topLevelNodes.some(n => n.id === edge.source) && 
+      topLevelNodes.some(n => n.id === edge.target)
+  )
+  
+  const orderedTopLevelNodes = topologicalSort(topLevelNodes, topLevelEdges)
+  orderedTopLevelNodes.forEach((node) => {
     lines.push(`    ${buildNodeCode(node)}`)
   })
 
@@ -45,6 +58,7 @@ export function buildFlowchartCode(data: FlowchartData, direction: 'TB' | 'LR' =
 
   return lines.join('\n')
 }
+
 
 // Group edges that can use & operator
 function groupEdgesWithAmpersand(edges: FlowchartData['edges']): string[] {

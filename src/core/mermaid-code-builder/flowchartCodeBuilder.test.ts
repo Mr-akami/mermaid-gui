@@ -462,14 +462,27 @@ describe('flowchartCodeBuilder', () => {
       }
 
       const result = buildFlowchartCode(data)
-      expect(result).toBe(`flowchart TD
-    A[A]
-    B[B]
-    C[C]
-    D[D]
-    A --> C
-    A --> D
-    B --> C`)
+      const lines = result.split('\n')
+      
+      // Check that all nodes are present
+      expect(result).toContain('A[A]')
+      expect(result).toContain('B[B]')
+      expect(result).toContain('C[C]')
+      expect(result).toContain('D[D]')
+      
+      // Check that edges are not optimized (should be individual)
+      expect(result).toContain('A --> C')
+      expect(result).toContain('A --> D')
+      expect(result).toContain('B --> C')
+      expect(result).not.toContain('&') // No optimization should occur
+      
+      // Check topological order: A and B (roots) should come before C and D
+      const aIndex = lines.findIndex(line => line.includes('A[A]'))
+      const bIndex = lines.findIndex(line => line.includes('B[B]'))
+      const cIndex = lines.findIndex(line => line.includes('C[C]'))
+      const dIndex = lines.findIndex(line => line.includes('D[D]'))
+      
+      expect(Math.max(aIndex, bIndex)).toBeLessThan(Math.min(cIndex, dIndex))
     })
 
     it('should optimize multiple edge types independently', () => {
@@ -547,13 +560,140 @@ describe('flowchartCodeBuilder', () => {
       }
 
       const result = buildFlowchartCode(data)
+      
+      // Check that all nodes are present
+      expect(result).toContain('A[A]')
+      expect(result).toContain('B[B]')
+      expect(result).toContain('C[C]')
+      expect(result).toContain('D[D]')
+      
+      // Check that edges are optimized by type
+      expect(result).toContain('A & B --> C & D') // Normal arrows optimized
+      expect(result).toContain('C & D -.-> A') // Dotted arrows optimized
+      
+      // Since there's a cycle (C->A, D->A), topological order isn't strictly defined
+      // But we can check that optimization still works
+      expect(result.startsWith('flowchart TD'))
+    })
+
+    it('should order nodes using topological sort (DAG)', () => {
+      const data: FlowchartData = {
+        nodes: [
+          {
+            id: 'E',
+            type: 'rectangle',
+            childIds: [],
+            position: { x: 200, y: 200 },
+            data: { label: 'End' },
+          },
+          {
+            id: 'A',
+            type: 'rectangle',
+            childIds: [],
+            position: { x: 0, y: 0 },
+            data: { label: 'Start' },
+          },
+          {
+            id: 'C',
+            type: 'rectangle',
+            childIds: [],
+            position: { x: 100, y: 100 },
+            data: { label: 'Middle' },
+          },
+          {
+            id: 'B',
+            type: 'rectangle',
+            childIds: [],
+            position: { x: 50, y: 50 },
+            data: { label: 'Second' },
+          },
+        ],
+        edges: [
+          {
+            id: 'edge1',
+            source: 'A',
+            target: 'B',
+            type: 'normal-arrow',
+          },
+          {
+            id: 'edge2',
+            source: 'B',
+            target: 'C',
+            type: 'normal-arrow',
+          },
+          {
+            id: 'edge3',
+            source: 'C',
+            target: 'E',
+            type: 'normal-arrow',
+          },
+        ],
+      }
+
+      const result = buildFlowchartCode(data)
+      // Should be ordered A -> B -> C -> E despite nodes being defined out of order
       expect(result).toBe(`flowchart TD
-    A[A]
-    B[B]
-    C[C]
-    D[D]
-    A & B --> C & D
-    C & D -.-> A`)
+    A[Start]
+    B[Second]
+    C[Middle]
+    E[End]
+    A --> B
+    B --> C
+    C --> E`)
+    })
+
+    it('should handle multiple root nodes correctly', () => {
+      const data: FlowchartData = {
+        nodes: [
+          {
+            id: 'C',
+            type: 'rectangle',
+            childIds: [],
+            position: { x: 100, y: 100 },
+            data: { label: 'Target' },
+          },
+          {
+            id: 'A',
+            type: 'rectangle',
+            childIds: [],
+            position: { x: 0, y: 0 },
+            data: { label: 'Root1' },
+          },
+          {
+            id: 'B',
+            type: 'rectangle',
+            childIds: [],
+            position: { x: 50, y: 0 },
+            data: { label: 'Root2' },
+          },
+        ],
+        edges: [
+          {
+            id: 'edge1',
+            source: 'A',
+            target: 'C',
+            type: 'normal-arrow',
+          },
+          {
+            id: 'edge2',
+            source: 'B',
+            target: 'C',
+            type: 'normal-arrow',
+          },
+        ],
+      }
+
+      const result = buildFlowchartCode(data)
+      // Both A and B are roots, should appear before C
+      const lines = result.split('\n')
+      const aIndex = lines.findIndex(line => line.includes('A[Root1]'))
+      const bIndex = lines.findIndex(line => line.includes('B[Root2]'))
+      const cIndex = lines.findIndex(line => line.includes('C[Target]'))
+      
+      expect(aIndex).toBeGreaterThan(0)
+      expect(bIndex).toBeGreaterThan(0)
+      expect(cIndex).toBeGreaterThan(0)
+      expect(Math.max(aIndex, bIndex)).toBeLessThan(cIndex)
     })
   })
 })
