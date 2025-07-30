@@ -1,5 +1,6 @@
 import { memo } from 'react'
-import { MERMAID_NODE_TYPES, type MermaidNodeType } from '../../flowchart'
+import { useAtom, useAtomValue } from 'jotai'
+import { MERMAID_NODE_TYPES, type MermaidNodeType, layoutDirectionAtom, updateLayoutDirectionAtom } from '../../flowchart'
 
 interface NodeToolbarProps {
   onNodeTypeSelect: (nodeType: string) => void
@@ -23,8 +24,24 @@ const NODE_ICONS: Record<MermaidNodeType, { icon: string; title: string }> = {
 }
 
 export const NodeToolbar = memo(({ onNodeTypeSelect, selectedNodeType }: NodeToolbarProps) => {
+  const layoutDirection = useAtomValue(layoutDirectionAtom)
+  const [, updateLayoutDirection] = useAtom(updateLayoutDirectionAtom)
+
   return (
     <div className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-white rounded-lg shadow-lg p-2 flex gap-1 z-10">
+      {/* Layout direction toggle */}
+      <button
+        onClick={() => updateLayoutDirection(layoutDirection === 'TB' ? 'LR' : 'TB')}
+        title={`Layout: ${layoutDirection === 'TB' ? 'Top to Bottom' : 'Left to Right'}`}
+        className="w-10 h-10 flex items-center justify-center rounded bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-bold transition-all mr-2"
+      >
+        {layoutDirection === 'TB' ? '↓' : '→'}
+      </button>
+      
+      {/* Separator */}
+      <div className="w-px bg-gray-300 mr-2"></div>
+      
+      {/* Node type buttons */}
       {MERMAID_NODE_TYPES.filter(type => type !== 'subgraph').map((type) => {
         const { icon, title } = NODE_ICONS[type]
         return (

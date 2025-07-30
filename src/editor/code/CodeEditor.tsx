@@ -1,10 +1,11 @@
 import { useAtomValue, useAtom } from 'jotai'
 import { useState, useCallback, useEffect, useRef } from 'react'
-import { mermaidCodeAtom, nodesAtom, edgesAtom } from '../../flowchart'
+import { mermaidCodeAtom, nodesAtom, edgesAtom, layoutDirectionAtom } from '../../flowchart'
 import { parseFlowchart } from '../../core/mermaid-parser/flowchartParser'
 
 export function CodeEditor() {
   const mermaidCode = useAtomValue(mermaidCodeAtom)
+  const layoutDirection = useAtomValue(layoutDirectionAtom)
   const [, setNodes] = useAtom(nodesAtom)
   const [, setEdges] = useAtom(edgesAtom)
   const [editableCode, setEditableCode] = useState(mermaidCode)
@@ -24,7 +25,7 @@ export function CodeEditor() {
     setEditableCode(newCode)
     
     // Try to parse and update the flowchart
-    const result = parseFlowchart(newCode)
+    const result = parseFlowchart(newCode, layoutDirection)
     if (result.success && result.data) {
       setNodes(result.data.nodes)
       setEdges(result.data.edges)
@@ -32,7 +33,7 @@ export function CodeEditor() {
     } else {
       setError(result.error || 'Failed to parse mermaid code')
     }
-  }, [setNodes, setEdges])
+  }, [setNodes, setEdges, layoutDirection])
 
   const handleFocus = useCallback(() => {
     isEditingRef.current = true

@@ -29,6 +29,7 @@ import {
   BiDirectionalEdge,
   updateNodeAtom,
   updateEdgeAtom,
+  layoutDirectionAtom,
 } from '../../flowchart'
 import { saveToHistoryAtom } from '../../history'
 import { toCustomNodes, toReactFlowNodes, toCustomEdges, toReactFlowEdges } from './deps'
@@ -62,6 +63,15 @@ let id = 1
 const getId = () => `${id++}`
 const nodeOrigin: [number, number] = [0.5, 0]
 
+// Helper function to get appropriate handles based on layout direction
+const getHandlesForDirection = (direction: 'TB' | 'LR') => {
+  if (direction === 'TB') {
+    return { source: 'bottom', target: 'top' }
+  } else {
+    return { source: 'right', target: 'left' }
+  }
+}
+
 export function NodeEditorCore() {
   const reactFlowWrapper = useRef<HTMLDivElement>(null)
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes)
@@ -72,6 +82,7 @@ export function NodeEditorCore() {
   // Connect to flowchart atoms
   const [flowchartNodes, setFlowchartNodes] = useAtom(nodesAtom)
   const [flowchartEdges, setFlowchartEdges] = useAtom(edgesAtom)
+  const [layoutDirection] = useAtom(layoutDirectionAtom)
   const [, saveToHistory] = useAtom(saveToHistoryAtom)
   const [, updateNode] = useAtom(updateNodeAtom)
   const [, updateEdge] = useAtom(updateEdgeAtom)
@@ -159,18 +170,22 @@ export function NodeEditorCore() {
   }, [nodes, edges, saveToHistory, setFlowchartNodes, setFlowchartEdges])
 
   const onConnect = useCallback(
-    (params: Connection) =>
+    (params: Connection) => {
+      const handles = getHandlesForDirection(layoutDirection)
       setEdges((eds) =>
         addEdge(
           {
             ...params,
             type: 'default',
             data: { edgeType: 'normal-arrow' },
+            sourceHandle: params.sourceHandle || handles.source,
+            targetHandle: params.targetHandle || handles.target,
           },
           eds,
         ),
-      ),
-    [setEdges],
+      )
+    },
+    [setEdges, layoutDirection],
   )
 
   const onConnectEnd = useCallback(
@@ -192,13 +207,15 @@ export function NodeEditorCore() {
         }
 
         setNodes((nds) => nds.concat(newNode))
+        const handles = getHandlesForDirection(layoutDirection)
         setEdges((eds) =>
           eds.concat([
             {
               id,
               source: connectionState.fromNode.id,
               target: id,
-              sourceHandle: connectionState.fromHandle?.id || undefined,
+              sourceHandle: connectionState.fromHandle?.id || handles.source,
+              targetHandle: handles.target,
               type: 'default',
               data: { edgeType: 'normal-arrow' },
             },
@@ -206,7 +223,7 @@ export function NodeEditorCore() {
         )
       }
     },
-    [screenToFlowPosition, setNodes, setEdges],
+    [screenToFlowPosition, setNodes, setEdges, layoutDirection],
   )
 
   const onPaneClick = useCallback(

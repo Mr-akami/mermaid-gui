@@ -2,8 +2,8 @@ import type { FlowchartData } from './deps'
 import { buildNodeCode } from './nodeCodeBuilder'
 import { buildEdgeCode } from './edgeCodeBuilder'
 
-export function buildFlowchartCode(data: FlowchartData): string {
-  const lines: string[] = ['flowchart TD']
+export function buildFlowchartCode(data: FlowchartData, direction: 'TB' | 'LR' = 'TB'): string {
+  const lines: string[] = [`flowchart ${direction}`]
 
   // Separate subgraphs from regular nodes
   const subgraphs = data.nodes.filter((node) => node.type === 'subgraph')
@@ -40,7 +40,7 @@ export function buildFlowchartCode(data: FlowchartData): string {
 
   // Handle empty flowchart
   if (lines.length === 1) {
-    return 'flowchart TD'
+    return `flowchart ${direction}`
   }
 
   return lines.join('\n')

@@ -19,6 +19,42 @@ const nodeCountersAtom = atom<Record<string, number>>({
 export const nodesAtom = atom<Node[]>([])
 export const edgesAtom = atom<Edge[]>([])
 
+// Layout direction atom ('TB' for top-to-bottom, 'LR' for left-to-right)
+export const layoutDirectionAtom = atom<'TB' | 'LR'>('TB')
+
+// Helper function to get appropriate handles based on layout direction
+const getHandlesForDirection = (direction: 'TB' | 'LR') => {
+  if (direction === 'TB') {
+    return { source: 'bottom', target: 'top' }
+  } else {
+    return { source: 'right', target: 'left' }
+  }
+}
+
+// Write atom for updating layout direction and adjusting edges
+export const updateLayoutDirectionAtom = atom(
+  null,
+  (get, set, newDirection: 'TB' | 'LR') => {
+    const currentDirection = get(layoutDirectionAtom)
+    if (currentDirection === newDirection) return
+    
+    set(layoutDirectionAtom, newDirection)
+    
+    // Update all edges to use appropriate handles for new direction
+    const edges = get(edgesAtom)
+    const handles = getHandlesForDirection(newDirection)
+    
+    const updatedEdges = edges.map(edge => ({
+      ...edge,
+      sourceHandle: handles.source,
+      targetHandle: handles.target,
+    }))
+    
+    set(edgesAtom, updatedEdges)
+    set(saveToHistoryAtom, { nodes: get(nodesAtom), edges: updatedEdges })
+  }
+)
+
 // Computed atom for flowchart data
 export const flowchartDataAtom = atom<FlowchartData>((get) => ({
   nodes: get(nodesAtom),
@@ -28,7 +64,8 @@ export const flowchartDataAtom = atom<FlowchartData>((get) => ({
 // Computed atom for mermaid code
 export const mermaidCodeAtom = atom<string>((get) => {
   const flowchartData = get(flowchartDataAtom)
-  return buildFlowchartCode(flowchartData)
+  const layoutDirection = get(layoutDirectionAtom)
+  return buildFlowchartCode(flowchartData, layoutDirection)
 })
 
 // Write atom for adding a node

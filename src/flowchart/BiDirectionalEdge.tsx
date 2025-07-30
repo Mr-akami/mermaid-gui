@@ -47,9 +47,6 @@ export const BiDirectionalEdge = memo(
     })
 
     const edgeType = (data as any)?.edgeType || 'normal-arrow'
-    
-    // Debug logging
-    console.log('BiDirectionalEdge:', { id, edgeType, data, hasArrow: edgeType.includes('arrow') })
 
     // Determine edge styling based on type
     const getEdgeStyle = () => {

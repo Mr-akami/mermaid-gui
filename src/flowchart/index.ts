@@ -4,6 +4,8 @@ export {
   edgesAtom,
   flowchartDataAtom,
   mermaidCodeAtom,
+  layoutDirectionAtom,
+  updateLayoutDirectionAtom,
   addNodeAtom,
   removeNodeAtom,
   updateNodeAtom,
