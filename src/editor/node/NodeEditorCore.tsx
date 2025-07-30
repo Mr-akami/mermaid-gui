@@ -166,12 +166,6 @@ export function NodeEditorCore() {
             ...params,
             type: 'default',
             data: { edgeType: 'normal-arrow' },
-            markerEnd: {
-              type: MarkerType.ArrowClosed,
-              width: 20,
-              height: 20,
-              color: '#333',
-            },
           },
           eds,
         ),
@@ -205,15 +199,8 @@ export function NodeEditorCore() {
               source: connectionState.fromNode.id,
               target: id,
               sourceHandle: connectionState.fromHandle?.id || undefined,
-              targetHandle: 'left', // Default to left handle for new nodes
               type: 'default',
               data: { edgeType: 'normal-arrow' },
-              markerEnd: {
-                type: MarkerType.ArrowClosed,
-                width: 20,
-                height: 20,
-                color: '#333',
-              },
             },
           ]),
         )
@@ -327,19 +314,13 @@ export function NodeEditorCore() {
             
             // Update type if provided
             if (update.type) {
-              updatedEdge.data = { 
-                ...updatedEdge.data, 
-                edgeType: update.type 
+              updatedEdge = {
+                ...updatedEdge,
+                data: { 
+                  ...updatedEdge.data, 
+                  edgeType: update.type 
+                }
               }
-              // Update markerEnd based on whether the type has an arrow
-              updatedEdge.markerEnd = update.type.includes('arrow')
-                ? {
-                    type: MarkerType.ArrowClosed,
-                    width: 20,
-                    height: 20,
-                    color: '#333',
-                  }
-                : undefined
             }
             
             return updatedEdge
@@ -401,6 +382,15 @@ export function NodeEditorCore() {
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
         connectionMode={ConnectionMode.Loose}
+        defaultEdgeOptions={{
+          type: 'default',
+          markerEnd: {
+            type: MarkerType.ArrowClosed,
+            width: 20,
+            height: 20,
+            color: '#333',
+          },
+        }}
       >
         <Background />
       </ReactFlow>

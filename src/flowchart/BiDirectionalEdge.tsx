@@ -5,6 +5,7 @@ import {
   BaseEdge,
   useStore,
   ReactFlowState,
+  MarkerType,
 } from '@xyflow/react'
 import { memo } from 'react'
 
@@ -46,6 +47,9 @@ export const BiDirectionalEdge = memo(
     })
 
     const edgeType = (data as any)?.edgeType || 'normal-arrow'
+    
+    // Debug logging
+    console.log('BiDirectionalEdge:', { id, edgeType, data, hasArrow: edgeType.includes('arrow') })
 
     // Determine edge styling based on type
     const getEdgeStyle = () => {
@@ -76,8 +80,13 @@ export const BiDirectionalEdge = memo(
     const hasArrow = edgeType.includes('arrow')
     const edgeStyle = getEdgeStyle()
 
-    // Use provided markerEnd or default based on edge type
-    const finalMarkerEnd = markerEnd || (hasArrow ? 'url(#react-flow__arrowclosed)' : undefined)
+    // Use provided markerEnd or create proper marker based on edge type
+    const finalMarkerEnd = hasArrow ? (markerEnd || {
+      type: MarkerType.ArrowClosed,
+      width: 20,
+      height: 20,
+      color: '#333',
+    }) : undefined
 
     return (
       <>

@@ -37,6 +37,14 @@ export function toCustomEdge(rfEdge: ReactFlowEdge): CustomEdge {
     type: (rfEdge.data?.edgeType || 'normal-arrow') as CustomEdge['type'],
   }
   
+  // Preserve handle information
+  if (rfEdge.sourceHandle) {
+    result.sourceHandle = rfEdge.sourceHandle
+  }
+  if (rfEdge.targetHandle) {
+    result.targetHandle = rfEdge.targetHandle
+  }
+  
   if (rfEdge.data?.label) {
     result.data = { label: String(rfEdge.data.label) }
   }
@@ -47,7 +55,7 @@ export function toCustomEdge(rfEdge: ReactFlowEdge): CustomEdge {
 // Convert our custom edge to React Flow edge
 // Note: markerEnd is handled by BiDirectionalEdge component, not here
 export function toReactFlowEdge(customEdge: CustomEdge): ReactFlowEdge {
-  return {
+  const result: ReactFlowEdge = {
     id: customEdge.id,
     source: customEdge.source,
     target: customEdge.target,
@@ -57,6 +65,16 @@ export function toReactFlowEdge(customEdge: CustomEdge): ReactFlowEdge {
       ...(customEdge.data?.label && { label: customEdge.data.label }),
     },
   }
+  
+  // Preserve handle information
+  if (customEdge.sourceHandle) {
+    result.sourceHandle = customEdge.sourceHandle
+  }
+  if (customEdge.targetHandle) {
+    result.targetHandle = customEdge.targetHandle
+  }
+  
+  return result
 }
 
 // Array conversion functions
