@@ -12,7 +12,10 @@ export {
   type Connection,
 } from '@xyflow/react'
 
-export { useCallback, useRef } from 'react'
+export { useCallback, useRef, useState } from 'react'
+
+// Internal dependencies
+export { FlowchartNode } from '../../flowchart/index'
 
 // Import React Flow CSS
 import '@xyflow/react/dist/style.css'

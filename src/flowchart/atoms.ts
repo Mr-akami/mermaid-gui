@@ -4,7 +4,7 @@ import {
   Node,
   Edge,
   FlowchartData,
-  saveToHistoryAtom,
+  // saveToHistoryAtom,
 } from './deps'
 
 // Counter atoms for sequential IDs
@@ -92,7 +92,7 @@ export const addNodeAtom = atom(
     }
 
     // Save to history
-    set(saveToHistoryAtom)
+    // set(saveToHistoryAtom)
   },
 )
 
@@ -119,7 +119,7 @@ export const removeNodeAtom = atom(null, (get, set, nodeId: string) => {
 
   set(nodesAtom, filteredNodes)
   set(edgesAtom, filteredEdges)
-  set(saveToHistoryAtom)
+  // set(saveToHistoryAtom)
 })
 
 // Write atom for updating a node
@@ -149,7 +149,7 @@ export const updateNodeAtom = atom(
         : node,
     )
     set(nodesAtom, updatedNodes)
-    set(saveToHistoryAtom)
+    // set(saveToHistoryAtom)
   },
 )
 

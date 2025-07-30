@@ -36,6 +36,83 @@ export const FlowchartNode = memo(({ data, type }: NodeProps) => {
             </div>
           </div>
         )
+      case 'roundEdges':
+        return (
+          <div className="px-4 py-2 bg-blue-100 border-2 border-blue-500 rounded-lg">
+            <div className="text-sm font-medium text-gray-900">
+              {data?.label || 'Round Edges'}
+            </div>
+          </div>
+        )
+      case 'stadium':
+        return (
+          <div className="px-6 py-2 bg-green-100 border-2 border-green-500 rounded-full">
+            <div className="text-sm font-medium text-gray-900">
+              {data?.label || 'Stadium'}
+            </div>
+          </div>
+        )
+      case 'subroutine':
+        return (
+          <div className="border-4 border-blue-600 p-0.5">
+            <div className="px-4 py-2 bg-blue-100 border-2 border-blue-500">
+              <div className="text-sm font-medium text-gray-900">
+                {data?.label || 'Subroutine'}
+              </div>
+            </div>
+          </div>
+        )
+      case 'cylindrical':
+        return (
+          <div className="px-4 py-2 bg-indigo-100 border-2 border-indigo-500 rounded-t-full rounded-b">
+            <div className="text-sm font-medium text-gray-900">
+              {data?.label || 'Cylindrical'}
+            </div>
+          </div>
+        )
+      case 'parallelogram':
+        return (
+          <div 
+            className="px-6 py-2 bg-orange-100 border-2 border-orange-500"
+            style={{ transform: 'skewX(-20deg)' }}
+          >
+            <div className="text-sm font-medium text-gray-900" style={{ transform: 'skewX(20deg)' }}>
+              {data?.label || 'Parallelogram'}
+            </div>
+          </div>
+        )
+      case 'trapezoid':
+        return (
+          <div 
+            className="px-6 py-2 bg-teal-100 border-2 border-teal-500"
+            style={{ clipPath: 'polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%)' }}
+          >
+            <div className="text-sm font-medium text-gray-900">
+              {data?.label || 'Trapezoid'}
+            </div>
+          </div>
+        )
+      case 'hexagon':
+        return (
+          <div 
+            className="px-6 py-2 bg-pink-100 border-2 border-pink-500"
+            style={{ clipPath: 'polygon(30% 0%, 70% 0%, 100% 50%, 70% 100%, 30% 100%, 0% 50%)' }}
+          >
+            <div className="text-sm font-medium text-gray-900">
+              {data?.label || 'Hexagon'}
+            </div>
+          </div>
+        )
+      case 'doubleCircle':
+        return (
+          <div className="p-1 bg-green-100 border-4 border-green-600 rounded-full">
+            <div className="w-16 h-16 bg-green-100 border-2 border-green-500 rounded-full flex items-center justify-center">
+              <div className="text-sm font-medium text-gray-900 text-center">
+                {data?.label || 'Double Circle'}
+              </div>
+            </div>
+          </div>
+        )
       default:
         return null
     }

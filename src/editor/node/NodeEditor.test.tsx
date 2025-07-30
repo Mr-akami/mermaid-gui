@@ -18,8 +18,8 @@ describe('NodeEditor', () => {
       expect(nodes).toHaveLength(1)
     })
     
-    // Check initial node has correct type
-    const initialNode = container.querySelector('.react-flow__node-input')
+    // Check initial node has correct type (changed from input to rectangle)
+    const initialNode = container.querySelector('.react-flow__node-rectangle')
     expect(initialNode).toBeTruthy()
   })
   

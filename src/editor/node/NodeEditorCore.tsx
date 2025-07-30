@@ -7,15 +7,25 @@ import {
   useReactFlow,
   useCallback,
   useRef,
+  useState,
   type Node,
   type Connection,
+  FlowchartNode,
 } from './deps'
+import { NodeToolbar } from './NodeToolbar'
+import { MERMAID_NODE_TYPES, NODE_TYPE_CONFIG } from '../../flowchart'
+
+// Create nodeTypes object dynamically from MERMAID_NODE_TYPES
+const nodeTypes = MERMAID_NODE_TYPES.reduce((acc, type) => {
+  acc[type] = FlowchartNode
+  return acc
+}, {} as Record<string, typeof FlowchartNode>)
 
 const initialNodes: Node[] = [
   {
     id: '0',
-    type: 'input',
-    data: { label: 'Node' },
+    type: 'rectangle',
+    data: { label: NODE_TYPE_CONFIG.rectangle.defaultLabel },
     position: { x: 0, y: 50 },
   },
 ]
@@ -28,6 +38,7 @@ export function NodeEditorCore() {
   const reactFlowWrapper = useRef<HTMLDivElement>(null)
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes)
   const [edges, setEdges, onEdgesChange] = useEdgesState([])
+  const [selectedNodeType, setSelectedNodeType] = useState<string | null>(null)
   const { screenToFlowPosition } = useReactFlow()
   
   const onConnect = useCallback(
@@ -44,12 +55,12 @@ export function NodeEditorCore() {
           'changedTouches' in event ? event.changedTouches[0] : event
         const newNode = {
           id,
-          type: 'default',
+          type: 'rectangle',
           position: screenToFlowPosition({
             x: clientX,
             y: clientY,
           }),
-          data: { label: `Node ${id}` },
+          data: { label: NODE_TYPE_CONFIG.rectangle.defaultLabel },
           origin: [0.5, 0.0] as [number, number],
         }
 
@@ -62,8 +73,39 @@ export function NodeEditorCore() {
     [screenToFlowPosition, setNodes, setEdges],
   )
 
+  const onPaneClick = useCallback(
+    (event: React.MouseEvent) => {
+      if (selectedNodeType) {
+        const position = screenToFlowPosition({
+          x: event.clientX,
+          y: event.clientY,
+        })
+        
+        const newNode: Node = {
+          id: getId(),
+          type: selectedNodeType,
+          position,
+          data: { label: NODE_TYPE_CONFIG[selectedNodeType as keyof typeof NODE_TYPE_CONFIG]?.defaultLabel || selectedNodeType },
+        }
+        
+        setNodes((nds) => nds.concat(newNode))
+        setSelectedNodeType(null) // Clear selection after adding
+      }
+    },
+    [selectedNodeType, screenToFlowPosition, setNodes],
+  )
+
   return (
-    <div className="wrapper" ref={reactFlowWrapper} style={{ width: '100%', height: '100%' }}>
+    <div className="wrapper" ref={reactFlowWrapper} style={{ 
+      width: '100%', 
+      height: '100%', 
+      position: 'relative',
+      cursor: selectedNodeType ? 'crosshair' : 'default'
+    }}>
+      <NodeToolbar 
+        onNodeTypeSelect={setSelectedNodeType}
+        selectedNodeType={selectedNodeType}
+      />
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -71,9 +113,11 @@ export function NodeEditorCore() {
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
         onConnectEnd={onConnectEnd}
+        onPaneClick={onPaneClick}
         fitView
         fitViewOptions={{ padding: 2 }}
         nodeOrigin={nodeOrigin}
+        nodeTypes={nodeTypes}
       >
         <Background />
       </ReactFlow>
