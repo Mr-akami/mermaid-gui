@@ -7,6 +7,16 @@
     "context7": {
       "command": "npx",
       "args": ["-y", "@upstash/context7-mcp@latest"]
+    },
+    "serena": {
+      "command": "uv",
+      "args": [
+        "run",
+        "--directory",
+        "/home/mr-akami/workspace/serena",
+        "serena-mcp-server"
+      ],
+      "env": {}
     }
   }
 }
