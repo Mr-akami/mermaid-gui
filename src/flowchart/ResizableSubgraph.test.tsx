@@ -10,7 +10,7 @@ const Wrapper = ({ children }: { children: React.ReactNode }) => (
 )
 
 describe('ResizableSubgraph', () => {
-  const defaultProps: NodeProps = {
+  const defaultProps = {
     id: 'subgraph1',
     type: 'subgraph',
     data: { label: 'Test Subgraph' },
@@ -19,6 +19,12 @@ describe('ResizableSubgraph', () => {
     targetPosition: undefined,
     sourcePosition: undefined,
     dragging: false,
+    zIndex: 0,
+    xPos: 0,
+    yPos: 0,
+    draggable: true,
+    selectable: true,
+    deletable: true,
   } as NodeProps
 
   it('should render with label', () => {

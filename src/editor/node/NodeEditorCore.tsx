@@ -12,10 +12,10 @@ import {
   type Node as ReactFlowNode,
   type Edge as ReactFlowEdge,
   type Connection,
-  FlowchartNode,
   useAtom,
   MarkerType,
   ConnectionMode,
+  FlowchartNode,
 } from './deps'
 import { NodeToolbar } from './NodeToolbar'
 import { UndoRedoButtons } from './UndoRedoButtons'
@@ -27,6 +27,7 @@ import {
   nodesAtom,
   edgesAtom,
   BiDirectionalEdge,
+  ResizableSubgraph,
   updateNodeAtom,
   updateEdgeAtom,
   layoutDirectionAtom,
@@ -39,10 +40,11 @@ import type { Edge } from '../../common/types'
 // Create nodeTypes object dynamically from MERMAID_NODE_TYPES
 const nodeTypes = MERMAID_NODE_TYPES.reduce(
   (acc, type) => {
-    acc[type] = FlowchartNode
+    // Use ResizableSubgraph for subgraph type
+    acc[type] = type === 'subgraph' ? ResizableSubgraph : FlowchartNode
     return acc
   },
-  {} as Record<string, typeof FlowchartNode>,
+  {} as Record<string, typeof FlowchartNode | typeof ResizableSubgraph>,
 )
 
 // Define edge types

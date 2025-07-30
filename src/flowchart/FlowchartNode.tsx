@@ -1,5 +1,6 @@
 import { Handle, Position, NodeProps } from '@xyflow/react'
 import { memo } from 'react'
+import React from 'react'
 
 export const FlowchartNode = memo(({ data, type }: NodeProps) => {
   const getNodeContent = () => {
@@ -8,7 +9,7 @@ export const FlowchartNode = memo(({ data, type }: NodeProps) => {
         return (
           <div className="px-4 py-2 bg-blue-100 border-2 border-blue-500 rounded">
             <div className="text-sm font-medium text-gray-900">
-              {data?.label || 'Rectangle'}
+              {String(data?.label || 'Rectangle')}
             </div>
           </div>
         )
@@ -16,7 +17,7 @@ export const FlowchartNode = memo(({ data, type }: NodeProps) => {
         return (
           <div className="w-20 h-20 bg-green-100 border-2 border-green-500 rounded-full flex items-center justify-center">
             <div className="text-sm font-medium text-gray-900 text-center">
-              {data?.label || 'Circle'}
+              {String(data?.label || 'Circle')}
             </div>
           </div>
         )
@@ -24,7 +25,7 @@ export const FlowchartNode = memo(({ data, type }: NodeProps) => {
         return (
           <div className="w-20 h-20 bg-yellow-100 border-2 border-yellow-500 transform rotate-45 flex items-center justify-center">
             <div className="transform -rotate-45 text-sm font-medium text-gray-900 text-center">
-              {data?.label || 'Diamond'}
+              {String(data?.label || 'Diamond')}
             </div>
           </div>
         )
@@ -32,7 +33,7 @@ export const FlowchartNode = memo(({ data, type }: NodeProps) => {
         return (
           <div className="px-4 py-2 bg-purple-100 border-2 border-purple-500 border-dashed rounded-lg min-w-[200px] min-h-[100px]">
             <div className="text-sm font-medium text-gray-900">
-              {data?.label || 'Subgraph'}
+              {String(data?.label || 'Subgraph')}
             </div>
           </div>
         )
@@ -40,7 +41,7 @@ export const FlowchartNode = memo(({ data, type }: NodeProps) => {
         return (
           <div className="px-4 py-2 bg-blue-100 border-2 border-blue-500 rounded-lg">
             <div className="text-sm font-medium text-gray-900">
-              {data?.label || 'Round Edges'}
+              {String(data?.label || 'Round Edges')}
             </div>
           </div>
         )
@@ -48,7 +49,7 @@ export const FlowchartNode = memo(({ data, type }: NodeProps) => {
         return (
           <div className="px-6 py-2 bg-green-100 border-2 border-green-500 rounded-full">
             <div className="text-sm font-medium text-gray-900">
-              {data?.label || 'Stadium'}
+              {String(data?.label || 'Stadium')}
             </div>
           </div>
         )
@@ -57,7 +58,7 @@ export const FlowchartNode = memo(({ data, type }: NodeProps) => {
           <div className="border-4 border-blue-600 p-0.5">
             <div className="px-4 py-2 bg-blue-100 border-2 border-blue-500">
               <div className="text-sm font-medium text-gray-900">
-                {data?.label || 'Subroutine'}
+                {String(data?.label || 'Subroutine')}
               </div>
             </div>
           </div>
@@ -66,7 +67,7 @@ export const FlowchartNode = memo(({ data, type }: NodeProps) => {
         return (
           <div className="px-4 py-2 bg-indigo-100 border-2 border-indigo-500 rounded-t-full rounded-b">
             <div className="text-sm font-medium text-gray-900">
-              {data?.label || 'Cylindrical'}
+              {String(data?.label || 'Cylindrical')}
             </div>
           </div>
         )
@@ -80,7 +81,7 @@ export const FlowchartNode = memo(({ data, type }: NodeProps) => {
               className="text-sm font-medium text-gray-900"
               style={{ transform: 'skewX(20deg)' }}
             >
-              {data?.label || 'Parallelogram'}
+              {String(data?.label || 'Parallelogram')}
             </div>
           </div>
         )
@@ -91,7 +92,7 @@ export const FlowchartNode = memo(({ data, type }: NodeProps) => {
             style={{ clipPath: 'polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%)' }}
           >
             <div className="text-sm font-medium text-gray-900">
-              {data?.label || 'Trapezoid'}
+              {String(data?.label || 'Trapezoid')}
             </div>
           </div>
         )
@@ -105,7 +106,7 @@ export const FlowchartNode = memo(({ data, type }: NodeProps) => {
             }}
           >
             <div className="text-sm font-medium text-gray-900">
-              {data?.label || 'Hexagon'}
+              {String(data?.label || 'Hexagon')}
             </div>
           </div>
         )
@@ -114,7 +115,7 @@ export const FlowchartNode = memo(({ data, type }: NodeProps) => {
           <div className="p-1 bg-green-100 border-4 border-green-600 rounded-full">
             <div className="w-16 h-16 bg-green-100 border-2 border-green-500 rounded-full flex items-center justify-center">
               <div className="text-sm font-medium text-gray-900 text-center">
-                {data?.label || 'Double Circle'}
+                {String(data?.label || 'Double Circle')}
               </div>
             </div>
           </div>

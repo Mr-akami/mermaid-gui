@@ -10,7 +10,7 @@ const Wrapper = ({ children }: { children: React.ReactNode }) => (
 )
 
 describe('FlowchartNode', () => {
-  const defaultProps: NodeProps = {
+  const defaultProps = {
     id: 'node1',
     type: 'rectangle',
     data: { label: 'Test Node' },
@@ -19,6 +19,12 @@ describe('FlowchartNode', () => {
     targetPosition: undefined,
     sourcePosition: undefined,
     dragging: false,
+    zIndex: 0,
+    xPos: 0,
+    yPos: 0,
+    draggable: true,
+    selectable: true,
+    deletable: true,
   } as NodeProps
 
   describe('Rectangle Node', () => {

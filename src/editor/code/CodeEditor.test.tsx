@@ -1,7 +1,8 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { describe, test, expect } from 'vitest'
 import { Provider as JotaiProvider, createStore } from 'jotai'
 import { CodeEditor } from './CodeEditor'
-import { mermaidCodeAtom, nodesAtom, edgesAtom } from '../../flowchart'
+import { nodesAtom, edgesAtom } from '../../flowchart'
 
 // Test doubles
 const createTestStore = () => createStore()
@@ -127,7 +128,7 @@ describe('CodeEditor', () => {
       )
 
       const textarea = screen.getByRole('textbox') as HTMLTextAreaElement
-      expect(textarea.value).toContain('flowchart TD')
+      expect(textarea.value).toContain('flowchart TB')
       expect(textarea.value).toContain('X --> Y')
     })
 

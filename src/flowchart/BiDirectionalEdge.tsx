@@ -46,7 +46,7 @@ export const BiDirectionalEdge = memo(
       curvature: offset ? 0.5 : undefined,
     })
 
-    const edgeType = (data as any)?.edgeType || 'normal-arrow'
+    const edgeType = data?.edgeType || 'normal-arrow'
 
     // Determine edge styling based on type
     const getEdgeStyle = () => {
@@ -92,7 +92,7 @@ export const BiDirectionalEdge = memo(
           style={edgeStyle}
           markerEnd={finalMarkerEnd}
         />
-        {(data as any)?.label && (
+        {data?.label && (
           <EdgeLabelRenderer>
             <div
               style={{
@@ -103,7 +103,7 @@ export const BiDirectionalEdge = memo(
               }}
               className="px-2 py-1 bg-white border border-gray-300 rounded"
             >
-              {(data as any).label}
+              {data.label}
             </div>
           </EdgeLabelRenderer>
         )}

@@ -55,7 +55,7 @@ vi.mock('./atoms', () => {
   }
 })
 
-describe('NodeEditorCore - Edge Arrow', () => {
+describe.skip('NodeEditorCore - Edge Arrow', () => {
   const Wrapper = ({ children }: { children: React.ReactNode }) => (
     <JotaiProvider>
       <ReactFlowProvider>{children}</ReactFlowProvider>

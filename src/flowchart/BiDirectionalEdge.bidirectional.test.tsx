@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render } from '@testing-library/react'
 import { BiDirectionalEdge } from './BiDirectionalEdge'
 import { ReactFlowProvider, useStore } from '@xyflow/react'

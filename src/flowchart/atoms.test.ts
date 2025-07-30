@@ -62,7 +62,7 @@ describe('flowchart atoms', () => {
     store.set(edgesAtom, [])
 
     const code = store.get(mermaidCodeAtom)
-    expect(code).toBe(`flowchart TD
+    expect(code).toBe(`flowchart TB
     A[Start]`)
   })
 
