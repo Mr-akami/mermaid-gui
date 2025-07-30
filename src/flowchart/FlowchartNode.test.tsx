@@ -49,9 +49,9 @@ describe('FlowchartNode', () => {
 
     it('should have circle styling', () => {
       const { container } = render(<FlowchartNode {...defaultProps} type="circle" />, { wrapper: Wrapper })
-      const node = container.querySelector('.rounded-full')
+      const node = container.querySelector('.bg-green-100.rounded-full')
       expect(node).toBeTruthy()
-      expect(node?.classList.contains('bg-green-100')).toBeTruthy()
+      expect(node?.classList.contains('border-green-500')).toBeTruthy()
     })
   })
 
@@ -182,6 +182,33 @@ describe('FlowchartNode', () => {
       const { container } = render(<FlowchartNode {...defaultProps} />, { wrapper: Wrapper })
       const handles = container.querySelectorAll('.react-flow__handle')
       expect(handles.length).toBe(4)
+    })
+
+    it('should have visible handles with blue background', () => {
+      const { container } = render(<FlowchartNode {...defaultProps} />, { wrapper: Wrapper })
+      const handles = container.querySelectorAll('.react-flow__handle')
+      
+      handles.forEach(handle => {
+        expect(handle.className).toContain('!bg-blue-500')
+        expect(handle.className).toContain('rounded-full')
+      })
+    })
+
+    it('should have special handle positions for diamond node', () => {
+      const { container } = render(
+        <FlowchartNode data={{ label: 'Decision' }} type="diamond" />,
+        { wrapper: Wrapper }
+      )
+      
+      const handles = container.querySelectorAll('.react-flow__handle')
+      expect(handles).toHaveLength(4)
+      
+      // Check that handles have special styling for diamond
+      handles.forEach(handle => {
+        expect(handle.className).toContain('!w-2')
+        expect(handle.className).toContain('!h-2')
+        expect(handle.className).toContain('!bg-blue-500')
+      })
     })
   })
 })

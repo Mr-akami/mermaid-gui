@@ -72,18 +72,21 @@ export const FlowchartNode = memo(({ data, type }: NodeProps) => {
         )
       case 'parallelogram':
         return (
-          <div 
+          <div
             className="px-6 py-2 bg-orange-100 border-2 border-orange-500"
             style={{ transform: 'skewX(-20deg)' }}
           >
-            <div className="text-sm font-medium text-gray-900" style={{ transform: 'skewX(20deg)' }}>
+            <div
+              className="text-sm font-medium text-gray-900"
+              style={{ transform: 'skewX(20deg)' }}
+            >
               {data?.label || 'Parallelogram'}
             </div>
           </div>
         )
       case 'trapezoid':
         return (
-          <div 
+          <div
             className="px-6 py-2 bg-teal-100 border-2 border-teal-500"
             style={{ clipPath: 'polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%)' }}
           >
@@ -94,9 +97,12 @@ export const FlowchartNode = memo(({ data, type }: NodeProps) => {
         )
       case 'hexagon':
         return (
-          <div 
+          <div
             className="px-6 py-2 bg-pink-100 border-2 border-pink-500"
-            style={{ clipPath: 'polygon(30% 0%, 70% 0%, 100% 50%, 70% 100%, 30% 100%, 0% 50%)' }}
+            style={{
+              clipPath:
+                'polygon(30% 0%, 70% 0%, 100% 50%, 70% 100%, 30% 100%, 0% 50%)',
+            }}
           >
             <div className="text-sm font-medium text-gray-900">
               {data?.label || 'Hexagon'}
@@ -118,34 +124,96 @@ export const FlowchartNode = memo(({ data, type }: NodeProps) => {
     }
   }
 
-  return (
+  // Special handle positions for diamond shape
+  const getDiamondHandles = () => (
     <>
-      {/* Connection handles on all sides */}
+      {/* Top vertex */}
       <Handle
         type="target"
         position={Position.Top}
-        className="w-16 h-2 !bg-transparent !border-0"
-        style={{ top: -1 }}
+        className="!w-2 !h-2 !bg-blue-500 !border !border-white rounded-full"
+        style={{
+          top: -20,
+          left: '50%',
+          transform: 'translateX(-50%)',
+          zIndex: 10,
+        }}
+      />
+      {/* Left vertex */}
+      <Handle
+        type="target"
+        position={Position.Left}
+        className="!w-2 !h-2 !bg-blue-500 !border !border-white rounded-full"
+        style={{
+          left: -20,
+          top: '50%',
+          transform: 'translateY(-50%)',
+          zIndex: 10,
+        }}
+      />
+      {/* Bottom vertex */}
+      <Handle
+        type="source"
+        position={Position.Bottom}
+        className="!w-2 !h-2 !bg-blue-500 !border !border-white rounded-full"
+        style={{
+          bottom: -20,
+          left: '50%',
+          transform: 'translateX(-50%)',
+          zIndex: 10,
+        }}
+      />
+      {/* Right vertex */}
+      <Handle
+        type="source"
+        position={Position.Right}
+        className="!w-2 !h-2 !bg-blue-500 !border !border-white rounded-full"
+        style={{
+          right: -20,
+          top: '50%',
+          transform: 'translateY(-50%)',
+          zIndex: 10,
+        }}
+      />
+    </>
+  )
+
+  // Default handle positions for other shapes
+  const getDefaultHandles = () => (
+    <>
+      <Handle
+        type="target"
+        position={Position.Top}
+        className="w-2 h-2 !bg-blue-500 !border !border-white rounded-full"
+        style={{ top: -4, left: '50%', transform: 'translateX(-50%)' }}
       />
       <Handle
         type="target"
         position={Position.Left}
-        className="w-2 h-16 !bg-transparent !border-0"
-        style={{ left: -1 }}
+        className="w-2 h-2 !bg-blue-500 !border !border-white rounded-full"
+        style={{ left: -4, top: '50%', transform: 'translateY(-50%)' }}
       />
       <Handle
         type="source"
         position={Position.Bottom}
-        className="w-16 h-2 !bg-transparent !border-0"
-        style={{ bottom: -1 }}
+        className="w-2 h-2 !bg-blue-500 !border !border-white rounded-full"
+        style={{ bottom: -4, left: '50%', transform: 'translateX(-50%)' }}
       />
       <Handle
         type="source"
         position={Position.Right}
-        className="w-2 h-16 !bg-transparent !border-0"
-        style={{ right: -1 }}
+        className="w-2 h-2 !bg-blue-500 !border !border-white rounded-full"
+        style={{ right: -4, top: '50%', transform: 'translateY(-50%)' }}
       />
+    </>
+  )
+
+  return (
+    <>
+      {/* Render content first, then handles on top */}
       {getNodeContent()}
+      {/* Use special handles for diamond, default for others */}
+      {type === 'diamond' ? getDiamondHandles() : getDefaultHandles()}
     </>
   )
 })
