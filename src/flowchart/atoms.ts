@@ -4,7 +4,7 @@ import {
   Node,
   Edge,
   FlowchartData,
-  // saveToHistoryAtom,
+  saveToHistoryAtom,
 } from './deps'
 
 // Counter atoms for sequential IDs
@@ -92,7 +92,7 @@ export const addNodeAtom = atom(
     }
 
     // Save to history
-    // set(saveToHistoryAtom)
+    set(saveToHistoryAtom, { nodes: get(nodesAtom), edges: get(edgesAtom) })
   },
 )
 
@@ -119,7 +119,7 @@ export const removeNodeAtom = atom(null, (get, set, nodeId: string) => {
 
   set(nodesAtom, filteredNodes)
   set(edgesAtom, filteredEdges)
-  // set(saveToHistoryAtom)
+  set(saveToHistoryAtom, { nodes: filteredNodes, edges: filteredEdges })
 })
 
 // Write atom for updating a node
@@ -149,7 +149,7 @@ export const updateNodeAtom = atom(
         : node,
     )
     set(nodesAtom, updatedNodes)
-    // set(saveToHistoryAtom)
+    set(saveToHistoryAtom, { nodes: updatedNodes, edges: get(edgesAtom) })
   },
 )
 
@@ -183,6 +183,7 @@ export const addEdgeAtom = atom(
       ...(newEdge.label && { data: { label: newEdge.label } }),
     }
     set(edgesAtom, [...edges, edge])
+    set(saveToHistoryAtom, { nodes: get(nodesAtom), edges: [...edges, edge] })
   },
 )
 
@@ -209,14 +210,14 @@ export const updateEdgeAtom = atom(
         : edge,
     )
     set(edgesAtom, updatedEdges)
+    set(saveToHistoryAtom, { nodes: get(nodesAtom), edges: updatedEdges })
   },
 )
 
 // Write atom for removing an edge
 export const removeEdgeAtom = atom(null, (get, set, edgeId: string) => {
   const edges = get(edgesAtom)
-  set(
-    edgesAtom,
-    edges.filter((edge) => edge.id !== edgeId),
-  )
+  const filteredEdges = edges.filter((edge) => edge.id !== edgeId)
+  set(edgesAtom, filteredEdges)
+  set(saveToHistoryAtom, { nodes: get(nodesAtom), edges: filteredEdges })
 })

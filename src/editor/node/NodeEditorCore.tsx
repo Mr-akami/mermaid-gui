@@ -8,12 +8,16 @@ import {
   useCallback,
   useRef,
   useState,
+  useEffect,
   type Node,
   type Connection,
   FlowchartNode,
+  useAtom,
 } from './deps'
 import { NodeToolbar } from './NodeToolbar'
-import { MERMAID_NODE_TYPES, NODE_TYPE_CONFIG } from '../../flowchart'
+import { UndoRedoButtons } from './UndoRedoButtons'
+import { MERMAID_NODE_TYPES, NODE_TYPE_CONFIG, nodesAtom, edgesAtom } from '../../flowchart'
+import { saveToHistoryAtom } from '../../history'
 
 // Create nodeTypes object dynamically from MERMAID_NODE_TYPES
 const nodeTypes = MERMAID_NODE_TYPES.reduce((acc, type) => {
@@ -40,6 +44,38 @@ export function NodeEditorCore() {
   const [edges, setEdges, onEdgesChange] = useEdgesState([])
   const [selectedNodeType, setSelectedNodeType] = useState<string | null>(null)
   const { screenToFlowPosition } = useReactFlow()
+  
+  // Connect to flowchart atoms
+  const [flowchartNodes, setFlowchartNodes] = useAtom(nodesAtom)
+  const [flowchartEdges, setFlowchartEdges] = useAtom(edgesAtom)
+  const [, saveToHistory] = useAtom(saveToHistoryAtom)
+  
+  // Track if we're in an undo/redo operation
+  const isUndoRedoRef = useRef(false)
+  
+  // Initialize history with initial state
+  useEffect(() => {
+    setFlowchartNodes(initialNodes)
+    setFlowchartEdges([])
+    saveToHistory({ nodes: initialNodes, edges: [] })
+  }, [saveToHistory, setFlowchartNodes, setFlowchartEdges])
+  
+  // Sync changes to history (debounced to avoid too many history entries)
+  useEffect(() => {
+    // Skip saving to history if we're in an undo/redo operation
+    if (isUndoRedoRef.current) {
+      isUndoRedoRef.current = false
+      return
+    }
+    
+    const timeoutId = setTimeout(() => {
+      if (nodes.length > 0 || edges.length > 0) {
+        saveToHistory({ nodes, edges })
+      }
+    }, 500)
+    
+    return () => clearTimeout(timeoutId)
+  }, [nodes, edges, saveToHistory])
   
   const onConnect = useCallback(
     (params: Connection) => setEdges((eds) => addEdge(params, eds)),
@@ -102,6 +138,18 @@ export function NodeEditorCore() {
       position: 'relative',
       cursor: selectedNodeType ? 'crosshair' : 'default'
     }}>
+      <UndoRedoButtons 
+        onUndo={(state) => {
+          isUndoRedoRef.current = true
+          setNodes(state.nodes)
+          setEdges(state.edges)
+        }}
+        onRedo={(state) => {
+          isUndoRedoRef.current = true
+          setNodes(state.nodes)
+          setEdges(state.edges)
+        }}
+      />
       <NodeToolbar 
         onNodeTypeSelect={setSelectedNodeType}
         selectedNodeType={selectedNodeType}

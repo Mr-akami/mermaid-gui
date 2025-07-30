@@ -12,3 +12,6 @@ export type {
   FlowchartData,
   MermaidParseResult,
 } from '../common/types/index'
+
+// History atoms
+export { saveToHistoryAtom } from '../history/index'

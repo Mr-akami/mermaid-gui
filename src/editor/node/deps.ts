@@ -12,10 +12,13 @@ export {
   type Connection,
 } from '@xyflow/react'
 
-export { useCallback, useRef, useState } from 'react'
+export { useCallback, useRef, useState, useEffect } from 'react'
 
 // Internal dependencies
 export { FlowchartNode } from '../../flowchart/index'
+
+// Jotai
+export { useAtom, useAtomValue } from 'jotai'
 
 // Import React Flow CSS
 import '@xyflow/react/dist/style.css'
