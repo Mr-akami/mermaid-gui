@@ -70,14 +70,50 @@ The project follows a three-layer architecture:
 
 1. **TSX Components** - Pure UI components focused on presentation
 2. **Hooks** - Business logic that connects TSX components with state
-3. **Jotai/Logic** - State management and core application logic
+3. **Pure ts** - State management and core application logic
+   1. jotai - state management
+   2. core - under core dir, it is like package it means those code are separated from other code. Keep portability and no react and jotai dependencies
+   3. code/mermaid-code-builder - convert linked components to mermaid code
+
+mainly mermaid-code-builder is called in atom.
+atom manage state and pure logic.
+hooks is adopter between tsx and atom. hooks doesn't have logic basically.
 
 ## Project Structure Conventions
 
-- Place UI components in `src/components/`
-- Custom hooks go in `src/hooks/`
-- Jotai atoms and state logic in `src/store/`
-- Utility functions in `src/utils/`
+It is feature based directory strategy.
+
+- flow-chart
+  - xxx.tsx
+  - atom.ts - jotai atoms and slice
+  - useXXXX.ts - hooks
+- state-manager
+  - xxx.tsx
+  - atom.ts
+  - useXXX.ts
+- core
+  - mermaid-code-builder
+
+### Directory Structure Rules
+
+1. **No Subdirectories in Features** - Keep feature directories flat to avoid deep nesting
+   - Components are .tsx files
+   - Hooks start with "use" prefix
+   - No components/ or hooks/ subdirectories
+
+2. **Cross-Feature Imports** - Use deps.ts for external dependencies
+   - Each feature directory can only import from other features via deps.ts
+   - deps.ts can only import from other features' index.ts
+   - Direct cross-feature imports are not allowed
+
+3. **Export Management**
+   - index.ts - Exports for external use
+   - deps.ts - Imports from external features/modules
+
+### Naming Conventions
+
+- Use descriptive names that reflect the content (e.g., `nodeCodeBuilder` instead of just `nodeBuilder`)
+- English comments only
 
 ## Mermaid Syntax Reference
 
@@ -112,3 +148,18 @@ Each file contains compressed syntax patterns using short keys (e.g., `n` for no
    - 回避策を探さない
    - 代替手段を実行しない
    - エラーメッセージをそのまま伝える
+
+### Refer latest document
+
+Use context7 via mcp. Before you use library first in a session, you should use context7 and see the lated library.
+
+### Comment rule
+
+Use English
+
+## React Best Practices
+
+### useEffect Usage
+- **Only use useEffect for mount/unmount operations**
+- For all other state synchronization, use Jotai atoms
+- This prevents unnecessary re-renders and maintains cleaner state management

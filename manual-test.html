@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Manual Node Deletion Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-steps { background: #f0f0f0; padding: 15px; margin: 10px 0; border-radius: 5px; }
+        .expected { background: #e8f5e9; padding: 15px; margin: 10px 0; border-radius: 5px; }
+        .issues { background: #ffebee; padding: 15px; margin: 10px 0; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Manual Test for Node Deletion</h1>
+    
+    <div class="test-steps">
+        <h2>Test Steps:</h2>
+        <ol>
+            <li>Open the app at <a href="http://localhost:5176/" target="_blank">http://localhost:5176/</a></li>
+            <li>Click on the canvas to create nodes (Rect1, Rect2, etc.)</li>
+            <li>Click on a node to select it (should show selection outline)</li>
+            <li>Press Delete or Backspace key</li>
+        </ol>
+    </div>
+    
+    <div class="expected">
+        <h2>Expected Results:</h2>
+        <ul>
+            <li>✅ Selected node should be deleted</li>
+            <li>✅ Mermaid code should update to reflect the deletion</li>
+            <li>✅ Connected edges should also be deleted</li>
+            <li>✅ Shift+Click should allow multi-selection</li>
+            <li>✅ Delete key should delete all selected nodes</li>
+        </ul>
+    </div>
+    
+    <div class="issues">
+        <h2>Current Implementation Status:</h2>
+        <ul>
+            <li>✅ React Flow's state management integrated with useNodesState/useEdgesState</li>
+            <li>✅ Bidirectional sync between React Flow and Jotai atoms</li>
+            <li>✅ deleteKeyCode prop set to ['Delete', 'Backspace']</li>
+            <li>✅ Node removal handled in handleNodesChange</li>
+            <li>✅ Selection state managed by React Flow</li>
+        </ul>
+    </div>
+    
+    <h3>Implementation Summary:</h3>
+    <pre>
+// React Flow's state management
+const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes)
+const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges)
+
+// Sync changes with Jotai atoms
+const handleNodesChange = useCallback((changes) => {
+  onNodesChange(changes) // Let React Flow handle selection
+  
+  changes.forEach((change) => {
+    if (change.type === 'remove') {
+      removeNode(change.id) // Sync with Jotai
+    }
+  })
+}, [onNodesChange, removeNode])
+
+// React Flow configuration
+&lt;ReactFlow
+  nodes={nodes}
+  edges={edges}
+  onNodesChange={handleNodesChange}
+  deleteKeyCode={['Delete', 'Backspace']}
+  ...
+/&gt;
+    </pre>
+</body>
+</html>

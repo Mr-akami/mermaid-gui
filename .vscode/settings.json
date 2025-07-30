@@ -1,3 +1,14 @@
 {
-  "typescript.experimental.useTsgo": true
+  "typescript.experimental.useTsgo": true,
+  "editor.acceptSuggestionOnEnter": "off",
+  "editor.acceptSuggestionOnCommitCharacter": false,
+  "editor.quickSuggestions": {
+    "other": false,
+    "comments": false,
+    "strings": false
+  },
+  "editor.suggestOnTriggerCharacters": false,
+  "editor.wordBasedSuggestions": "off",
+  "editor.parameterHints.enabled": false,
+  "editor.snippetSuggestions": "none"
 }
