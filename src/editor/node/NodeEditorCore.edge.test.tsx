@@ -21,7 +21,9 @@ vi.mock('../../flowchart', () => {
       diamond: { defaultLabel: 'Diamond' }
     },
     nodesAtom: atom([]),
-    edgesAtom: atom([])
+    edgesAtom: atom([]),
+    updateNodeAtom: atom(null, () => {}),
+    updateEdgeAtom: atom(null, () => {})
   }
 })
 
@@ -34,6 +36,17 @@ vi.mock('../../history', () => {
     canRedoAtom: atom(false),
     undoAtom: atom(null, () => null),
     redoAtom: atom(null, () => null)
+  }
+})
+
+// Mock atoms module
+vi.mock('./atoms', () => {
+  const { atom } = require('jotai')
+  return {
+    selectedNodeAtom: atom(null),
+    selectedEdgeAtom: atom(null),
+    focusPropertyPanelAtom: atom(false),
+    updateSelectionAtom: atom(null, () => {})
   }
 })
 

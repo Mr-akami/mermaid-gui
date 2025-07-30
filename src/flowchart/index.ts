@@ -19,3 +19,4 @@ export { ResizableSubgraph } from './ResizableSubgraph'
 
 // Export types and constants
 export { MERMAID_NODE_TYPES, NODE_TYPE_CONFIG, type MermaidNodeType } from './nodeTypes'
+export { MERMAID_EDGE_TYPES, EDGE_TYPE_CONFIG, type MermaidEdgeType } from './edgeTypes'

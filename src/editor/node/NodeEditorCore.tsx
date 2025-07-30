@@ -18,15 +18,20 @@ import {
 } from './deps'
 import { NodeToolbar } from './NodeToolbar'
 import { UndoRedoButtons } from './UndoRedoButtons'
+import { PropertyPanel } from './PropertyPanel'
+import { useSelection } from './useSelection'
 import {
   MERMAID_NODE_TYPES,
   NODE_TYPE_CONFIG,
   nodesAtom,
   edgesAtom,
   FlowchartEdge,
+  updateNodeAtom,
+  updateEdgeAtom,
 } from '../../flowchart'
 import { saveToHistoryAtom } from '../../history'
 import { toCustomNodes, toReactFlowNodes, toCustomEdges, toReactFlowEdges } from './nodeTypeUtils'
+import { focusPropertyPanelAtom } from './atoms'
 
 // Create nodeTypes object dynamically from MERMAID_NODE_TYPES
 const nodeTypes = MERMAID_NODE_TYPES.reduce(
@@ -66,9 +71,25 @@ export function NodeEditorCore() {
   const [, setFlowchartNodes] = useAtom(nodesAtom)
   const [, setFlowchartEdges] = useAtom(edgesAtom)
   const [, saveToHistory] = useAtom(saveToHistoryAtom)
+  const [, updateNode] = useAtom(updateNodeAtom)
+  const [, updateEdge] = useAtom(updateEdgeAtom)
+  const [shouldFocusPropertyPanel, setShouldFocusPropertyPanel] = useAtom(focusPropertyPanelAtom)
 
   // Track if we're in an undo/redo operation
   const isUndoRedoRef = useRef(false)
+
+  // Get current selection
+  const { selectedNode, selectedEdge } = useSelection(nodes, edges)
+
+  // Reset focus flag after PropertyPanel has focused
+  useEffect(() => {
+    if (shouldFocusPropertyPanel) {
+      const timeoutId = setTimeout(() => {
+        setShouldFocusPropertyPanel(false)
+      }, 100)
+      return () => clearTimeout(timeoutId)
+    }
+  }, [shouldFocusPropertyPanel, setShouldFocusPropertyPanel])
 
   // Initialize history with initial state
   useEffect(() => {
@@ -91,11 +112,15 @@ export function NodeEditorCore() {
         const customNodes = toCustomNodes(nodes)
         const customEdges = toCustomEdges(edges)
         saveToHistory({ nodes: customNodes, edges: customEdges })
+        
+        // Also sync to flowchart atoms
+        setFlowchartNodes(customNodes)
+        setFlowchartEdges(customEdges)
       }
     }, 500)
 
     return () => clearTimeout(timeoutId)
-  }, [nodes, edges, saveToHistory])
+  }, [nodes, edges, saveToHistory, setFlowchartNodes, setFlowchartEdges])
 
   const onConnect = useCallback(
     (params: Connection) =>
@@ -186,6 +211,103 @@ export function NodeEditorCore() {
     [selectedNodeType, screenToFlowPosition, setNodes],
   )
 
+  const onNodeDoubleClick = useCallback(
+    (_event: React.MouseEvent, node: Node) => {
+      setShouldFocusPropertyPanel(true)
+    },
+    [setShouldFocusPropertyPanel],
+  )
+
+  const onEdgeDoubleClick = useCallback(
+    (_event: React.MouseEvent, edge: Edge) => {
+      setShouldFocusPropertyPanel(true)
+    },
+    [setShouldFocusPropertyPanel],
+  )
+
+  const onSelectionChange = useCallback(
+    ({ nodes: selectedNodes, edges: selectedEdges }: { nodes: Node[]; edges: Edge[] }) => {
+      // React Flow calls this with arrays of selected items
+      // Don't reset focus flag here as it interferes with double-click
+    },
+    [],
+  )
+
+  // Handle PropertyPanel updates
+  const handleNodeUpdate = useCallback(
+    (update: { id: string; data?: { label: string }; type?: string }) => {
+      if (update.data) {
+        // Update atom
+        updateNode({
+          id: update.id,
+          data: update.data,
+        })
+        
+        // Also update React Flow nodes immediately for label changes
+        setNodes((nds) =>
+          nds.map((node) =>
+            node.id === update.id
+              ? { ...node, data: { ...node.data, ...update.data } }
+              : node
+          )
+        )
+      }
+      if (update.type) {
+        // For type changes, we need to update the React Flow nodes directly
+        setNodes((nds) =>
+          nds.map((node) =>
+            node.id === update.id
+              ? { ...node, type: update.type }
+              : node
+          )
+        )
+      }
+    },
+    [updateNode, setNodes],
+  )
+
+  const handleEdgeUpdate = useCallback(
+    (update: { id: string; data?: { label: string }; type?: string }) => {
+      // Update edge in atoms
+      updateEdge(update)
+      
+      // Update React Flow edges immediately
+      setEdges((eds) =>
+        eds.map((edge) => {
+          if (edge.id === update.id) {
+            let updatedEdge = { ...edge }
+            
+            // Update label if provided
+            if (update.data) {
+              updatedEdge.data = { ...edge.data, ...update.data }
+            }
+            
+            // Update type if provided
+            if (update.type) {
+              updatedEdge.data = { 
+                ...updatedEdge.data, 
+                edgeType: update.type 
+              }
+              // Update markerEnd based on whether the type has an arrow
+              updatedEdge.markerEnd = update.type.includes('arrow')
+                ? {
+                    type: MarkerType.ArrowClosed,
+                    width: 20,
+                    height: 20,
+                    color: '#333',
+                  }
+                : undefined
+            }
+            
+            return updatedEdge
+          }
+          return edge
+        })
+      )
+    },
+    [updateEdge, setEdges],
+  )
+
   return (
     <div
       className="wrapper"
@@ -225,6 +347,9 @@ export function NodeEditorCore() {
         onConnect={onConnect}
         onConnectEnd={onConnectEnd}
         onPaneClick={onPaneClick}
+        onNodeDoubleClick={onNodeDoubleClick}
+        onEdgeDoubleClick={onEdgeDoubleClick}
+        onSelectionChange={onSelectionChange}
         fitView
         fitViewOptions={{ padding: 2 }}
         nodeOrigin={nodeOrigin}
@@ -233,6 +358,13 @@ export function NodeEditorCore() {
       >
         <Background />
       </ReactFlow>
+      <PropertyPanel
+        selectedNode={selectedNode}
+        selectedEdge={selectedEdge}
+        onNodeUpdate={handleNodeUpdate}
+        onEdgeUpdate={handleEdgeUpdate}
+        autoFocus={shouldFocusPropertyPanel}
+      />
     </div>
   )
 }
