@@ -1,6 +1,12 @@
 import { Node as ReactFlowNode, Edge as ReactFlowEdge } from '@xyflow/react'
 import { Node as CustomNode, Edge as CustomEdge } from '../../common/types'
 
+/**
+ * Core conversion utilities for flowchart data
+ * These functions handle the conversion between different data formats
+ * without any UI-specific logic like markerEnd handling
+ */
+
 // Convert React Flow node to our custom node type
 export function toCustomNode(rfNode: ReactFlowNode): CustomNode {
   return {
@@ -8,7 +14,7 @@ export function toCustomNode(rfNode: ReactFlowNode): CustomNode {
     type: rfNode.type as CustomNode['type'],
     position: rfNode.position,
     data: {
-      label: rfNode.data?.label || ''
+      label: String(rfNode.data?.label || '')
     },
     childIds: [],
     ...(rfNode.width && { width: rfNode.width }),
@@ -22,15 +28,6 @@ export function toReactFlowNode(customNode: CustomNode): ReactFlowNode {
   return rfNodeProps as ReactFlowNode
 }
 
-// Convert arrays
-export function toCustomNodes(rfNodes: ReactFlowNode[]): CustomNode[] {
-  return rfNodes.map(toCustomNode)
-}
-
-export function toReactFlowNodes(customNodes: CustomNode[]): ReactFlowNode[] {
-  return customNodes.map(toReactFlowNode)
-}
-
 // Convert React Flow edge to our custom edge type
 export function toCustomEdge(rfEdge: ReactFlowEdge): CustomEdge {
   const result: CustomEdge = {
@@ -41,13 +38,14 @@ export function toCustomEdge(rfEdge: ReactFlowEdge): CustomEdge {
   }
   
   if (rfEdge.data?.label) {
-    result.data = { label: rfEdge.data.label }
+    result.data = { label: String(rfEdge.data.label) }
   }
   
   return result
 }
 
 // Convert our custom edge to React Flow edge
+// Note: markerEnd is handled by BiDirectionalEdge component, not here
 export function toReactFlowEdge(customEdge: CustomEdge): ReactFlowEdge {
   return {
     id: customEdge.id,
@@ -61,7 +59,15 @@ export function toReactFlowEdge(customEdge: CustomEdge): ReactFlowEdge {
   }
 }
 
-// Convert arrays
+// Array conversion functions
+export function toCustomNodes(rfNodes: ReactFlowNode[]): CustomNode[] {
+  return rfNodes.map(toCustomNode)
+}
+
+export function toReactFlowNodes(customNodes: CustomNode[]): ReactFlowNode[] {
+  return customNodes.map(toReactFlowNode)
+}
+
 export function toCustomEdges(rfEdges: ReactFlowEdge[]): CustomEdge[] {
   return rfEdges.map(toCustomEdge)
 }

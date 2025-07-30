@@ -31,7 +31,7 @@ import {
   updateEdgeAtom,
 } from '../../flowchart'
 import { saveToHistoryAtom } from '../../history'
-import { toCustomNodes, toReactFlowNodes, toCustomEdges, toReactFlowEdges } from './nodeTypeUtils'
+import { toCustomNodes, toReactFlowNodes, toCustomEdges, toReactFlowEdges } from './deps'
 import { focusPropertyPanelAtom } from './atoms'
 import type { Edge } from '../../common/types'
 
@@ -70,8 +70,8 @@ export function NodeEditorCore() {
   const { screenToFlowPosition } = useReactFlow()
 
   // Connect to flowchart atoms
-  const [, setFlowchartNodes] = useAtom(nodesAtom)
-  const [, setFlowchartEdges] = useAtom(edgesAtom)
+  const [flowchartNodes, setFlowchartNodes] = useAtom(nodesAtom)
+  const [flowchartEdges, setFlowchartEdges] = useAtom(edgesAtom)
   const [, saveToHistory] = useAtom(saveToHistoryAtom)
   const [, updateNode] = useAtom(updateNodeAtom)
   const [, updateEdge] = useAtom(updateEdgeAtom)
@@ -79,6 +79,9 @@ export function NodeEditorCore() {
 
   // Track if we're in an undo/redo operation
   const isUndoRedoRef = useRef(false)
+  
+  // Track if we're updating from code editor to prevent infinite loops
+  const isCodeUpdateRef = useRef(false)
 
   // Get current selection
   const { selectedNode, selectedEdge } = useSelection(nodes, edges)
@@ -93,9 +96,39 @@ export function NodeEditorCore() {
     }
   }, [shouldFocusPropertyPanel, setShouldFocusPropertyPanel])
 
+  // Sync flowchart atoms to React Flow state (for code editor updates)
+  useEffect(() => {
+    if (isCodeUpdateRef.current) {
+      isCodeUpdateRef.current = false
+      return
+    }
+    
+    // Preserve existing node positions when syncing from code editor
+    setNodes(currentNodes => {
+      const reactFlowNodes = toReactFlowNodes(flowchartNodes).map(newNode => {
+        const existingNode = currentNodes.find(n => n.id === newNode.id)
+        if (existingNode) {
+          // Preserve position and dimensions of existing node
+          return {
+            ...newNode,
+            position: existingNode.position,
+            ...(existingNode.width && { width: existingNode.width }),
+            ...(existingNode.height && { height: existingNode.height }),
+          }
+        }
+        return newNode
+      })
+      return reactFlowNodes
+    })
+    
+    const reactFlowEdges = toReactFlowEdges(flowchartEdges)
+    setEdges(reactFlowEdges)
+  }, [flowchartNodes, flowchartEdges, setNodes, setEdges])
+
   // Initialize history with initial state
   useEffect(() => {
     const customNodes = toCustomNodes(initialNodes)
+    isCodeUpdateRef.current = true  // Prevent sync loop during initialization
     setFlowchartNodes(customNodes)
     setFlowchartEdges([])
     saveToHistory({ nodes: customNodes, edges: [] })
@@ -115,7 +148,8 @@ export function NodeEditorCore() {
         const customEdges = toCustomEdges(edges)
         saveToHistory({ nodes: customNodes, edges: customEdges })
         
-        // Also sync to flowchart atoms
+        // Also sync to flowchart atoms (prevent code editor loop)
+        isCodeUpdateRef.current = true
         setFlowchartNodes(customNodes)
         setFlowchartEdges(customEdges)
       }
@@ -331,6 +365,7 @@ export function NodeEditorCore() {
       <UndoRedoButtons
         onUndo={(state) => {
           isUndoRedoRef.current = true
+          isCodeUpdateRef.current = true
           const rfNodes = toReactFlowNodes(state.nodes)
           const rfEdges = toReactFlowEdges(state.edges)
           setNodes(rfNodes)
@@ -338,6 +373,7 @@ export function NodeEditorCore() {
         }}
         onRedo={(state) => {
           isUndoRedoRef.current = true
+          isCodeUpdateRef.current = true
           const rfNodes = toReactFlowNodes(state.nodes)
           const rfEdges = toReactFlowEdges(state.edges)
           setNodes(rfNodes)

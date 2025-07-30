@@ -26,7 +26,7 @@ export { useAtom, useAtomValue } from 'jotai'
 // Import React Flow CSS
 import '@xyflow/react/dist/style.css'
 
-// Node type utilities
+// Node type utilities from flowchart converters
 export { 
   toCustomNode, 
   toReactFlowNode, 
@@ -36,4 +36,4 @@ export {
   toReactFlowEdge,
   toCustomEdges,
   toReactFlowEdges 
-} from './nodeTypeUtils'
+} from '../../flowchart/converters'

@@ -89,7 +89,7 @@ export function PropertyPanel({
   return (
     <div
       data-testid="property-panel"
-      className="property-panel fixed right-4 top-20 w-64 bg-white rounded-lg shadow-lg border border-gray-200 p-4 z-10"
+      className="property-panel fixed left-4 top-20 w-64 bg-white rounded-lg shadow-lg border border-gray-200 p-4 z-10"
     >
       <h3 className="text-lg font-semibold mb-4">
         {selectedNode ? 'Node Properties' : 'Edge Properties'}

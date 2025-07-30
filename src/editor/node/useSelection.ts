@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { Node as ReactFlowNode, Edge as ReactFlowEdge } from '@xyflow/react'
-import { toCustomNode, toCustomEdge } from './nodeTypeUtils'
+import { toCustomNode, toCustomEdge } from '../../flowchart/converters'
 
 export function useSelection(nodes: ReactFlowNode[], edges: ReactFlowEdge[]) {
   const selectedNode = useMemo(() => {
