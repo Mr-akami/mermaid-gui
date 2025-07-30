@@ -2,15 +2,41 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, waitFor, fireEvent } from '@testing-library/react'
 import { NodeEditorCore } from './NodeEditorCore'
 import { ReactFlowProvider } from '@xyflow/react'
+import { Provider as JotaiProvider, atom } from 'jotai'
 
 // Mock FlowchartNode
-vi.mock('../../flowchart', () => ({
-  FlowchartNode: vi.fn(() => <div data-testid="flowchart-node">FlowchartNode</div>),
-}))
+vi.mock('../../flowchart', () => {
+  const { atom } = require('jotai')
+  return {
+    FlowchartNode: vi.fn(() => <div data-testid="flowchart-node">FlowchartNode</div>),
+    MERMAID_NODE_TYPES: ['rectangle', 'circle', 'diamond'],
+    NODE_TYPE_CONFIG: {
+      rectangle: { defaultLabel: 'Rectangle' },
+      circle: { defaultLabel: 'Circle' },
+      diamond: { defaultLabel: 'Diamond' }
+    },
+    nodesAtom: atom([]),
+    edgesAtom: atom([])
+  }
+})
+
+// Mock history module
+vi.mock('../../history', () => {
+  const { atom } = require('jotai')
+  return {
+    saveToHistoryAtom: atom(null, () => {}),
+    canUndoAtom: atom(false),
+    canRedoAtom: atom(false),
+    undoAtom: atom(null, () => null),
+    redoAtom: atom(null, () => null)
+  }
+})
 
 describe('NodeEditorCore', () => {
   const Wrapper = ({ children }: { children: React.ReactNode }) => (
-    <ReactFlowProvider>{children}</ReactFlowProvider>
+    <JotaiProvider>
+      <ReactFlowProvider>{children}</ReactFlowProvider>
+    </JotaiProvider>
   )
 
   it('should render ReactFlow with initial rectangle node', async () => {

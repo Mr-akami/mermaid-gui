@@ -51,18 +51,22 @@ describe('ResizableSubgraph', () => {
     expect(resizer).toBeFalsy()
   })
 
-  it('should have input and output handles', () => {
+  it('should have input and output handles on all sides', () => {
     const { container } = render(<ResizableSubgraph {...defaultProps} />, {
       wrapper: Wrapper,
     })
     const handles = container.querySelectorAll('.react-flow__handle')
-    expect(handles.length).toBe(2)
+    expect(handles.length).toBe(4) // Top, Left, Bottom, Right
 
-    const targetHandle = container.querySelector('.react-flow__handle-top')
-    const sourceHandle = container.querySelector('.react-flow__handle-bottom')
+    const targetHandleTop = container.querySelector('.react-flow__handle-top')
+    const targetHandleLeft = container.querySelector('.react-flow__handle-left')
+    const sourceHandleBottom = container.querySelector('.react-flow__handle-bottom')
+    const sourceHandleRight = container.querySelector('.react-flow__handle-right')
 
-    expect(targetHandle).toBeTruthy()
-    expect(sourceHandle).toBeTruthy()
+    expect(targetHandleTop).toBeTruthy()
+    expect(targetHandleLeft).toBeTruthy()
+    expect(sourceHandleBottom).toBeTruthy()
+    expect(sourceHandleRight).toBeTruthy()
   })
 })
 
