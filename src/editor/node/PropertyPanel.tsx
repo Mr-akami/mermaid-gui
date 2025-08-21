@@ -21,7 +21,7 @@ export function PropertyPanel({
   const [nodeType, setNodeType] = useState<string>('')
   const [edgeType, setEdgeType] = useState<string>('')
   const [isEditing, setIsEditing] = useState(false)
-  const labelInputRef = useRef<HTMLInputElement>(null)
+  const labelInputRef = useRef<HTMLTextAreaElement>(null)
 
   // Update local state when selection changes (node ID changes)
   useEffect(() => {
@@ -47,7 +47,16 @@ export function PropertyPanel({
     }
   }, [autoFocus])
 
-  const handleLabelChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Auto-resize textarea based on content
+  useEffect(() => {
+    if (labelInputRef.current) {
+      const textarea = labelInputRef.current
+      textarea.style.height = 'auto'
+      textarea.style.height = `${textarea.scrollHeight}px`
+    }
+  }, [label])
+
+  const handleLabelChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newLabel = e.target.value
     setLabel(newLabel)
     setIsEditing(true)  // Mark as editing
@@ -116,15 +125,16 @@ export function PropertyPanel({
           <label htmlFor="label-input" className="block text-sm font-medium text-gray-700 mb-1">
             Label
           </label>
-          <input
+          <textarea
             ref={labelInputRef}
             id="label-input"
-            type="text"
             value={label}
             onChange={handleLabelChange}
             onFocus={handleLabelFocus}
             onBlur={handleLabelBlur}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none overflow-hidden"
+            style={{ minHeight: '2.5rem', maxHeight: '10rem' }}
+            placeholder="Enter label (supports line breaks)"
           />
         </div>
 

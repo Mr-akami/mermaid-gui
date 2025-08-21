@@ -35,8 +35,10 @@ export function buildNodeCode(node: Node): string {
 }
 
 function escapeLabel(label: string): string {
+  // Convert line breaks to <br> for Mermaid
   // Escape special characters for Mermaid
   return label
+    .replace(/\n/g, '<br>')  // Convert newlines to <br>
     .replace(/\[/g, '\\[')
     .replace(/\]/g, '\\]')
     .replace(/\{/g, '\\{')

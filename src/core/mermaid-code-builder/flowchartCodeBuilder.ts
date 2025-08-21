@@ -9,12 +9,14 @@ export function buildFlowchartCode(data: FlowchartData, direction: 'TD' | 'TB' |
   // Helper function to build subgraph declaration
   function buildSubgraphDeclaration(node: Node): string {
     const label = node.data.label || 'Subgraph'
+    // Convert newlines to <br> in subgraph labels
+    const processedLabel = label.replace(/\n/g, '<br>')
     // If node.id is a generic subgraph ID pattern, just use the label
-    if (node.id.match(/^(subgraph|sg)\d+$/) || node.id === label.toLowerCase()) {
-      return `subgraph ${label}`
+    if (node.id.match(/^(subgraph|sg)\d+$/) || node.id === processedLabel.toLowerCase()) {
+      return `subgraph ${processedLabel}`
     }
     // Otherwise, use id [label] format
-    return `subgraph ${node.id} [${label}]`
+    return `subgraph ${node.id} [${processedLabel}]`
   }
 
   // Process nodes recursively with proper indentation

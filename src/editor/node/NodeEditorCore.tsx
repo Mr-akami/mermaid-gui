@@ -94,14 +94,12 @@ export function NodeEditorCore() {
   
   // Custom onNodesChange to prevent selection reset during label editing
   const onNodesChange = useCallback((changes: any) => {
-    console.log('onNodesChange called:', changes)
     // Filter out selection changes when we're updating nodes programmatically
     const filteredChanges = changes.filter((change: any) => {
       // Allow all changes except selection changes during updates
       if (change.type === 'select' && selectedNodeId) {
         // Check if this is trying to deselect our selected node
         if (change.id === selectedNodeId && !change.selected) {
-          console.log('Preventing deselection of:', selectedNodeId)
           return false
         }
       }
@@ -319,12 +317,8 @@ export function NodeEditorCore() {
   
   const onSelectionChange = useCallback(
     ({ nodes: selectedNodes, edges: selectedEdges }: { nodes: ReactFlowNode[]; edges: ReactFlowEdge[] }) => {
-      // Track selection in our atoms
-      console.log('Selection changed:', { selectedNodes: selectedNodes.map(n => n.id), selectedEdges: selectedEdges.map(e => e.id) })
-      
       // Don't clear selection if we're updating programmatically
       if (isUpdatingRef.current && selectedNodes.length === 0 && selectedNodeId) {
-        console.log('Ignoring selection clear during update')
         // Re-select the node
         setTimeout(() => {
           setNodes(nds => nds.map(n => 
@@ -351,7 +345,6 @@ export function NodeEditorCore() {
   // Handle PropertyPanel updates
   const handleNodeUpdate = useCallback(
     (update: { id: string; data?: { label: string }; type?: string }) => {
-      console.log('handleNodeUpdate called:', update)
       if (update.data) {
         // Mark that we're updating programmatically
         isUpdatingRef.current = true
@@ -373,12 +366,10 @@ export function NodeEditorCore() {
                 data: { ...node.data, ...update.data },
                 selected: true  // Force selection to stay true
               }
-              console.log('Updating node:', { old: node, new: updatedNode })
               return updatedNode
             }
             return node
           })
-          console.log('Updated nodes:', updatedNodes.map(n => ({ id: n.id, selected: n.selected })))
           return updatedNodes
         })
         

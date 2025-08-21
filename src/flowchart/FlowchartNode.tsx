@@ -2,6 +2,21 @@ import { Handle, Position, NodeProps } from '@xyflow/react'
 import { memo } from 'react'
 import React from 'react'
 
+// Helper component to render label with line breaks
+const LabelWithBreaks = ({ label }: { label: string }) => {
+  const lines = label.split('\n')
+  return (
+    <>
+      {lines.map((line, index) => (
+        <React.Fragment key={index}>
+          {line}
+          {index < lines.length - 1 && <br />}
+        </React.Fragment>
+      ))}
+    </>
+  )
+}
+
 export const FlowchartNode = memo(({ data, type }: NodeProps) => {
   const getNodeContent = () => {
     switch (type) {
@@ -9,7 +24,7 @@ export const FlowchartNode = memo(({ data, type }: NodeProps) => {
         return (
           <div className="px-4 py-2 bg-blue-100 border-2 border-blue-500 rounded">
             <div className="text-sm font-medium text-gray-900">
-              {String(data?.label || 'Rectangle')}
+              <LabelWithBreaks label={String(data?.label || 'Rectangle')} />
             </div>
           </div>
         )
@@ -17,7 +32,7 @@ export const FlowchartNode = memo(({ data, type }: NodeProps) => {
         return (
           <div className="w-20 h-20 bg-green-100 border-2 border-green-500 rounded-full flex items-center justify-center">
             <div className="text-sm font-medium text-gray-900 text-center">
-              {String(data?.label || 'Circle')}
+              <LabelWithBreaks label={String(data?.label || 'Circle')} />
             </div>
           </div>
         )
@@ -25,7 +40,7 @@ export const FlowchartNode = memo(({ data, type }: NodeProps) => {
         return (
           <div className="w-20 h-20 bg-yellow-100 border-2 border-yellow-500 transform rotate-45 flex items-center justify-center">
             <div className="transform -rotate-45 text-sm font-medium text-gray-900 text-center">
-              {String(data?.label || 'Diamond')}
+              <LabelWithBreaks label={String(data?.label || 'Diamond')} />
             </div>
           </div>
         )
@@ -33,7 +48,7 @@ export const FlowchartNode = memo(({ data, type }: NodeProps) => {
         return (
           <div className="px-4 py-2 bg-purple-100 border-2 border-purple-500 border-dashed rounded-lg min-w-[200px] min-h-[100px]">
             <div className="text-sm font-medium text-gray-900">
-              {String(data?.label || 'Subgraph')}
+              <LabelWithBreaks label={String(data?.label || 'Subgraph')} />
             </div>
           </div>
         )
@@ -41,7 +56,7 @@ export const FlowchartNode = memo(({ data, type }: NodeProps) => {
         return (
           <div className="px-4 py-2 bg-blue-100 border-2 border-blue-500 rounded-lg">
             <div className="text-sm font-medium text-gray-900">
-              {String(data?.label || 'Round Edges')}
+              <LabelWithBreaks label={String(data?.label || 'Round Edges')} />
             </div>
           </div>
         )
@@ -49,7 +64,7 @@ export const FlowchartNode = memo(({ data, type }: NodeProps) => {
         return (
           <div className="px-6 py-2 bg-green-100 border-2 border-green-500 rounded-full">
             <div className="text-sm font-medium text-gray-900">
-              {String(data?.label || 'Stadium')}
+              <LabelWithBreaks label={String(data?.label || 'Stadium')} />
             </div>
           </div>
         )
@@ -58,7 +73,7 @@ export const FlowchartNode = memo(({ data, type }: NodeProps) => {
           <div className="border-4 border-blue-600 p-0.5">
             <div className="px-4 py-2 bg-blue-100 border-2 border-blue-500">
               <div className="text-sm font-medium text-gray-900">
-                {String(data?.label || 'Subroutine')}
+                <LabelWithBreaks label={String(data?.label || 'Subroutine')} />
               </div>
             </div>
           </div>
@@ -67,7 +82,7 @@ export const FlowchartNode = memo(({ data, type }: NodeProps) => {
         return (
           <div className="px-4 py-2 bg-indigo-100 border-2 border-indigo-500 rounded-t-full rounded-b">
             <div className="text-sm font-medium text-gray-900">
-              {String(data?.label || 'Cylindrical')}
+              <LabelWithBreaks label={String(data?.label || 'Cylindrical')} />
             </div>
           </div>
         )
@@ -81,7 +96,7 @@ export const FlowchartNode = memo(({ data, type }: NodeProps) => {
               className="text-sm font-medium text-gray-900"
               style={{ transform: 'skewX(20deg)' }}
             >
-              {String(data?.label || 'Parallelogram')}
+              <LabelWithBreaks label={String(data?.label || 'Parallelogram')} />
             </div>
           </div>
         )
@@ -92,7 +107,7 @@ export const FlowchartNode = memo(({ data, type }: NodeProps) => {
             style={{ clipPath: 'polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%)' }}
           >
             <div className="text-sm font-medium text-gray-900">
-              {String(data?.label || 'Trapezoid')}
+              <LabelWithBreaks label={String(data?.label || 'Trapezoid')} />
             </div>
           </div>
         )
@@ -106,7 +121,7 @@ export const FlowchartNode = memo(({ data, type }: NodeProps) => {
             }}
           >
             <div className="text-sm font-medium text-gray-900">
-              {String(data?.label || 'Hexagon')}
+              <LabelWithBreaks label={String(data?.label || 'Hexagon')} />
             </div>
           </div>
         )
@@ -115,7 +130,7 @@ export const FlowchartNode = memo(({ data, type }: NodeProps) => {
           <div className="p-1 bg-green-100 border-4 border-green-600 rounded-full">
             <div className="w-16 h-16 bg-green-100 border-2 border-green-500 rounded-full flex items-center justify-center">
               <div className="text-sm font-medium text-gray-900 text-center">
-                {String(data?.label || 'Double Circle')}
+                <LabelWithBreaks label={String(data?.label || 'Double Circle')} />
               </div>
             </div>
           </div>
