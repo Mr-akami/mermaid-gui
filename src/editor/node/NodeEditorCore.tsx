@@ -324,12 +324,23 @@ export function NodeEditorCore() {
   
   const onSelectionChange = useCallback(
     ({ nodes: selectedNodes, edges: selectedEdges }: { nodes: ReactFlowNode[]; edges: ReactFlowEdge[] }) => {
-      // Don't clear selection if we're updating programmatically
+      // Don't clear selection if we're updating programmatically for nodes
       if (isUpdatingRef.current && selectedNodes.length === 0 && selectedNodeId) {
         // Re-select the node
         setTimeout(() => {
           setNodes(nds => nds.map(n => 
             n.id === selectedNodeId ? { ...n, selected: true } : n
+          ))
+        }, 0)
+        return
+      }
+      
+      // Don't clear selection if we're updating programmatically for edges
+      if (isUpdatingRef.current && selectedEdges.length === 0 && selectedEdgeId) {
+        // Re-select the edge
+        setTimeout(() => {
+          setEdges(eds => eds.map(e => 
+            e.id === selectedEdgeId ? { ...e, selected: true } : e
           ))
         }, 0)
         return
@@ -346,7 +357,7 @@ export function NodeEditorCore() {
         setSelectedEdgeId(null)
       }
     },
-    [setSelectedNodeId, setSelectedEdgeId, selectedNodeId, setNodes],
+    [setSelectedNodeId, setSelectedEdgeId, selectedNodeId, selectedEdgeId, setNodes, setEdges],
   )
 
   // Handle PropertyPanel updates
@@ -407,6 +418,9 @@ export function NodeEditorCore() {
 
   const handleEdgeUpdate = useCallback(
     (update: { id: string; data?: { label: string }; type?: string }) => {
+      // Mark that we're updating programmatically
+      isUpdatingRef.current = true
+      
       // Update edge in atoms
       const edgeUpdate: Parameters<typeof updateEdge>[0] = {
         id: update.id,
@@ -415,11 +429,14 @@ export function NodeEditorCore() {
       }
       updateEdge(edgeUpdate)
       
-      // Update React Flow edges immediately
+      // Update React Flow edges immediately while preserving selection
       setEdges((eds) =>
         eds.map((edge) => {
           if (edge.id === update.id) {
-            let updatedEdge = { ...edge }
+            let updatedEdge = { 
+              ...edge,
+              selected: true  // Force selection to stay true
+            }
             
             // Update label if provided
             if (update.data) {
@@ -442,8 +459,13 @@ export function NodeEditorCore() {
           return edge
         })
       )
+      
+      // Reset flag after a short delay
+      setTimeout(() => {
+        isUpdatingRef.current = false
+      }, 100)
     },
-    [updateEdge, setEdges],
+    [updateEdge, setEdges, isUpdatingRef],
   )
 
   return (
