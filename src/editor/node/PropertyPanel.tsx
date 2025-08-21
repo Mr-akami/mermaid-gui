@@ -124,10 +124,21 @@ export function PropertyPanel({
     }
   }
 
-  // Get available parent nodes (subgraphs that are not the selected node itself)
-  const availableParents = allNodes.filter(
-    node => node.type === 'subgraph' && node.id !== selectedNode?.id
-  )
+  // Get available parent nodes (subgraphs that are not the selected node itself or its descendants)
+  const availableParents = allNodes.filter(node => {
+    if (node.type !== 'subgraph' || node.id === selectedNode?.id) return false
+    
+    // Check if this node is a descendant of the selected node
+    if (selectedNode?.type === 'subgraph') {
+      let parent = node.parentId
+      while (parent) {
+        if (parent === selectedNode.id) return false // This node is a descendant
+        parent = allNodes.find(n => n.id === parent)?.parentId
+      }
+    }
+    
+    return true
+  })
 
   // Don't render if nothing is selected
   if (!selectedNode && !selectedEdge) {
@@ -187,8 +198,8 @@ export function PropertyPanel({
           </select>
         </div>
 
-        {/* Parent selector - only show for nodes that are not subgraphs */}
-        {selectedNode && selectedNode.type !== 'subgraph' && (
+        {/* Parent selector - show for all nodes */}
+        {selectedNode && (
           <div>
             <label htmlFor="parent-select" className="block text-sm font-medium text-gray-700 mb-1">
               Parent Subgraph

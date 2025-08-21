@@ -550,8 +550,7 @@ export function NodeEditorCore() {
   // Handle node drag stop for auto parent-child relationship
   const onNodeDragStop = useCallback(
     (_event: React.MouseEvent, node: ReactFlowNode) => {
-      // Skip if the dragged node is a subgraph
-      if (node.type === 'subgraph') return
+      // No need to skip subgraphs - they can also have parents
       
       // Find all subgraph nodes
       const subgraphs = nodes.filter(n => n.type === 'subgraph')
@@ -572,6 +571,17 @@ export function NodeEditorCore() {
       for (const subgraph of subgraphs) {
         // Skip if it's the same node
         if (subgraph.id === node.id) continue
+        
+        // Skip if the subgraph is a child of the dragged node (prevent circular dependency)
+        if (node.type === 'subgraph') {
+          // Check if this subgraph is a descendant of the dragged node
+          let parent = subgraph.parentId
+          while (parent) {
+            if (parent === node.id) break // This subgraph is a child of the dragged node
+            parent = nodes.find(n => n.id === parent)?.parentId
+          }
+          if (parent === node.id) continue // Skip this subgraph
+        }
         
         // Check if node center is inside subgraph bounds
         const nodeWidth = node.width || 100
