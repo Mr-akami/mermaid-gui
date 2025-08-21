@@ -426,7 +426,7 @@ export function NodeEditorCore() {
 
   // Handle PropertyPanel updates
   const handleNodeUpdate = useCallback(
-    (update: { id: string; data?: { label: string }; type?: string }) => {
+    (update: { id: string; data?: { label: string }; type?: string; parentId?: string | null }) => {
       if (update.data) {
         // Mark that we're updating programmatically
         isUpdatingRef.current = true
@@ -475,6 +475,66 @@ export function NodeEditorCore() {
             return node
           })
         )
+      }
+      if (update.parentId !== undefined) {
+        // Handle parent-child relationship update
+        isUpdatingRef.current = true
+        
+        // Update in atoms first
+        updateNode({
+          id: update.id,
+          parentId: update.parentId
+        })
+        
+        // Update in React Flow nodes
+        setNodes((nds) => {
+          const targetNode = nds.find(n => n.id === update.id)
+          if (!targetNode) return nds
+          
+          return nds.map((node) => {
+            if (node.id === update.id) {
+              // If setting a parent, use relative position and add extent
+              if (update.parentId) {
+                const parentNode = nds.find(n => n.id === update.parentId)
+                if (parentNode) {
+                  // Convert absolute position to relative position
+                  const relativePosition = {
+                    x: node.position.x - parentNode.position.x,
+                    y: node.position.y - parentNode.position.y
+                  }
+                  return {
+                    ...node,
+                    parentId: update.parentId,
+                    extent: 'parent' as const,
+                    position: relativePosition,
+                    selected: true // Keep selection
+                  }
+                }
+              } else {
+                // Removing parent - convert relative position to absolute
+                const currentParentNode = node.parentId ? nds.find(n => n.id === node.parentId) : null
+                const absolutePosition = currentParentNode ? {
+                  x: node.position.x + currentParentNode.position.x,
+                  y: node.position.y + currentParentNode.position.y
+                } : node.position
+                
+                // Remove parentId and extent
+                const { parentId, extent, ...nodeWithoutParent } = node as any
+                return {
+                  ...nodeWithoutParent,
+                  position: absolutePosition,
+                  selected: true // Keep selection
+                }
+              }
+            }
+            return node
+          })
+        })
+        
+        // Reset flag after a short delay
+        setTimeout(() => {
+          isUpdatingRef.current = false
+        }, 100)
       }
     },
     [updateNode, setNodes, isUpdatingRef],

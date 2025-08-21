@@ -17,6 +17,7 @@ export function toCustomNode(rfNode: ReactFlowNode): CustomNode {
       label: String(rfNode.data?.label || '')
     },
     childIds: [],
+    ...(rfNode.parentId && { parentId: rfNode.parentId }),
     ...(rfNode.width && { width: rfNode.width }),
     ...(rfNode.height && { height: rfNode.height }),
   }
@@ -26,17 +27,19 @@ export function toCustomNode(rfNode: ReactFlowNode): CustomNode {
 export function toReactFlowNode(customNode: CustomNode, index?: number, isSelected?: boolean): ReactFlowNode {
   const { childIds: _childIds, ...rfNodeProps } = customNode
   
-  // Convert subgraph to group type for React Flow with explicit z-index
+  // Keep subgraph type for React Flow with explicit z-index
   if (customNode.type === 'subgraph') {
     // Keep subgraphs in background even when selected
     const baseZIndex = -1000
     const orderZIndex = index !== undefined ? index : 0
     return {
       ...rfNodeProps,
-      type: 'group',
+      type: 'subgraph', // Keep as subgraph, not group
       zIndex: baseZIndex + orderZIndex, // Subgraphs always in background, ordered by creation
       style: {
         zIndex: baseZIndex + orderZIndex,
+        width: customNode.width || 200,
+        height: customNode.height || 200,
       },
       ...(customNode.parentId && { parentId: customNode.parentId }),
     } as ReactFlowNode
@@ -103,7 +106,30 @@ export function toReactFlowEdge(customEdge: CustomEdge): ReactFlowEdge {
 
 // Array conversion functions
 export function toCustomNodes(rfNodes: ReactFlowNode[]): CustomNode[] {
-  return rfNodes.map(toCustomNode)
+  const nodes = rfNodes.map(toCustomNode)
+  
+  // Rebuild childIds based on parentId relationships
+  const nodeMap = new Map(nodes.map(n => [n.id, n]))
+  
+  // Clear existing childIds and rebuild
+  nodes.forEach(node => {
+    node.childIds = []
+  })
+  
+  // Populate childIds based on parentId
+  nodes.forEach(node => {
+    if (node.parentId && nodeMap.has(node.parentId)) {
+      const parent = nodeMap.get(node.parentId)!
+      if (!parent.childIds) {
+        parent.childIds = []
+      }
+      if (!parent.childIds.includes(node.id)) {
+        parent.childIds.push(node.id)
+      }
+    }
+  })
+  
+  return nodes
 }
 
 export function toReactFlowNodes(customNodes: CustomNode[]): ReactFlowNode[] {

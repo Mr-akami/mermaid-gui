@@ -178,20 +178,58 @@ export const updateNodeAtom = atom(
       data?: { label: string }
       width?: number
       height?: number
+      parentId?: string | null
     },
   ) => {
     const nodes = get(nodesAtom)
-    const updatedNodes = nodes.map((node) =>
-      node.id === update.id
-        ? {
-            ...node,
-            ...(update.position && { position: update.position }),
-            ...(update.data && { data: { ...node.data, ...update.data } }),
-            ...(update.width !== undefined && { width: update.width }),
-            ...(update.height !== undefined && { height: update.height }),
+    const updatedNodes = nodes.map((node) => {
+      if (node.id === update.id) {
+        // Handle parent-child relationship updates
+        const oldParentId = node.parentId
+        const newParentId = update.parentId
+        
+        let updatedNode = {
+          ...node,
+          ...(update.position && { position: update.position }),
+          ...(update.data && { data: { ...node.data, ...update.data } }),
+          ...(update.width !== undefined && { width: update.width }),
+          ...(update.height !== undefined && { height: update.height }),
+        }
+        
+        // Handle parentId update
+        if (update.parentId !== undefined) {
+          if (update.parentId === null) {
+            // Removing parent
+            delete updatedNode.parentId
+          } else {
+            // Setting parent
+            updatedNode.parentId = update.parentId
           }
-        : node,
-    )
+        }
+        
+        return updatedNode
+      }
+      
+      // Update parent nodes' childIds
+      if (update.parentId !== undefined) {
+        // Remove from old parent's childIds
+        if (node.parentId === update.id) {
+          return {
+            ...node,
+            childIds: node.childIds?.filter(id => id !== update.id) || []
+          }
+        }
+        // Add to new parent's childIds
+        if (update.parentId && node.id === update.parentId) {
+          return {
+            ...node,
+            childIds: [...(node.childIds || []), update.id]
+          }
+        }
+      }
+      
+      return node
+    })
     set(nodesAtom, updatedNodes)
     set(saveToHistoryAtom, { nodes: updatedNodes, edges: get(edgesAtom) })
   },

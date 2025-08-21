@@ -1,11 +1,13 @@
 import { useState, useEffect, useRef } from 'react'
 import { Node, Edge } from '../../common/types'
 import { MERMAID_NODE_TYPES, MERMAID_EDGE_TYPES } from '../../flowchart'
+import { useAtomValue } from 'jotai'
+import { nodesAtom } from '../../flowchart/atoms'
 
 interface PropertyPanelProps {
   selectedNode: Node | null
   selectedEdge: Edge | null
-  onNodeUpdate: (update: { id: string; data?: { label: string }; type?: string }) => void
+  onNodeUpdate: (update: { id: string; data?: { label: string }; type?: string; parentId?: string | null }) => void
   onEdgeUpdate: (update: { id: string; data?: { label: string }; type?: Edge['type'] }) => void
   autoFocus?: boolean
 }
@@ -20,8 +22,12 @@ export function PropertyPanel({
   const [label, setLabel] = useState('')
   const [nodeType, setNodeType] = useState<string>('')
   const [edgeType, setEdgeType] = useState<string>('')
+  const [parentId, setParentId] = useState<string | null>(null)
   const [isEditing, setIsEditing] = useState(false)
   const labelInputRef = useRef<HTMLTextAreaElement>(null)
+  
+  // Get all nodes to find potential parent nodes (subgraphs)
+  const allNodes = useAtomValue(nodesAtom)
 
   // Update local state when selection changes (node ID changes)
   useEffect(() => {
@@ -33,11 +39,13 @@ export function PropertyPanel({
     if (selectedNode) {
       setLabel(selectedNode.data.label || '')
       setNodeType(selectedNode.type)
+      setParentId(selectedNode.parentId || null)
     } else if (selectedEdge) {
       setLabel(selectedEdge.data?.label || '')
       setEdgeType(selectedEdge.type)
+      setParentId(null)
     }
-  }, [selectedNode?.id, selectedEdge?.id, isEditing, selectedNode?.type, selectedEdge?.type])
+  }, [selectedNode?.id, selectedEdge?.id, isEditing, selectedNode?.type, selectedEdge?.type, selectedNode?.parentId])
 
   // Handle auto-focus
   useEffect(() => {
@@ -105,6 +113,22 @@ export function PropertyPanel({
     }
   }
 
+  const handleParentChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newParentId = e.target.value || null
+    setParentId(newParentId)
+    if (selectedNode) {
+      onNodeUpdate({
+        id: selectedNode.id,
+        parentId: newParentId,
+      })
+    }
+  }
+
+  // Get available parent nodes (subgraphs that are not the selected node itself)
+  const availableParents = allNodes.filter(
+    node => node.type === 'subgraph' && node.id !== selectedNode?.id
+  )
+
   // Don't render if nothing is selected
   if (!selectedNode && !selectedEdge) {
     return null
@@ -162,6 +186,28 @@ export function PropertyPanel({
                 ))}
           </select>
         </div>
+
+        {/* Parent selector - only show for nodes that are not subgraphs */}
+        {selectedNode && selectedNode.type !== 'subgraph' && (
+          <div>
+            <label htmlFor="parent-select" className="block text-sm font-medium text-gray-700 mb-1">
+              Parent Subgraph
+            </label>
+            <select
+              id="parent-select"
+              value={parentId || ''}
+              onChange={handleParentChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">None</option>
+              {availableParents.map((parent) => (
+                <option key={parent.id} value={parent.id}>
+                  {parent.data.label || parent.id}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
       </div>
     </div>
   )
