@@ -9,6 +9,7 @@ import {
   useRef,
   useState,
   useEffect,
+  useMemo,
   type Node as ReactFlowNode,
   type Edge as ReactFlowEdge,
   type Connection,
@@ -20,7 +21,6 @@ import {
 import { NodeToolbar } from './NodeToolbar'
 import { UndoRedoButtons } from './UndoRedoButtons'
 import { PropertyPanel } from './PropertyPanel'
-import { useSelection } from './useSelection'
 import {
   MERMAID_NODE_TYPES,
   NODE_TYPE_CONFIG,
@@ -34,7 +34,7 @@ import {
 } from '../../flowchart'
 import { saveToHistoryAtom } from '../../history'
 import { toCustomNodes, toReactFlowNodes, toCustomEdges, toReactFlowEdges } from './deps'
-import { focusPropertyPanelAtom } from './atoms'
+import { focusPropertyPanelAtom, selectedNodeIdAtom, selectedEdgeIdAtom } from './atoms'
 import type { Edge } from '../../common/types'
 
 // Create nodeTypes object dynamically from MERMAID_NODE_TYPES
@@ -76,7 +76,7 @@ const getHandlesForDirection = (direction: 'TB' | 'LR') => {
 
 export function NodeEditorCore() {
   const reactFlowWrapper = useRef<HTMLDivElement>(null)
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes)
+  const [nodes, setNodes, onNodesChangeOriginal] = useNodesState(initialNodes)
   const [edges, setEdges, onEdgesChange] = useEdgesState([])
   const [selectedNodeType, setSelectedNodeType] = useState<string | null>(null)
   const { screenToFlowPosition } = useReactFlow()
@@ -89,6 +89,26 @@ export function NodeEditorCore() {
   const [, updateNode] = useAtom(updateNodeAtom)
   const [, updateEdge] = useAtom(updateEdgeAtom)
   const [shouldFocusPropertyPanel, setShouldFocusPropertyPanel] = useAtom(focusPropertyPanelAtom)
+  const [selectedNodeId, setSelectedNodeId] = useAtom(selectedNodeIdAtom)
+  const [selectedEdgeId, setSelectedEdgeId] = useAtom(selectedEdgeIdAtom)
+  
+  // Custom onNodesChange to prevent selection reset during label editing
+  const onNodesChange = useCallback((changes: any) => {
+    console.log('onNodesChange called:', changes)
+    // Filter out selection changes when we're updating nodes programmatically
+    const filteredChanges = changes.filter((change: any) => {
+      // Allow all changes except selection changes during updates
+      if (change.type === 'select' && selectedNodeId) {
+        // Check if this is trying to deselect our selected node
+        if (change.id === selectedNodeId && !change.selected) {
+          console.log('Preventing deselection of:', selectedNodeId)
+          return false
+        }
+      }
+      return true
+    })
+    onNodesChangeOriginal(filteredChanges)
+  }, [onNodesChangeOriginal, selectedNodeId])
 
   // Track if we're in an undo/redo operation
   const isUndoRedoRef = useRef(false)
@@ -96,8 +116,18 @@ export function NodeEditorCore() {
   // Track if we're updating from code editor to prevent infinite loops
   const isCodeUpdateRef = useRef(false)
 
-  // Get current selection
-  const { selectedNode, selectedEdge } = useSelection(nodes, edges)
+  // Get current selection based on tracked IDs
+  const selectedNode = useMemo(() => {
+    if (!selectedNodeId) return null
+    const node = nodes.find(n => n.id === selectedNodeId)
+    return node ? toCustomNodes([node])[0] : null
+  }, [selectedNodeId, nodes])
+  
+  const selectedEdge = useMemo(() => {
+    if (!selectedEdgeId) return null  
+    const edge = edges.find(e => e.id === selectedEdgeId)
+    return edge ? toCustomEdges([edge])[0] : null
+  }, [selectedEdgeId, edges])
 
   // Reset focus flag after PropertyPanel has focused
   useEffect(() => {
@@ -284,18 +314,48 @@ export function NodeEditorCore() {
     [setShouldFocusPropertyPanel],
   )
 
+  // Track if we're updating programmatically
+  const isUpdatingRef = useRef(false)
+  
   const onSelectionChange = useCallback(
-    ({ nodes: _selectedNodes, edges: _selectedEdges }: { nodes: ReactFlowNode[]; edges: ReactFlowEdge[] }) => {
-      // React Flow calls this with arrays of selected items
-      // Don't reset focus flag here as it interferes with double-click
+    ({ nodes: selectedNodes, edges: selectedEdges }: { nodes: ReactFlowNode[]; edges: ReactFlowEdge[] }) => {
+      // Track selection in our atoms
+      console.log('Selection changed:', { selectedNodes: selectedNodes.map(n => n.id), selectedEdges: selectedEdges.map(e => e.id) })
+      
+      // Don't clear selection if we're updating programmatically
+      if (isUpdatingRef.current && selectedNodes.length === 0 && selectedNodeId) {
+        console.log('Ignoring selection clear during update')
+        // Re-select the node
+        setTimeout(() => {
+          setNodes(nds => nds.map(n => 
+            n.id === selectedNodeId ? { ...n, selected: true } : n
+          ))
+        }, 0)
+        return
+      }
+      
+      if (selectedNodes.length > 0) {
+        setSelectedNodeId(selectedNodes[0].id)
+        setSelectedEdgeId(null)
+      } else if (selectedEdges.length > 0) {
+        setSelectedNodeId(null)
+        setSelectedEdgeId(selectedEdges[0].id)
+      } else {
+        setSelectedNodeId(null)
+        setSelectedEdgeId(null)
+      }
     },
-    [],
+    [setSelectedNodeId, setSelectedEdgeId, selectedNodeId, setNodes],
   )
 
   // Handle PropertyPanel updates
   const handleNodeUpdate = useCallback(
     (update: { id: string; data?: { label: string }; type?: string }) => {
+      console.log('handleNodeUpdate called:', update)
       if (update.data) {
+        // Mark that we're updating programmatically
+        isUpdatingRef.current = true
+        
         // Update atom
         updateNode({
           id: update.id,
@@ -303,26 +363,48 @@ export function NodeEditorCore() {
         })
         
         // Also update React Flow nodes immediately for label changes
-        setNodes((nds) =>
-          nds.map((node) =>
-            node.id === update.id
-              ? { ...node, data: { ...node.data, ...update.data } }
-              : node
-          )
-        )
+        // IMPORTANT: Must preserve ALL node properties including selected state
+        setNodes((nds) => {
+          const updatedNodes = nds.map((node) => {
+            if (node.id === update.id) {
+              // Create new node object while preserving all existing properties
+              const updatedNode = {
+                ...node,
+                data: { ...node.data, ...update.data },
+                selected: true  // Force selection to stay true
+              }
+              console.log('Updating node:', { old: node, new: updatedNode })
+              return updatedNode
+            }
+            return node
+          })
+          console.log('Updated nodes:', updatedNodes.map(n => ({ id: n.id, selected: n.selected })))
+          return updatedNodes
+        })
+        
+        // Reset flag after a short delay
+        setTimeout(() => {
+          isUpdatingRef.current = false
+        }, 100)
       }
       if (update.type) {
         // For type changes, we need to update the React Flow nodes directly
+        // IMPORTANT: Must preserve ALL node properties including selected state
         setNodes((nds) =>
-          nds.map((node) =>
-            node.id === update.id
-              ? { ...node, type: update.type }
-              : node
-          )
+          nds.map((node) => {
+            if (node.id === update.id) {
+              // Create new node object while preserving all existing properties
+              return {
+                ...node,
+                type: update.type
+              }
+            }
+            return node
+          })
         )
       }
     },
-    [updateNode, setNodes],
+    [updateNode, setNodes, isUpdatingRef],
   )
 
   const handleEdgeUpdate = useCallback(

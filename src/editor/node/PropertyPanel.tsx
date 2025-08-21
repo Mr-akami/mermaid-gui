@@ -20,10 +20,16 @@ export function PropertyPanel({
   const [label, setLabel] = useState('')
   const [nodeType, setNodeType] = useState<string>('')
   const [edgeType, setEdgeType] = useState<string>('')
+  const [isEditing, setIsEditing] = useState(false)
   const labelInputRef = useRef<HTMLInputElement>(null)
 
-  // Update local state when selection changes
+  // Update local state when selection changes (node ID changes)
   useEffect(() => {
+    // Skip state updates while editing to prevent losing focus
+    if (isEditing) {
+      return
+    }
+    
     if (selectedNode) {
       setLabel(selectedNode.data.label || '')
       setNodeType(selectedNode.type)
@@ -31,7 +37,7 @@ export function PropertyPanel({
       setLabel(selectedEdge.data?.label || '')
       setEdgeType(selectedEdge.type)
     }
-  }, [selectedNode, selectedEdge])
+  }, [selectedNode?.id, selectedEdge?.id, isEditing, selectedNode?.type, selectedEdge?.type])
 
   // Handle auto-focus
   useEffect(() => {
@@ -44,6 +50,7 @@ export function PropertyPanel({
   const handleLabelChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newLabel = e.target.value
     setLabel(newLabel)
+    setIsEditing(true)  // Mark as editing
     
     // Update immediately on change
     if (selectedNode) {
@@ -57,6 +64,14 @@ export function PropertyPanel({
         data: { label: newLabel },
       })
     }
+  }
+
+  const handleLabelBlur = () => {
+    setIsEditing(false)  // Mark editing as complete
+  }
+
+  const handleLabelFocus = () => {
+    setIsEditing(true)  // Mark as editing when input is focused
   }
 
   const handleNodeTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -107,6 +122,8 @@ export function PropertyPanel({
             type="text"
             value={label}
             onChange={handleLabelChange}
+            onFocus={handleLabelFocus}
+            onBlur={handleLabelBlur}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>

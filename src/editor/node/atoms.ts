@@ -1,6 +1,12 @@
 import { atom } from 'jotai'
 import { Node, Edge } from '../../common/types'
 
+// Atom to track the currently selected node ID
+export const selectedNodeIdAtom = atom<string | null>(null)
+
+// Atom to track the currently selected edge ID
+export const selectedEdgeIdAtom = atom<string | null>(null)
+
 // Atom to track the currently selected node
 export const selectedNodeAtom = atom<Node | null>(null)
 

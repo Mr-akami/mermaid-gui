@@ -15,7 +15,7 @@ export {
 } from '@xyflow/react'
 
 
-export { useCallback, useRef, useState, useEffect } from 'react'
+export { useCallback, useRef, useState, useEffect, useMemo } from 'react'
 
 // Internal dependencies
 export { FlowchartNode } from '../../flowchart/index'
