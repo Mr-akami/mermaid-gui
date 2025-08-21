@@ -45,7 +45,7 @@ export function buildFlowchartCode(data: FlowchartData, direction: 'TD' | 'TB' |
       }
       
       orderedChildNodes.forEach(child => {
-        processNode(child, '    ')
+        processNode(child, indent + '    ')
       })
       
       lines.push(`${indent}end`)
@@ -65,7 +65,7 @@ export function buildFlowchartCode(data: FlowchartData, direction: 'TD' | 'TB' |
   )
 
   orderedTopLevelNodes.forEach(node => {
-    processNode(node)
+    processNode(node, '    ')
   })
 
   // Create a mapping of node IDs to their display names for subgraphs
