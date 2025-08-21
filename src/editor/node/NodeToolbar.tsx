@@ -31,11 +31,24 @@ export const NodeToolbar = memo(({ onNodeTypeSelect, selectedNodeType }: NodeToo
     <div className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-white rounded-lg shadow-lg p-2 flex gap-1 z-10">
       {/* Layout direction toggle */}
       <button
-        onClick={() => updateLayoutDirection(layoutDirection === 'TB' ? 'LR' : 'TB')}
-        title={`Layout: ${layoutDirection === 'TB' ? 'Top to Bottom' : 'Left to Right'}`}
+        onClick={() => {
+          const nextDirection = 
+            layoutDirection === 'TD' ? 'LR' : 
+            layoutDirection === 'LR' ? 'RL' : 
+            layoutDirection === 'RL' ? 'BT' : 'TD'
+          updateLayoutDirection(nextDirection)
+        }}
+        title={`Layout: ${
+          layoutDirection === 'TD' ? 'Top to Bottom' : 
+          layoutDirection === 'BT' ? 'Bottom to Top' :
+          layoutDirection === 'LR' ? 'Left to Right' : 
+          'Right to Left'
+        }`}
         className="w-10 h-10 flex items-center justify-center rounded bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-bold transition-all mr-2"
       >
-        {layoutDirection === 'TB' ? '↓' : '→'}
+        {layoutDirection === 'TD' ? '↓' : 
+         layoutDirection === 'BT' ? '↑' :
+         layoutDirection === 'LR' ? '→' : '←'}
       </button>
       
       {/* Separator */}

@@ -19,22 +19,29 @@ const nodeCountersAtom = atom<Record<string, number>>({
 export const nodesAtom = atom<Node[]>([])
 export const edgesAtom = atom<Edge[]>([])
 
-// Layout direction atom ('TB' for top-to-bottom, 'LR' for left-to-right)
-export const layoutDirectionAtom = atom<'TB' | 'LR'>('TB')
+// Layout direction atom
+export const layoutDirectionAtom = atom<'TD' | 'LR' | 'RL' | 'BT'>('TD')
 
 // Helper function to get appropriate handles based on layout direction
-const getHandlesForDirection = (direction: 'TB' | 'LR') => {
-  if (direction === 'TB') {
-    return { source: 'bottom', target: 'top' }
-  } else {
-    return { source: 'right', target: 'left' }
+const getHandlesForDirection = (direction: 'TD' | 'LR' | 'RL' | 'BT') => {
+  switch (direction) {
+    case 'TD':
+      return { source: 'bottom', target: 'top' }
+    case 'BT':
+      return { source: 'top', target: 'bottom' }
+    case 'LR':
+      return { source: 'right', target: 'left' }
+    case 'RL':
+      return { source: 'left', target: 'right' }
+    default:
+      return { source: 'bottom', target: 'top' }
   }
 }
 
 // Write atom for updating layout direction and adjusting edges
 export const updateLayoutDirectionAtom = atom(
   null,
-  (get, set, newDirection: 'TB' | 'LR') => {
+  (get, set, newDirection: 'TD' | 'LR' | 'RL' | 'BT') => {
     const currentDirection = get(layoutDirectionAtom)
     if (currentDirection === newDirection) return
     

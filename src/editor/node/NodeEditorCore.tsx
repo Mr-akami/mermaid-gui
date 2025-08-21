@@ -66,11 +66,18 @@ const getId = () => `N${id++}`
 const nodeOrigin: [number, number] = [0.5, 0]
 
 // Helper function to get appropriate handles based on layout direction
-const getHandlesForDirection = (direction: 'TB' | 'LR') => {
-  if (direction === 'TB') {
-    return { source: 'bottom', target: 'top' }
-  } else {
-    return { source: 'right', target: 'left' }
+const getHandlesForDirection = (direction: 'TD' | 'LR' | 'RL' | 'BT') => {
+  switch (direction) {
+    case 'TD':
+      return { source: 'bottom', target: 'top' }
+    case 'BT':
+      return { source: 'top', target: 'bottom' }
+    case 'LR':
+      return { source: 'right', target: 'left' }
+    case 'RL':
+      return { source: 'left', target: 'right' }
+    default:
+      return { source: 'bottom', target: 'top' }
   }
 }
 

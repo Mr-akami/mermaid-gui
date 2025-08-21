@@ -1,7 +1,7 @@
 import type { Node, Edge } from '../../common/types'
 
 export interface ParsedFlowchart {
-  direction: 'TD' | 'TB' | 'LR' | 'RL' | 'BT'
+  direction: 'TD' | 'TB' | 'LR' | 'RL' | 'BT' | 'DT'
   nodes: Node[]
   edges: Edge[]
 }
@@ -231,21 +231,27 @@ function assignNodePositions(nodes: Node[], edges: Edge[], direction: string) {
   
   // Assign positions based on level and index
   // TD and TB have the same behavior (top to bottom)
+  // BT and DT have the same behavior (bottom to top)
   const isHorizontal = direction === 'LR' || direction === 'RL'
+  const isReversed = direction === 'BT' || direction === 'DT' || direction === 'RL'
   const levelSpacing = 150
   const nodeSpacing = 150
   
+  const maxLevel = Math.max(...nodesByLevel.keys())
+  
   nodesByLevel.forEach((levelNodes, level) => {
     levelNodes.forEach((node, index) => {
+      const effectiveLevel = isReversed ? maxLevel - level : level
+      
       if (isHorizontal) {
         node.position = {
-          x: level * levelSpacing,
+          x: effectiveLevel * levelSpacing,
           y: index * nodeSpacing
         }
       } else {
         node.position = {
           x: index * nodeSpacing,
-          y: level * levelSpacing
+          y: effectiveLevel * levelSpacing
         }
       }
     })

@@ -3,7 +3,7 @@ import { nanoid } from './deps'
 import { parseNode } from './nodeParser'
 import { parseEdge } from './edgeParser'
 
-export function parseFlowchart(code: string, layoutDirection: 'TB' | 'LR' = 'TB'): MermaidParseResult {
+export function parseFlowchart(code: string, layoutDirection: 'TD' | 'LR' = 'TD'): MermaidParseResult {
   try {
     const lines = code
       .split('\n')
@@ -70,8 +70,8 @@ export function parseFlowchart(code: string, layoutDirection: 'TB' | 'LR' = 'TB'
       const parsedEdge = parseEdge(line)
       if (parsedEdge) {
         // Helper function to get appropriate handles based on layout direction
-        const getHandlesForDirection = (direction: 'TB' | 'LR') => {
-          if (direction === 'TB') {
+        const getHandlesForDirection = (direction: 'TD' | 'LR') => {
+          if (direction === 'TD') {
             return { source: 'bottom', target: 'top' }
           } else {
             return { source: 'right', target: 'left' }
@@ -160,10 +160,10 @@ export function parseFlowchart(code: string, layoutDirection: 'TB' | 'LR' = 'TB'
 }
 
 // Auto layout function for arranging nodes based on connections
-function applyAutoLayout(nodes: Node[], edges: Edge[], direction: 'TB' | 'LR'): void {
+function applyAutoLayout(nodes: Node[], edges: Edge[], direction: 'TD' | 'LR'): void {
   if (nodes.length === 0) return
 
-  const nodeSpacing = direction === 'TB' ? { x: 200, y: 150 } : { x: 200, y: 150 }
+  const nodeSpacing = direction === 'TD' ? { x: 200, y: 150 } : { x: 200, y: 150 }
   const startPosition = { x: 100, y: 100 }
   
   // Build adjacency map
@@ -209,7 +209,7 @@ function applyAutoLayout(nodes: Node[], edges: Edge[], direction: 'TB' | 'LR'): 
       .filter(([_, nodeLevel]) => nodeLevel === level)
       .length
     
-    if (direction === 'TB') {
+    if (direction === 'TD') {
       node.position = {
         x: startPosition.x + (nodesAtLevel - 1) * nodeSpacing.x,
         y: startPosition.y + level * nodeSpacing.y
@@ -236,7 +236,7 @@ function applyAutoLayout(nodes: Node[], edges: Edge[], direction: 'TB' | 'LR'): 
   // Position any remaining unconnected nodes
   nodes.forEach((node, index) => {
     if (!positioned.has(node.id)) {
-      if (direction === 'TB') {
+      if (direction === 'TD') {
         node.position = {
           x: startPosition.x + index * nodeSpacing.x,
           y: startPosition.y

@@ -3,7 +3,7 @@ import { buildNodeCode } from './nodeCodeBuilder'
 import { buildEdgeCode } from './edgeCodeBuilder'
 import { topologicalSort } from './topologicalSort'
 
-export function buildFlowchartCode(data: FlowchartData, direction: 'TD' | 'TB' | 'LR' = 'TD'): string {
+export function buildFlowchartCode(data: FlowchartData, direction: 'TD' | 'TB' | 'LR' | 'RL' | 'BT' | 'DT' = 'TD'): string {
   const lines: string[] = [`flowchart ${direction}`]
 
   // Helper function to build subgraph declaration

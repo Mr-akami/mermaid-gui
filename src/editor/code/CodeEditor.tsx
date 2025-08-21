@@ -30,12 +30,11 @@ export function CodeEditor() {
     try {
       const result = parseFlowchartCode(newCode)
       if (result && result.nodes && result.edges) {
-        // Update layout direction from parsed code and normalize TB to TD
+        // Update layout direction from parsed code and normalize TB to TD, DT to BT
         const parsedDirection = result.direction || 'TD'
         const normalizedDirection = parsedDirection === 'TB' ? 'TD' : 
-                                   parsedDirection === 'BT' ? 'TD' : 
-                                   parsedDirection === 'RL' ? 'LR' : 
-                                   parsedDirection as 'TD' | 'LR'
+                                   parsedDirection === 'DT' ? 'BT' : 
+                                   parsedDirection as 'TD' | 'LR' | 'RL' | 'BT'
         
         // Set nodes and edges first
         setNodes(result.nodes)
