@@ -7,13 +7,24 @@ export interface ParsedNode {
 export function parseNode(line: string): ParsedNode | null {
   const trimmedLine = line.trim()
 
-  // Parse subgraph declaration
-  const subgraphMatch = trimmedLine.match(/^subgraph\s+(\w+)\s*\[([^\]]*)\]/)
-  if (subgraphMatch) {
+  // Parse subgraph declaration with optional label
+  // First try with label in brackets
+  const subgraphWithLabelMatch = trimmedLine.match(/^subgraph\s+([\w\-]+)\s*\[([^\]]*)\]/)
+  if (subgraphWithLabelMatch) {
     return {
-      id: subgraphMatch[1],
+      id: subgraphWithLabelMatch[1],
       type: 'subgraph',
-      label: subgraphMatch[2],
+      label: subgraphWithLabelMatch[2],
+    }
+  }
+  
+  // Then try without label (just ID)
+  const subgraphNoLabelMatch = trimmedLine.match(/^subgraph\s+([\w\-]+)\s*$/)
+  if (subgraphNoLabelMatch) {
+    return {
+      id: subgraphNoLabelMatch[1],
+      type: 'subgraph',
+      label: subgraphNoLabelMatch[1], // Use ID as label
     }
   }
 

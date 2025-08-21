@@ -98,7 +98,56 @@ export function parseFlowchartCode(code: string): ParsedFlowchart {
       continue
     }
     
-    // Parse connections
+    // Check for chained connections first (e.g., A --> B --> C)
+    const chainPattern = /^(.+?)\s+((?:--|==|-\.)+>?)\s+(.+)$/
+    const chainMatch = line.match(chainPattern)
+    
+    if (chainMatch) {
+      const [, firstPart, connector, rest] = chainMatch
+      
+      // Check if rest contains another connector (chain)
+      const restChainMatch = rest.match(/^(.+?)\s+((?:--|==|-\.)+>?)\s+(.+)$/)
+      
+      if (restChainMatch && restChainMatch[2] === connector) {
+        // This is a chained connection
+        const nodes = [firstPart, restChainMatch[1], restChainMatch[3]]
+        
+        // Process each node in the chain
+        for (const nodeDef of nodes) {
+          const nodeId = getNodeId(nodeDef)
+          if (!nodeMap.has(nodeId)) {
+            const node = parseNode(nodeDef) || {
+              id: nodeId,
+              type: 'rectangle' as const,
+              data: { label: nodeId },
+              position: { x: 0, y: 0 },
+              childIds: []
+            }
+            
+            if (currentSubgraph) {
+              node.parentId = currentSubgraph.id
+              currentSubgraph.childIds?.push(node.id)
+            }
+            nodeMap.set(node.id, node)
+            result.nodes.push(node)
+          }
+        }
+        
+        // Create edges between consecutive nodes
+        for (let i = 0; i < nodes.length - 1; i++) {
+          const sourceId = getNodeId(nodes[i])
+          const targetId = getNodeId(nodes[i + 1])
+          const edge = parseEdge(sourceId, targetId, connector)
+          if (edge) {
+            result.edges.push(edge)
+          }
+        }
+        
+        continue
+      }
+    }
+    
+    // Parse regular connections
     const connectionMatch = line.match(/^([A-Za-z0-9_]+(?:\[.*?\]|\(.*?\)|\{.*?\}|\[\[.*?\]\])*)\s*(.*?)\s*([A-Za-z0-9_]+(?:\[.*?\]|\(.*?\)|\{.*?\}|\[\[.*?\]\])*)$/)
     
     if (connectionMatch) {

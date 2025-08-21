@@ -9,8 +9,73 @@ export interface ParsedEdge {
   label?: string
 }
 
+// Parse chained edges like A --> B --> C
+export function parseChainedEdges(line: string): ParsedEdge[] | null {
+  const trimmedLine = line.trim()
+  
+  // Define connector patterns (sorted by length to avoid false matches)
+  const connectors = [
+    { pattern: '--->', type: 'normal-arrow' as const },
+    { pattern: '===>', type: 'thick-arrow' as const },
+    { pattern: '-.->', type: 'dotted-arrow' as const },
+    { pattern: '-->', type: 'normal-arrow' as const },
+    { pattern: '==>', type: 'thick-arrow' as const },
+    { pattern: '---', type: 'normal' as const },
+    { pattern: '===', type: 'thick' as const },
+    { pattern: '-.-', type: 'dotted' as const },
+  ]
+  
+  // Find which connector is used
+  let connectorType: Edge['type'] | null = null
+  let connectorPattern: string | null = null
+  
+  for (const { pattern, type } of connectors) {
+    if (trimmedLine.includes(pattern)) {
+      // Check if this is a chain (appears more than once)
+      const parts = trimmedLine.split(pattern)
+      if (parts.length > 2) {
+        connectorType = type
+        connectorPattern = pattern
+        break
+      }
+    }
+  }
+  
+  if (!connectorType || !connectorPattern) {
+    return null
+  }
+  
+  // Split by the connector
+  const nodes = trimmedLine.split(connectorPattern).map(n => n.trim())
+  
+  if (nodes.length < 2) {
+    return null
+  }
+  
+  // Create edges for each pair
+  const edges: ParsedEdge[] = []
+  for (let i = 0; i < nodes.length - 1; i++) {
+    edges.push({
+      source: nodes[i],
+      target: nodes[i + 1],
+      type: connectorType,
+      label: undefined,
+    })
+  }
+  
+  return edges
+}
+
+
 export function parseEdge(line: string): ParsedEdge | null {
   const trimmedLine = line.trim()
+
+  // Skip chained edges - they should be handled by parseChainedEdges directly
+  const chainedEdges = parseChainedEdges(trimmedLine)
+  if (chainedEdges && chainedEdges.length > 0) {
+    // Return null to indicate this should be handled as chained edges
+    return null
+  }
 
   // Helper function to parse node lists with & operator
   const parseNodeList = (nodeString: string): string[] => {

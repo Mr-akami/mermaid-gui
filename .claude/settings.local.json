@@ -73,7 +73,11 @@
       "Bash(cat:*)",
       "Bash(env)",
       "Bash(node:*)",
-      "Bash(sed:*)"
+      "Bash(sed:*)",
+      "mcp__serena__replace_lines",
+      "mcp__serena__replace_symbol_body",
+      "mcp__serena__insert_before_symbol",
+      "mcp__serena__insert_after_symbol"
     ],
     "deny": []
   },

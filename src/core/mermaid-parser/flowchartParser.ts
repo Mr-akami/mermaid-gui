@@ -1,7 +1,7 @@
 import type { Node, Edge, MermaidParseResult } from './deps'
 import { nanoid } from './deps'
 import { parseNode } from './nodeParser'
-import { parseEdge } from './edgeParser'
+import { parseEdge, parseChainedEdges } from './edgeParser'
 
 export function parseFlowchart(code: string, layoutDirection: 'TD' | 'LR' = 'TD'): MermaidParseResult {
   try {
@@ -66,7 +66,62 @@ export function parseFlowchart(code: string, layoutDirection: 'TD' | 'LR' = 'TD'
         continue
       }
 
-      // Try to parse as edge
+      // Try to parse as chained edges first
+      const chainedEdges = parseChainedEdges(line)
+      if (chainedEdges && chainedEdges.length > 0) {
+        // Helper function to get appropriate handles based on layout direction
+        const getHandlesForDirection = (direction: 'TD' | 'LR') => {
+          if (direction === 'TD') {
+            return { source: 'bottom', target: 'top' }
+          } else {
+            return { source: 'right', target: 'left' }
+          }
+        }
+
+        // Helper function to ensure node exists
+        const ensureNodeExists = (nodeId: string) => {
+          if (!nodeMap.has(nodeId)) {
+            const node: Node = {
+              id: nodeId,
+              type: 'rectangle', // Default type for implicitly created nodes
+              parentId: subgraphStack.length > 0 ? subgraphStack[subgraphStack.length - 1].id : undefined,
+              childIds: [],
+              position: { x: 0, y: 0 },
+              data: { label: nodeId }, // Use ID as label by default
+            }
+            nodes.push(node)
+            nodeMap.set(nodeId, node)
+            
+            // Update parent's childIds
+            if (node.parentId) {
+              const parent = nodeMap.get(node.parentId)
+              if (parent) {
+                parent.childIds.push(node.id)
+              }
+            }
+          }
+        }
+
+        // Process each edge in the chain
+        for (const edge of chainedEdges) {
+          ensureNodeExists(edge.source!)
+          ensureNodeExists(edge.target!)
+          const handles = getHandlesForDirection(layoutDirection)
+          const edgeObj: Edge = {
+            id: nanoid(),
+            source: edge.source!,
+            target: edge.target!,
+            sourceHandle: handles.source,
+            targetHandle: handles.target,
+            type: edge.type,
+            data: edge.label ? { label: edge.label } : undefined,
+          }
+          edges.push(edgeObj)
+        }
+        continue
+      }
+
+      // Try to parse as single edge
       const parsedEdge = parseEdge(line)
       if (parsedEdge) {
         // Helper function to get appropriate handles based on layout direction
