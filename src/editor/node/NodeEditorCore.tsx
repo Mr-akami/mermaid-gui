@@ -63,7 +63,7 @@ const initialNodes: ReactFlowNode[] = [
 
 let id = 1
 const getId = () => `N${id++}`
-const nodeOrigin: [number, number] = [0.5, 0]
+const nodeOrigin: [number, number] = [0, 0]
 
 // Helper function to get appropriate handles based on layout direction
 const getHandlesForDirection = (direction: 'TD' | 'LR' | 'RL' | 'BT') => {
@@ -486,44 +486,51 @@ export function NodeEditorCore() {
           parentId: update.parentId
         })
         
-        // Update in React Flow nodes
+        // Update in React Flow nodes using positionAbsolute for accurate transformation
         setNodes((nds) => {
           const targetNode = nds.find(n => n.id === update.id)
           if (!targetNode) return nds
           
           return nds.map((node) => {
             if (node.id === update.id) {
-              // If setting a parent, use relative position and add extent
+              // Use positionAbsolute if available, otherwise calculate it
+              const absoluteX = (node as any).positionAbsolute?.x ?? 
+                (node.parentId ? 
+                  (nds.find(n => n.id === node.parentId)?.position.x || 0) + node.position.x :
+                  node.position.x)
+              const absoluteY = (node as any).positionAbsolute?.y ?? 
+                (node.parentId ?
+                  (nds.find(n => n.id === node.parentId)?.position.y || 0) + node.position.y :
+                  node.position.y)
+              
               if (update.parentId) {
+                // Setting a new parent - convert absolute to relative position
                 const parentNode = nds.find(n => n.id === update.parentId)
                 if (parentNode) {
-                  // Convert absolute position to relative position
+                  // Use parent's positionAbsolute if available
+                  const parentAbsoluteX = (parentNode as any).positionAbsolute?.x ?? parentNode.position.x
+                  const parentAbsoluteY = (parentNode as any).positionAbsolute?.y ?? parentNode.position.y
+                  
                   const relativePosition = {
-                    x: node.position.x - parentNode.position.x,
-                    y: node.position.y - parentNode.position.y
+                    x: absoluteX - parentAbsoluteX,
+                    y: absoluteY - parentAbsoluteY
                   }
+                  
                   return {
                     ...node,
+                    position: relativePosition,
                     parentId: update.parentId,
                     extent: 'parent' as const,
-                    position: relativePosition,
-                    selected: true // Keep selection
+                    selected: true
                   }
                 }
               } else {
-                // Removing parent - convert relative position to absolute
-                const currentParentNode = node.parentId ? nds.find(n => n.id === node.parentId) : null
-                const absolutePosition = currentParentNode ? {
-                  x: node.position.x + currentParentNode.position.x,
-                  y: node.position.y + currentParentNode.position.y
-                } : node.position
-                
-                // Remove parentId and extent
+                // Removing parent - use absolute position directly
                 const { parentId, extent, ...nodeWithoutParent } = node as any
                 return {
                   ...nodeWithoutParent,
-                  position: absolutePosition,
-                  selected: true // Keep selection
+                  position: { x: absoluteX, y: absoluteY },
+                  selected: true
                 }
               }
             }
@@ -538,6 +545,65 @@ export function NodeEditorCore() {
       }
     },
     [updateNode, setNodes, isUpdatingRef],
+  )
+
+  // Handle node drag stop for auto parent-child relationship
+  const onNodeDragStop = useCallback(
+    (_event: React.MouseEvent, node: ReactFlowNode) => {
+      // Skip if the dragged node is a subgraph
+      if (node.type === 'subgraph') return
+      
+      // Find all subgraph nodes
+      const subgraphs = nodes.filter(n => n.type === 'subgraph')
+      
+      // Check intersection with each subgraph
+      let newParent: string | null = null
+      
+      // Use positionAbsolute for accurate absolute position
+      const nodeAbsoluteX = (node as any).positionAbsolute?.x ?? 
+        (node.parentId ? 
+          (nodes.find(n => n.id === node.parentId)?.position.x || 0) + node.position.x :
+          node.position.x)
+      const nodeAbsoluteY = (node as any).positionAbsolute?.y ?? 
+        (node.parentId ?
+          (nodes.find(n => n.id === node.parentId)?.position.y || 0) + node.position.y :
+          node.position.y)
+      
+      for (const subgraph of subgraphs) {
+        // Skip if it's the same node
+        if (subgraph.id === node.id) continue
+        
+        // Check if node center is inside subgraph bounds
+        const nodeWidth = node.width || 100
+        const nodeHeight = node.height || 50
+        const nodeCenterX = nodeAbsoluteX + nodeWidth / 2
+        const nodeCenterY = nodeAbsoluteY + nodeHeight / 2
+        
+        const subgraphWidth = subgraph.style?.width || subgraph.width || 200
+        const subgraphHeight = subgraph.style?.height || subgraph.height || 200
+        
+        if (
+          nodeCenterX >= subgraph.position.x &&
+          nodeCenterX <= subgraph.position.x + subgraphWidth &&
+          nodeCenterY >= subgraph.position.y &&
+          nodeCenterY <= subgraph.position.y + subgraphHeight
+        ) {
+          newParent = subgraph.id
+          break
+        }
+      }
+      
+      // Update parent if changed
+      const currentParent = node.parentId || null
+      if (newParent !== currentParent) {
+        // Just update parent relationship - let handleNodeUpdate handle coordinate transformation
+        handleNodeUpdate({
+          id: node.id,
+          parentId: newParent
+        })
+      }
+    },
+    [nodes, handleNodeUpdate, setNodes],
   )
 
   const handleEdgeUpdate = useCallback(
@@ -634,6 +700,7 @@ export function NodeEditorCore() {
         onConnectEnd={onConnectEnd}
         onPaneClick={onPaneClick}
         onNodeDoubleClick={onNodeDoubleClick}
+        onNodeDragStop={onNodeDragStop}
         onEdgeDoubleClick={onEdgeDoubleClick}
         onSelectionChange={onSelectionChange}
         fitView
