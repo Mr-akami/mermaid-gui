@@ -183,13 +183,21 @@ export function PropertyPanel({
             value={selectedNode ? nodeType : edgeType}
             onChange={selectedNode ? handleNodeTypeChange : handleEdgeTypeChange}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            disabled={selectedNode && selectedNode.type === 'subgraph'}
           >
             {selectedNode
-              ? MERMAID_NODE_TYPES.map((type) => (
-                  <option key={type} value={type}>
-                    {type}
-                  </option>
-                ))
+              ? MERMAID_NODE_TYPES
+                  .filter(type => {
+                    // If current node is subgraph, only show subgraph
+                    if (selectedNode.type === 'subgraph') return type === 'subgraph'
+                    // If current node is not subgraph, exclude subgraph from options
+                    return type !== 'subgraph'
+                  })
+                  .map((type) => (
+                    <option key={type} value={type}>
+                      {type}
+                    </option>
+                  ))
               : MERMAID_EDGE_TYPES.map((type) => (
                   <option key={type} value={type}>
                     {type}
@@ -213,7 +221,7 @@ export function PropertyPanel({
               <option value="">None</option>
               {availableParents.map((parent) => (
                 <option key={parent.id} value={parent.id}>
-                  {parent.data.label || parent.id}
+                  {parent.id}
                 </option>
               ))}
             </select>
