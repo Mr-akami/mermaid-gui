@@ -24,6 +24,11 @@ export function buildFlowchartCode(data: FlowchartData, direction: 'TD' | 'TB' |
     if (node.type === 'subgraph') {
       lines.push(`${indent}${buildSubgraphDeclaration(node)}`)
       
+      // Add direction if specified
+      if (node.direction) {
+        lines.push(`${indent}    direction ${node.direction}`)
+      }
+      
       // Find and process child nodes
       const childNodes = data.nodes.filter(n => n.parentId === node.id)
       

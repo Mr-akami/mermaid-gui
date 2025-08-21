@@ -91,6 +91,16 @@ export function parseFlowchartCode(code: string): ParsedFlowchart {
       continue
     }
     
+    // Parse direction statement inside subgraph
+    if (line.startsWith('direction ')) {
+      const direction = line.split(' ')[1] as 'TD' | 'TB' | 'LR' | 'RL' | 'BT' | 'DT'
+      if (subgraphStack.length > 0 && direction) {
+        const currentSubgraph = subgraphStack[subgraphStack.length - 1]
+        currentSubgraph.direction = direction
+      }
+      continue
+    }
+    
     // Parse connections and nodes
     // First check if it's just a node definition without connection
     if (!line.includes('--') && !line.includes('==') && !line.includes('-.')) {

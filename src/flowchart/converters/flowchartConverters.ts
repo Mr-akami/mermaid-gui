@@ -20,12 +20,13 @@ export function toCustomNode(rfNode: ReactFlowNode): CustomNode {
     ...(rfNode.parentId && { parentId: rfNode.parentId }),
     ...(rfNode.width && { width: rfNode.width }),
     ...(rfNode.height && { height: rfNode.height }),
+    ...(rfNode.data?.direction && { direction: rfNode.data.direction }),
   }
 }
 
 // Convert our custom node to React Flow node
 export function toReactFlowNode(customNode: CustomNode, index?: number, isSelected?: boolean): ReactFlowNode {
-  const { childIds: _childIds, ...rfNodeProps } = customNode
+  const { childIds: _childIds, direction, ...rfNodeProps } = customNode
   
   // Keep subgraph type for React Flow with explicit z-index
   if (customNode.type === 'subgraph') {
@@ -35,6 +36,10 @@ export function toReactFlowNode(customNode: CustomNode, index?: number, isSelect
     return {
       ...rfNodeProps,
       type: 'subgraph', // Keep as subgraph, not group
+      data: {
+        ...rfNodeProps.data,
+        ...(direction && { direction }),
+      },
       zIndex: baseZIndex + orderZIndex, // Subgraphs always in background, ordered by creation
       style: {
         zIndex: baseZIndex + orderZIndex,

@@ -49,13 +49,40 @@ export const updateLayoutDirectionAtom = atom(
     
     // Update all edges to use appropriate handles for new direction
     const edges = get(edgesAtom)
-    const handles = getHandlesForDirection(newDirection)
+    const nodes = get(nodesAtom)
     
-    const updatedEdges = edges.map(edge => ({
-      ...edge,
-      sourceHandle: handles.source,
-      targetHandle: handles.target,
-    }))
+    // Build a map of node IDs to their parent subgraph's direction
+    const nodeDirectionMap = new Map<string, 'TD' | 'LR' | 'RL' | 'BT'>()
+    
+    nodes.forEach(node => {
+      if (node.parentId) {
+        const parent = nodes.find(n => n.id === node.parentId)
+        if (parent?.type === 'subgraph' && parent.direction) {
+          // Use parent subgraph's direction
+          nodeDirectionMap.set(node.id, parent.direction as 'TD' | 'LR' | 'RL' | 'BT')
+        }
+      }
+    })
+    
+    const updatedEdges = edges.map(edge => {
+      // Check if either source or target has a specific direction from their subgraph
+      const sourceDirection = nodeDirectionMap.get(edge.source)
+      const targetDirection = nodeDirectionMap.get(edge.target)
+      
+      // Use subgraph direction if both nodes are in the same subgraph with a direction
+      // Otherwise use the global direction
+      const effectiveDirection = (sourceDirection && sourceDirection === targetDirection) 
+        ? sourceDirection 
+        : newDirection
+      
+      const handles = getHandlesForDirection(effectiveDirection)
+      
+      return {
+        ...edge,
+        sourceHandle: handles.source,
+        targetHandle: handles.target,
+      }
+    })
     
     set(edgesAtom, updatedEdges)
     set(saveToHistoryAtom, { nodes: get(nodesAtom), edges: updatedEdges })

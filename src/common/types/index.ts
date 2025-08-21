@@ -9,6 +9,7 @@ export interface Node {
   }
   width?: number
   height?: number
+  direction?: 'TD' | 'TB' | 'LR' | 'RL' | 'BT' | 'DT' // Direction for subgraphs
 }
 
 export interface Edge {
