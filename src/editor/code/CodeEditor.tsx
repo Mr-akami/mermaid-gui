@@ -1,13 +1,15 @@
-import { useAtomValue, useAtom } from 'jotai'
+import { useAtomValue, useAtom, useSetAtom } from 'jotai'
 import { useState, useCallback, useEffect, useRef } from 'react'
-import { mermaidCodeAtom, nodesAtom, edgesAtom, layoutDirectionAtom } from '../../flowchart'
-import { parseFlowchart } from '../../core/mermaid-parser/flowchartParser'
+import { mermaidCodeAtom, nodesAtom, edgesAtom, layoutDirectionAtom, updateLayoutDirectionAtom } from '../../flowchart'
+import { parseFlowchartCode } from '../../core/mermaid-code-parser/flowchartParser'
 
 export function CodeEditor() {
   const mermaidCode = useAtomValue(mermaidCodeAtom)
   const layoutDirection = useAtomValue(layoutDirectionAtom)
   const [, setNodes] = useAtom(nodesAtom)
   const [, setEdges] = useAtom(edgesAtom)
+  const setLayoutDirection = useSetAtom(layoutDirectionAtom)
+  const updateLayoutDirection = useSetAtom(updateLayoutDirectionAtom)
   const [editableCode, setEditableCode] = useState(mermaidCode)
   const [error, setError] = useState<string | null>(null)
   const isEditingRef = useRef(false)
@@ -25,15 +27,28 @@ export function CodeEditor() {
     setEditableCode(newCode)
     
     // Try to parse and update the flowchart
-    const result = parseFlowchart(newCode, layoutDirection)
-    if (result.success && result.data) {
-      setNodes(result.data.nodes)
-      setEdges(result.data.edges)
-      setError(null)
-    } else {
-      setError(result.error || 'Failed to parse mermaid code')
+    try {
+      const result = parseFlowchartCode(newCode)
+      if (result && result.nodes && result.edges) {
+        // Update layout direction from parsed code and normalize TB to TD
+        const parsedDirection = result.direction || 'TD'
+        const normalizedDirection = parsedDirection === 'TB' ? 'TD' : 
+                                   parsedDirection === 'BT' ? 'TD' : 
+                                   parsedDirection === 'RL' ? 'LR' : 
+                                   parsedDirection as 'TD' | 'LR'
+        
+        // Set nodes and edges first
+        setNodes(result.nodes)
+        setEdges(result.edges)
+        setError(null)
+        
+        // Then update layout direction which will also update edge handles
+        updateLayoutDirection(normalizedDirection)
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to parse mermaid code')
     }
-  }, [setNodes, setEdges, layoutDirection])
+  }, [setNodes, setEdges, updateLayoutDirection])
 
   const handleFocus = useCallback(() => {
     isEditingRef.current = true

@@ -287,7 +287,7 @@ export function NodeEditorCore() {
             label:
               NODE_TYPE_CONFIG[
                 selectedNodeType as keyof typeof NODE_TYPE_CONFIG
-              ]?.defaultLabel || selectedNodeType,
+              ]?.defaultLabel || selectedNodeType
           },
         }
 

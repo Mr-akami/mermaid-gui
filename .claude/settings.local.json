@@ -71,7 +71,9 @@
       "mcp__serena__create_text_file",
       "mcp__serena__think_about_collected_information",
       "Bash(cat:*)",
-      "Bash(env)"
+      "Bash(env)",
+      "Bash(node:*)",
+      "Bash(sed:*)"
     ],
     "deny": []
   },
