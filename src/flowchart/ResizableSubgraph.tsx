@@ -8,7 +8,12 @@ export const ResizableSubgraph = memo(({ data, selected, id }: NodeProps) => {
     <div
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      style={{ width: '100%', height: '100%' }}
+      style={{ 
+        width: '100%', 
+        height: '100%',
+        zIndex: -1000, // Force subgraph to stay in background
+        position: 'relative'
+      }}
     >
       <NodeResizer
         isVisible={selected || isHovered}

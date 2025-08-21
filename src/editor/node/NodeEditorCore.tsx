@@ -162,12 +162,15 @@ export function NodeEditorCore() {
       const reactFlowNodes = toReactFlowNodes(flowchartNodes).map(newNode => {
         const existingNode = currentNodes.find(n => n.id === newNode.id)
         if (existingNode) {
-          // Preserve position and dimensions of existing node
+          // Preserve position and dimensions of existing node, but keep new z-index
           return {
             ...newNode,
             position: existingNode.position,
             ...(existingNode.width && { width: existingNode.width }),
             ...(existingNode.height && { height: existingNode.height }),
+            // Explicitly keep the z-index from toReactFlowNodes
+            zIndex: newNode.zIndex,
+            style: newNode.style,
           }
         }
         return newNode
@@ -256,6 +259,7 @@ export function NodeEditorCore() {
           }),
           data: { label: NODE_TYPE_CONFIG.rectangle.defaultLabel },
           origin: [0.5, 0.0] as [number, number],
+          zIndex: 1000, // Regular nodes in foreground
         }
 
         setNodes((nds) => nds.concat(newNode))
@@ -286,6 +290,7 @@ export function NodeEditorCore() {
           y: event.clientY,
         })
 
+        const isSubgraph = selectedNodeType === 'subgraph'
         const newNode: ReactFlowNode = {
           id: getId(),
           type: selectedNodeType,
@@ -296,13 +301,43 @@ export function NodeEditorCore() {
                 selectedNodeType as keyof typeof NODE_TYPE_CONFIG
               ]?.defaultLabel || selectedNodeType
           },
+          // Set z-index based on node type
+          zIndex: isSubgraph ? -1000 : 1000,
+          style: {
+            zIndex: isSubgraph ? -1000 : 1000,
+          }
         }
 
-        setNodes((nds) => nds.concat(newNode))
+        setNodes((nds) => {
+          // If it's a subgraph, place it at the beginning of the array
+          if (isSubgraph) {
+            // Find the last subgraph index
+            const lastSubgraphIndex = nds.findIndex(n => n.type !== 'subgraph' && n.type !== 'group')
+            if (lastSubgraphIndex === -1) {
+              // All nodes are subgraphs or no nodes exist
+              return nds.concat(newNode)
+            }
+            // Insert before the first non-subgraph node
+            return [...nds.slice(0, lastSubgraphIndex), newNode, ...nds.slice(lastSubgraphIndex)]
+          }
+          return nds.concat(newNode)
+        })
         setSelectedNodeType(null) // Clear selection after adding
+      } else {
+        // Deselect all nodes and edges when clicking on empty pane
+        setNodes(nds => nds.map(n => ({
+          ...n,
+          selected: false
+        })))
+        setEdges(eds => eds.map(e => ({
+          ...e,
+          selected: false
+        })))
+        setSelectedNodeId(null)
+        setSelectedEdgeId(null)
       }
     },
-    [selectedNodeType, screenToFlowPosition, setNodes],
+    [selectedNodeType, screenToFlowPosition, setNodes, setEdges, setSelectedNodeId, setSelectedEdgeId],
   )
 
   const onNodeDoubleClick = useCallback(
@@ -347,12 +382,41 @@ export function NodeEditorCore() {
       }
       
       if (selectedNodes.length > 0) {
+        // Deselect all other nodes except the newly selected one
+        setNodes(nds => nds.map(n => ({
+          ...n,
+          selected: selectedNodes.some(sn => sn.id === n.id)
+        })))
+        // Deselect all edges
+        setEdges(eds => eds.map(e => ({
+          ...e,
+          selected: false
+        })))
         setSelectedNodeId(selectedNodes[0].id)
         setSelectedEdgeId(null)
       } else if (selectedEdges.length > 0) {
+        // Deselect all nodes
+        setNodes(nds => nds.map(n => ({
+          ...n,
+          selected: false
+        })))
+        // Deselect all other edges except the newly selected one
+        setEdges(eds => eds.map(e => ({
+          ...e,
+          selected: selectedEdges.some(se => se.id === e.id)
+        })))
         setSelectedNodeId(null)
         setSelectedEdgeId(selectedEdges[0].id)
       } else {
+        // Deselect everything
+        setNodes(nds => nds.map(n => ({
+          ...n,
+          selected: false
+        })))
+        setEdges(eds => eds.map(e => ({
+          ...e,
+          selected: false
+        })))
         setSelectedNodeId(null)
         setSelectedEdgeId(null)
       }
@@ -518,6 +582,8 @@ export function NodeEditorCore() {
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
         connectionMode={ConnectionMode.Loose}
+        selectNodesOnDrag={false}
+        multiSelectionKeyCode={null}
         defaultEdgeOptions={{
           type: 'default',
           markerEnd: {

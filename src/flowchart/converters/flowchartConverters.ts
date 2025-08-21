@@ -23,20 +23,31 @@ export function toCustomNode(rfNode: ReactFlowNode): CustomNode {
 }
 
 // Convert our custom node to React Flow node
-export function toReactFlowNode(customNode: CustomNode): ReactFlowNode {
+export function toReactFlowNode(customNode: CustomNode, index?: number, isSelected?: boolean): ReactFlowNode {
   const { childIds: _childIds, ...rfNodeProps } = customNode
   
-  // Convert subgraph to group type for React Flow
+  // Convert subgraph to group type for React Flow with explicit z-index
   if (customNode.type === 'subgraph') {
+    // Keep subgraphs in background even when selected
+    const baseZIndex = -1000
+    const orderZIndex = index !== undefined ? index : 0
     return {
       ...rfNodeProps,
       type: 'group',
+      zIndex: baseZIndex + orderZIndex, // Subgraphs always in background, ordered by creation
+      style: {
+        zIndex: baseZIndex + orderZIndex,
+      },
       ...(customNode.parentId && { parentId: customNode.parentId }),
     } as ReactFlowNode
   }
   
   return {
     ...rfNodeProps,
+    zIndex: 1000, // Regular nodes in foreground
+    style: {
+      zIndex: 1000,
+    },
     ...(customNode.parentId && { parentId: customNode.parentId }),
   } as ReactFlowNode
 }
@@ -98,7 +109,20 @@ export function toCustomNodes(rfNodes: ReactFlowNode[]): CustomNode[] {
 export function toReactFlowNodes(customNodes: CustomNode[]): ReactFlowNode[] {
   // Perform topological sort to ensure parents come before children
   const sorted = topologicalSortNodes(customNodes)
-  return sorted.map(toReactFlowNode)
+  
+  // Sort nodes to place subgraphs at the back (lower z-index)
+  // Subgraphs are sorted by their creation order (array index)
+  const subgraphs = sorted.filter(n => n.type === 'subgraph')
+  const otherNodes = sorted.filter(n => n.type !== 'subgraph')
+  
+  // Subgraphs first (background), then other nodes (foreground)
+  // zIndex property in toReactFlowNode will handle the actual layering
+  const finalOrder = [...subgraphs, ...otherNodes]
+  
+  return finalOrder.map((node, index) => {
+    const subgraphIndex = node.type === 'subgraph' ? subgraphs.indexOf(node) : undefined
+    return toReactFlowNode(node, subgraphIndex)
+  })
 }
 
 // Helper function to perform topological sort on nodes based on parent-child relationships
