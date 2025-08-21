@@ -69,7 +69,9 @@
       "mcp__serena__get_symbols_overview",
       "mcp__serena__find_symbol",
       "mcp__serena__create_text_file",
-      "mcp__serena__think_about_collected_information"
+      "mcp__serena__think_about_collected_information",
+      "Bash(cat:*)",
+      "Bash(env)"
     ],
     "deny": []
   },
