@@ -1,6 +1,6 @@
 export interface Node {
   id: string
-  type: 'rectangle' | 'circle' | 'diamond' | 'subgraph'
+  type: 'rectangle' | 'circle' | 'diamond' | 'roundEdges' | 'stadium' | 'subroutine' | 'cylindrical' | 'parallelogram' | 'trapezoid' | 'hexagon' | 'doubleCircle' | 'subgraph'
   parentId?: string
   childIds: string[]
   position: { x: number; y: number }

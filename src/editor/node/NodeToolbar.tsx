@@ -20,7 +20,7 @@ const NODE_ICONS: Record<MermaidNodeType, { icon: string; title: string }> = {
   trapezoid: { icon: '⏢', title: 'Trapezoid' },
   hexagon: { icon: '⬡', title: 'Hexagon' },
   doubleCircle: { icon: '◉', title: 'Double Circle' },
-  subgraph: { icon: '▦', title: 'Subgraph' },
+  subgraph: { icon: '⊞', title: 'Subgraph' },
 }
 
 export const NodeToolbar = memo(({ onNodeTypeSelect, selectedNodeType }: NodeToolbarProps) => {
@@ -42,7 +42,7 @@ export const NodeToolbar = memo(({ onNodeTypeSelect, selectedNodeType }: NodeToo
       <div className="w-px bg-gray-300 mr-2"></div>
       
       {/* Node type buttons */}
-      {MERMAID_NODE_TYPES.filter(type => type !== 'subgraph').map((type) => {
+      {MERMAID_NODE_TYPES.map((type) => {
         const { icon, title } = NODE_ICONS[type]
         return (
           <button

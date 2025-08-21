@@ -25,7 +25,20 @@ export function toCustomNode(rfNode: ReactFlowNode): CustomNode {
 // Convert our custom node to React Flow node
 export function toReactFlowNode(customNode: CustomNode): ReactFlowNode {
   const { childIds: _childIds, ...rfNodeProps } = customNode
-  return rfNodeProps as ReactFlowNode
+  
+  // Convert subgraph to group type for React Flow
+  if (customNode.type === 'subgraph') {
+    return {
+      ...rfNodeProps,
+      type: 'group',
+      ...(customNode.parentId && { parentId: customNode.parentId }),
+    } as ReactFlowNode
+  }
+  
+  return {
+    ...rfNodeProps,
+    ...(customNode.parentId && { parentId: customNode.parentId }),
+  } as ReactFlowNode
 }
 
 // Convert React Flow edge to our custom edge type
@@ -83,7 +96,39 @@ export function toCustomNodes(rfNodes: ReactFlowNode[]): CustomNode[] {
 }
 
 export function toReactFlowNodes(customNodes: CustomNode[]): ReactFlowNode[] {
-  return customNodes.map(toReactFlowNode)
+  // Perform topological sort to ensure parents come before children
+  const sorted = topologicalSortNodes(customNodes)
+  return sorted.map(toReactFlowNode)
+}
+
+// Helper function to perform topological sort on nodes based on parent-child relationships
+function topologicalSortNodes(nodes: CustomNode[]): CustomNode[] {
+  const nodeMap = new Map(nodes.map(n => [n.id, n]))
+  const visited = new Set<string>()
+  const result: CustomNode[] = []
+  
+  function visit(nodeId: string) {
+    if (visited.has(nodeId)) return
+    visited.add(nodeId)
+    
+    const node = nodeMap.get(nodeId)
+    if (!node) return
+    
+    // Visit parent first
+    if (node.parentId && nodeMap.has(node.parentId)) {
+      visit(node.parentId)
+    }
+    
+    result.push(node)
+  }
+  
+  // First visit all top-level nodes (nodes without parents)
+  nodes.filter(n => !n.parentId).forEach(node => visit(node.id))
+  
+  // Then visit any remaining nodes (in case of orphaned children)
+  nodes.forEach(node => visit(node.id))
+  
+  return result
 }
 
 export function toCustomEdges(rfEdges: ReactFlowEdge[]): CustomEdge[] {

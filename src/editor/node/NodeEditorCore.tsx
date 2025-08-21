@@ -77,7 +77,7 @@ const getHandlesForDirection = (direction: 'TB' | 'LR') => {
 export function NodeEditorCore() {
   const reactFlowWrapper = useRef<HTMLDivElement>(null)
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes)
-  const [edges, setEdges, onEdgesChange] = useEdgesState<ReactFlowEdge[]>([])
+  const [edges, setEdges, onEdgesChange] = useEdgesState([])
   const [selectedNodeType, setSelectedNodeType] = useState<string | null>(null)
   const { screenToFlowPosition } = useReactFlow()
 

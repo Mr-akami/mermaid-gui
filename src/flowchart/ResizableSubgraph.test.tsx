@@ -25,6 +25,8 @@ describe('ResizableSubgraph', () => {
     draggable: true,
     selectable: true,
     deletable: true,
+    positionAbsoluteX: 0,
+    positionAbsoluteY: 0,
   } as NodeProps
 
   it('should render with label', () => {
