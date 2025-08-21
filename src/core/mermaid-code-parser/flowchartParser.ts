@@ -42,7 +42,7 @@ export function parseFlowchartCode(code: string): ParsedFlowchart {
   }
   
   const nodeMap = new Map<string, Node>()
-  let currentSubgraph: Node | null = null
+  const subgraphStack: Node[] = []
   let nodeIdCounter = 0
   
   for (let i = 0; i < lines.length; i++) {
@@ -57,29 +57,37 @@ export function parseFlowchartCode(code: string): ParsedFlowchart {
       continue
     }
     
-    // Skip subgraph handling for now (can be added later)
+    // Handle subgraph declarations
     if (line.startsWith('subgraph')) {
       const match = line.match(/subgraph\s+([A-Za-z0-9_]+)?\s*\[(.*?)\]/) || 
                    line.match(/subgraph\s+(.*)/)
       if (match) {
         const id = match[1] || `sg${nodeIdCounter++}`
         const label = match[2] || match[1] || 'Subgraph'
-        currentSubgraph = {
+        const newSubgraph: Node = {
           id,
           type: 'subgraph',
           data: { label: label.replace(/<br>/g, '\n') },
           position: { x: 0, y: 0 },
           childIds: [],
-          parentId: undefined
+          parentId: subgraphStack.length > 0 ? subgraphStack[subgraphStack.length - 1].id : undefined
         }
-        nodeMap.set(id, currentSubgraph)
-        result.nodes.push(currentSubgraph)
+        
+        // If nested, add to parent's childIds
+        if (subgraphStack.length > 0) {
+          const parent = subgraphStack[subgraphStack.length - 1]
+          parent.childIds?.push(id)
+        }
+        
+        nodeMap.set(id, newSubgraph)
+        result.nodes.push(newSubgraph)
+        subgraphStack.push(newSubgraph)
       }
       continue
     }
     
     if (line === 'end') {
-      currentSubgraph = null
+      subgraphStack.pop()
       continue
     }
     
@@ -88,9 +96,10 @@ export function parseFlowchartCode(code: string): ParsedFlowchart {
     if (!line.includes('--') && !line.includes('==') && !line.includes('-.')) {
       const node = parseNode(line)
       if (node && !nodeMap.has(node.id)) {
-        if (currentSubgraph) {
-          node.parentId = currentSubgraph.id
-          currentSubgraph.childIds?.push(node.id)
+        if (subgraphStack.length > 0) {
+          const parent = subgraphStack[subgraphStack.length - 1]
+          node.parentId = parent.id
+          parent.childIds?.push(node.id)
         }
         nodeMap.set(node.id, node)
         result.nodes.push(node)
@@ -124,9 +133,10 @@ export function parseFlowchartCode(code: string): ParsedFlowchart {
               childIds: []
             }
             
-            if (currentSubgraph) {
-              node.parentId = currentSubgraph.id
-              currentSubgraph.childIds?.push(node.id)
+            if (subgraphStack.length > 0) {
+              const parent = subgraphStack[subgraphStack.length - 1]
+              node.parentId = parent.id
+              parent.childIds?.push(node.id)
             }
             nodeMap.set(node.id, node)
             result.nodes.push(node)
@@ -157,9 +167,10 @@ export function parseFlowchartCode(code: string): ParsedFlowchart {
       if (source && !nodeMap.has(getNodeId(source))) {
         const sourceNode = parseNode(source)
         if (sourceNode) {
-          if (currentSubgraph) {
-            sourceNode.parentId = currentSubgraph.id
-            currentSubgraph.childIds?.push(sourceNode.id)
+          if (subgraphStack.length > 0) {
+            const parent = subgraphStack[subgraphStack.length - 1]
+            sourceNode.parentId = parent.id
+            parent.childIds?.push(sourceNode.id)
           }
           nodeMap.set(sourceNode.id, sourceNode)
           result.nodes.push(sourceNode)
@@ -170,9 +181,10 @@ export function parseFlowchartCode(code: string): ParsedFlowchart {
       if (target && !nodeMap.has(getNodeId(target))) {
         const targetNode = parseNode(target)
         if (targetNode) {
-          if (currentSubgraph) {
-            targetNode.parentId = currentSubgraph.id
-            currentSubgraph.childIds?.push(targetNode.id)
+          if (subgraphStack.length > 0) {
+            const parent = subgraphStack[subgraphStack.length - 1]
+            targetNode.parentId = parent.id
+            parent.childIds?.push(targetNode.id)
           }
           nodeMap.set(targetNode.id, targetNode)
           result.nodes.push(targetNode)
