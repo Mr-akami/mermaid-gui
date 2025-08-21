@@ -25,27 +25,31 @@ export const ResizableSubgraph = memo(({ data, selected, id }: NodeProps) => {
         keepAspectRatio={false}
         nodeId={id}
       />
-      {/* Connection handles on all sides */}
+      {/* Connection handles on all sides - same as FlowchartNode */}
       <Handle
-        type="target"
+        type="source"
+        id="top"
         position={Position.Top}
         className="w-2 h-2 !bg-purple-500 !border !border-white rounded-full"
         style={{ top: -4, left: '50%', transform: 'translateX(-50%)' }}
       />
       <Handle
-        type="target"
+        type="source"
+        id="left"
         position={Position.Left}
         className="w-2 h-2 !bg-purple-500 !border !border-white rounded-full"
         style={{ left: -4, top: '50%', transform: 'translateY(-50%)' }}
       />
       <Handle
         type="source"
+        id="bottom"
         position={Position.Bottom}
         className="w-2 h-2 !bg-purple-500 !border !border-white rounded-full"
         style={{ bottom: -4, left: '50%', transform: 'translateX(-50%)' }}
       />
       <Handle
         type="source"
+        id="right"
         position={Position.Right}
         className="w-2 h-2 !bg-purple-500 !border !border-white rounded-full"
         style={{ right: -4, top: '50%', transform: 'translateY(-50%)' }}
