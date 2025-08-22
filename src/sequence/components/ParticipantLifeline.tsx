@@ -12,7 +12,7 @@ interface ParticipantLifelineData {
 }
 
 export const ParticipantLifeline = memo((props: NodeProps) => {
-  const { data, selected, id, positionAbsolute } = props
+  const { data, selected, id } = props
   const participantData = ((data as unknown) || { type: 'participant', label: 'Participant' }) as ParticipantLifelineData
   const isActor = participantData.type === 'actor'
   
@@ -168,7 +168,7 @@ export const ParticipantLifeline = memo((props: NodeProps) => {
 
   return (
     <div
-      className="participant-lifeline nodrag"
+      className="participant-lifeline"
       style={{
         display: 'flex',
         flexDirection: 'column',

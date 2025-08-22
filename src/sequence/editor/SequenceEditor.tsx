@@ -36,25 +36,9 @@ function SequenceEditorContent() {
   const [edgeCreation, setEdgeCreation] = useAtom(edgeCreationAtom)
   const { screenToFlowPosition } = useReactFlow()
   
-  // Convert participants to nodes with lifelines
-  const nodes: Node[] = useMemo(() => {
-    return participants.map((p, index) => ({
-      id: p.id,
-      type: 'participantLifeline',
-      position: { x: index * 200 + 100, y: 50 },
-      data: {
-        type: p.type,
-        label: p.label || p.alias || p.id,
-        alias: p.alias,
-        // Pass edge creation handler to each node
-        onHandleClick: (nodeId: string, handleId: string) => {
-          handleEdgeCreation(nodeId, handleId)
-        }
-      }
-    }))
-  }, [participants])
-
-  const [nodesState, setNodes, onNodesChange] = useNodesState(nodes)
+  // Initialize nodes state directly without useMemo to allow position updates
+  const initialNodes: Node[] = []
+  const [nodesState, setNodes, onNodesChange] = useNodesState(initialNodes)
   const [edgesState, setEdges, onEdgesChange] = useEdgesState([] as Edge[])
   
   // Custom node change handler to restrict Y movement
@@ -132,21 +116,34 @@ function SequenceEditorContent() {
     }
   }, [edgeCreation, setEdgeCreation, setEdges, isHandleConnected])
 
-  // Update nodes when participants change
+  // Initialize and update nodes when participants change
   useEffect(() => {
-    // Pass the handler to nodes
-    const updatedNodes = participants.map((p, index) => ({
-      id: p.id,
-      type: 'participantLifeline',
-      position: { x: index * 200 + 100, y: 50 },
-      data: {
-        type: p.type,
-        label: p.label || p.alias || p.id,
-        alias: p.alias,
-        onHandleClick: handleEdgeCreation
-      }
-    }))
-    setNodes(updatedNodes)
+    setNodes(currentNodes => {
+      // Create a map of existing node positions
+      const existingPositions = new Map<string, number>()
+      currentNodes.forEach(node => {
+        existingPositions.set(node.id, node.position.x)
+      })
+      
+      // Update nodes preserving existing X positions
+      return participants.map((p, index) => ({
+        id: p.id,
+        type: 'participantLifeline',
+        // Use existing X position if available, otherwise calculate default
+        position: { 
+          x: existingPositions.get(p.id) ?? (index * 200 + 100), 
+          y: 50 
+        },
+        data: {
+          type: p.type,
+          label: p.label || p.alias || p.id,
+          alias: p.alias,
+          onHandleClick: handleEdgeCreation
+        },
+        // Explicitly set draggable
+        draggable: true
+      }))
+    })
   }, [participants, handleEdgeCreation, setNodes])
 
   const handlePaneClick = useCallback((event: React.MouseEvent) => {
@@ -174,11 +171,13 @@ function SequenceEditorContent() {
       const newNode: Node = {
         id: newParticipant.id,
         type: 'participantLifeline',
-        position: position,
+        position: { x: position.x, y: 50 },  // Force Y to 50
         data: {
           type: newParticipant.type,
           label: newParticipant.label,
-        }
+          onHandleClick: handleEdgeCreation
+        },
+        draggable: true
       }
       
       setNodes((nodes) => [...nodes, newNode])
