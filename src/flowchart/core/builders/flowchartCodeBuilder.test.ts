@@ -92,8 +92,8 @@ describe('flowchartCodeBuilder', () => {
       const result = buildFlowchartCode(data)
       expect(result).toBe(`flowchart TD
     subgraph sub1 [Process Group]
-        A[Task 1]
-        B[Task 2]
+    A[Task 1]
+    B[Task 2]
     end
     C((End))
     A --> B

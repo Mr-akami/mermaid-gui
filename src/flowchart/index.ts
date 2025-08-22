@@ -51,7 +51,7 @@ export {
 
 
 // Export code parser
-export { parseFlowchartCode } from './code-parser/flowchartParser'
+export { parseFlowchartCode } from './core/code-parser/flowchartParser'
 
 // Export builders
-export { buildFlowchartCode } from './builders'
+export { buildFlowchartCode } from './core/builders'

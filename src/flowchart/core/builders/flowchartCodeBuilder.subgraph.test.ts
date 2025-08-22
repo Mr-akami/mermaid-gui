@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { buildFlowchartCode } from './flowchartCodeBuilder'
-import type { Node, Edge } from '../types'
+import type { Node, Edge } from '../../types'
 
 describe('flowchartCodeBuilder - subgraph support', () => {
   it('should generate code for a simple subgraph', () => {

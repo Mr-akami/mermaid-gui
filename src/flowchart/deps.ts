@@ -2,7 +2,7 @@
 export { atom } from 'jotai'
 
 // Internal dependencies
-export { buildFlowchartCode } from './builders'
+export { buildFlowchartCode } from './core/builders'
 
 // Types
 export type {

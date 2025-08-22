@@ -8,7 +8,7 @@ import {
   canUndoAtom,
   canRedoAtom 
 } from './atoms'
-import { Node } from '../common/types'
+import { Node } from '../types'
 
 // Helper to create a valid node
 const createNode = (id: string): Node => ({

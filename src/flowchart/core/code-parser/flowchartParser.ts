@@ -1,4 +1,4 @@
-import type { Node, Edge } from '../types'
+import type { Node, Edge } from '../../types'
 
 export interface ParsedFlowchart {
   direction: 'TD' | 'TB' | 'LR' | 'RL' | 'BT' | 'DT'
