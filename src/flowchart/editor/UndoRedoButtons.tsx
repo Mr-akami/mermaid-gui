@@ -1,6 +1,6 @@
 import { memo } from 'react'
 import { useAtom, useAtomValue } from 'jotai'
-import { canUndoAtom, canRedoAtom, undoAtom, redoAtom } from '../../flowchart/history'
+import { canUndoAtom, canRedoAtom, undoAtom, redoAtom } from '../history'
 
 interface UndoRedoButtonsProps {
   onUndo: (state: { nodes: any[], edges: any[] }) => void

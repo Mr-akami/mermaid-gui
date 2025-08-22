@@ -4,7 +4,7 @@ import {
   nodesAtom,
   edgesAtom,
   flowchartDataAtom,
-  mermaidCodeAtom,
+  flowchartMermaidCodeAtom,
   addNodeAtom,
   removeNodeAtom,
   updateNodeAtom,
@@ -61,7 +61,7 @@ describe('flowchart atoms', () => {
     store.set(nodesAtom, [node1])
     store.set(edgesAtom, [])
 
-    const code = store.get(mermaidCodeAtom)
+    const code = store.get(flowchartMermaidCodeAtom)
     expect(code).toBe(`flowchart TD
     A[Start]`)
   })

@@ -18,7 +18,7 @@ export {
 export { useCallback, useRef, useState, useEffect, useMemo } from 'react'
 
 // Internal dependencies
-export { FlowchartNode } from '../../flowchart/index'
+export { FlowchartNode } from '../index'
 
 // Jotai
 export { useAtom, useAtomValue } from 'jotai'
@@ -36,4 +36,4 @@ export {
   toReactFlowEdge,
   toCustomEdges,
   toReactFlowEdges 
-} from '../../flowchart/converters'
+} from '../converters'

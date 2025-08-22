@@ -5,7 +5,9 @@ import {
   Edge,
   FlowchartData,
   saveToHistoryAtom,
+  parseFlowchartCode,
 } from './deps'
+import { rawCodeAtom, diagramTypeAtom, parseErrorAtom, isEditingAtom } from '../editor/atoms'
 
 // Counter atoms for sequential IDs
 const nodeCountersAtom = atom<Record<string, number>>({
@@ -95,12 +97,63 @@ export const flowchartDataAtom = atom<FlowchartData>((get) => ({
   edges: get(edgesAtom),
 }))
 
-// Computed atom for mermaid code
-export const mermaidCodeAtom = atom<string>((get) => {
+// Computed atom for flowchart mermaid code (GUI -> Code)
+export const flowchartMermaidCodeAtom = atom<string>((get) => {
   const flowchartData = get(flowchartDataAtom)
   const layoutDirection = get(layoutDirectionAtom)
   return buildFlowchartCode(flowchartData, layoutDirection)
 })
+
+// Sync raw code to flowchart atoms (Code -> GUI)
+// This write-only atom is used to manually trigger the sync
+export const syncRawCodeToFlowchartAtom = atom(
+  null,
+  (get, set) => {
+    const rawCode = get(rawCodeAtom)
+    const diagramType = get(diagramTypeAtom)
+    
+    // Only sync if diagram type is flowchart
+    if (diagramType !== 'flowchart') {
+      return
+    }
+    
+    try {
+      const result = parseFlowchartCode(rawCode)
+      
+      if (result && result.nodes && result.edges) {
+        // Update layout direction from parsed code
+        const parsedDirection = result.direction || 'TD'
+        const normalizedDirection = parsedDirection === 'TB' ? 'TD' : 
+                                   parsedDirection === 'DT' ? 'BT' : 
+                                   parsedDirection as 'TD' | 'LR' | 'RL' | 'BT'
+        
+        // Set nodes and edges
+        set(nodesAtom, result.nodes)
+        set(edgesAtom, result.edges)
+        set(updateLayoutDirectionAtom, normalizedDirection)
+        set(parseErrorAtom, null)
+      }
+    } catch (err) {
+      set(parseErrorAtom, err instanceof Error ? err.message : 'Failed to parse flowchart code')
+    }
+  }
+)
+
+// Sync flowchart atoms to raw code (GUI -> Code)
+export const syncFlowchartToRawCodeAtom = atom(
+  null,
+  (get, set) => {
+    const isEditing = get(isEditingAtom)
+    
+    // Only sync if user is not editing
+    if (isEditing) {
+      return
+    }
+    
+    const mermaidCode = get(flowchartMermaidCodeAtom)
+    set(rawCodeAtom, mermaidCode)
+  }
+)
 
 // Write atom for adding a node
 export const addNodeAtom = atom(
@@ -119,11 +172,19 @@ export const addNodeAtom = atom(
     const counters = get(nodeCountersAtom)
 
     // Generate sequential ID based on node type
-    const typePrefix = {
+    const typePrefix: Record<string, string> = {
       rectangle: 'Rect',
       circle: 'Circle',
       diamond: 'Diamond',
       subgraph: 'Subgraph',
+      cylindrical: 'Cylinder',
+      parallelogram: 'Para',
+      trapezoid: 'Trap',
+      hexagon: 'Hex',
+      doubleCircle: 'DCircle',
+      roundEdges: 'Round',
+      stadium: 'Stadium',
+      subroutine: 'Sub',
     }
     const nextCount = counters[newNode.type] + 1
     const nodeId = `${typePrefix[newNode.type]}${nextCount}`

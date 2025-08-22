@@ -1,8 +1,8 @@
 import { memo } from 'react'
 import { useAtom, useAtomValue } from 'jotai'
-import { MERMAID_NODE_TYPES, type MermaidNodeType, layoutDirectionAtom, updateLayoutDirectionAtom } from '../../flowchart'
+import { MERMAID_NODE_TYPES, type MermaidNodeType, layoutDirectionAtom, updateLayoutDirectionAtom } from '..'
 
-interface NodeToolbarProps {
+interface FlowchartToolbarProps {
   onNodeTypeSelect: (nodeType: string) => void
   selectedNodeType: string | null
 }
@@ -23,7 +23,7 @@ const NODE_ICONS: Record<MermaidNodeType, { icon: string; title: string }> = {
   subgraph: { icon: '⊞', title: 'Subgraph' },
 }
 
-export const NodeToolbar = memo(({ onNodeTypeSelect, selectedNodeType }: NodeToolbarProps) => {
+export const FlowchartToolbar = memo(({ onNodeTypeSelect, selectedNodeType }: FlowchartToolbarProps) => {
   const layoutDirection = useAtomValue(layoutDirectionAtom)
   const [, updateLayoutDirection] = useAtom(updateLayoutDirectionAtom)
 
@@ -80,4 +80,4 @@ export const NodeToolbar = memo(({ onNodeTypeSelect, selectedNodeType }: NodeToo
   )
 })
 
-NodeToolbar.displayName = 'NodeToolbar'
+FlowchartToolbar.displayName = 'FlowchartToolbar'

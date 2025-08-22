@@ -6,7 +6,9 @@ export {
   nodesAtom,
   edgesAtom,
   flowchartDataAtom,
-  mermaidCodeAtom,
+  flowchartMermaidCodeAtom,
+  syncRawCodeToFlowchartAtom,
+  syncFlowchartToRawCodeAtom,
   layoutDirectionAtom,
   updateLayoutDirectionAtom,
   addNodeAtom,
@@ -49,9 +51,13 @@ export {
   redoAtom,
 } from './history'
 
-
-// Export code parser
+// Export builders and parsers
+export { buildFlowchartCode } from './core/builders/flowchartCodeBuilder'
 export { parseFlowchartCode } from './core/code-parser/flowchartParser'
 
-// Export builders
-export { buildFlowchartCode } from './core/builders'
+// Export editor components
+export { FlowchartEditor } from './editor/FlowchartEditor'
+export { FlowchartToolbar } from './editor/FlowchartToolbar'
+export { FlowchartPropertyPanel } from './editor/FlowchartPropertyPanel'
+
+

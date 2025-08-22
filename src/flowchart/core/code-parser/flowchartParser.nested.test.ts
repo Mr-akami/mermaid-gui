@@ -20,11 +20,8 @@ describe('parseFlowchartCode with nested subgraphs', () => {
 
     const result = parseFlowchartCode(code)
     
-      id: n.id,
-      type: n.type,
-      parentId: n.parentId,
-      childIds: n.childIds
-    })))
+    expect(result.nodes).toBeDefined()
+    expect(result.edges).toBeDefined()
     
     // Find specific nodes
     const topNode = result.nodes.find(n => n.id === 'TOP')

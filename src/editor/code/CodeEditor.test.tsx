@@ -14,7 +14,7 @@ describe('CodeEditor', () => {
       
       render(
         <JotaiProvider store={store}>
-          <CodeEditor />
+          <CodeEditor diagramType="flowchart" />
         </JotaiProvider>
       )
 
@@ -26,7 +26,7 @@ describe('CodeEditor', () => {
       
       render(
         <JotaiProvider store={store}>
-          <CodeEditor />
+          <CodeEditor diagramType="flowchart" />
         </JotaiProvider>
       )
 
@@ -38,7 +38,7 @@ describe('CodeEditor', () => {
       
       render(
         <JotaiProvider store={store}>
-          <CodeEditor />
+          <CodeEditor diagramType="flowchart" />
         </JotaiProvider>
       )
 
@@ -53,7 +53,7 @@ describe('CodeEditor', () => {
       
       render(
         <JotaiProvider store={store}>
-          <CodeEditor />
+          <CodeEditor diagramType="flowchart" />
         </JotaiProvider>
       )
 
@@ -75,7 +75,7 @@ describe('CodeEditor', () => {
       
       render(
         <JotaiProvider store={store}>
-          <CodeEditor />
+          <CodeEditor diagramType="flowchart" />
         </JotaiProvider>
       )
 
@@ -94,7 +94,7 @@ describe('CodeEditor', () => {
       
       render(
         <JotaiProvider store={store}>
-          <CodeEditor />
+          <CodeEditor diagramType="flowchart" />
         </JotaiProvider>
       )
 
@@ -110,7 +110,7 @@ describe('CodeEditor', () => {
   })
 
   describe('双方向同期', () => {
-    test('mermaidCodeAtomの値がテキストエリアに反映される', () => {
+    test('rawCodeAtomの値がテキストエリアに反映される', () => {
       const store = createTestStore()
       // 事前にノードとエッジを設定してmermaidCodeを生成
       store.set(nodesAtom, [
@@ -123,7 +123,7 @@ describe('CodeEditor', () => {
       
       render(
         <JotaiProvider store={store}>
-          <CodeEditor />
+          <CodeEditor diagramType="flowchart" />
         </JotaiProvider>
       )
 
@@ -137,7 +137,7 @@ describe('CodeEditor', () => {
       
       render(
         <JotaiProvider store={store}>
-          <CodeEditor />
+          <CodeEditor diagramType="flowchart" />
         </JotaiProvider>
       )
 

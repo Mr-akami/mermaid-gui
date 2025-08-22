@@ -14,13 +14,14 @@ import {
   type Edge as ReactFlowEdge,
   type Connection,
   useAtom,
+  useAtomValue,
   MarkerType,
   ConnectionMode,
   FlowchartNode,
 } from './deps'
-import { NodeToolbar } from './NodeToolbar'
+import { FlowchartToolbar } from './FlowchartToolbar'
 import { UndoRedoButtons } from './UndoRedoButtons'
-import { PropertyPanel } from './PropertyPanel'
+import { FlowchartPropertyPanel } from './FlowchartPropertyPanel'
 import {
   MERMAID_NODE_TYPES,
   NODE_TYPE_CONFIG,
@@ -31,11 +32,14 @@ import {
   updateNodeAtom,
   updateEdgeAtom,
   layoutDirectionAtom,
-} from '../../flowchart'
-import { saveToHistoryAtom } from '../../flowchart/history'
+  syncRawCodeToFlowchartAtom,
+  syncFlowchartToRawCodeAtom,
+} from '..'
+import { saveToHistoryAtom } from '../history'
 import { toCustomNodes, toReactFlowNodes, toCustomEdges, toReactFlowEdges } from './deps'
 import { focusPropertyPanelAtom, selectedNodeIdAtom, selectedEdgeIdAtom } from './atoms'
-import type { Edge } from '../../flowchart/types'
+import type { Edge } from '../types'
+import { rawCodeAtom } from '../../editor/atoms'
 
 // Create nodeTypes object dynamically from MERMAID_NODE_TYPES
 const nodeTypes = MERMAID_NODE_TYPES.reduce(
@@ -81,7 +85,7 @@ const getHandlesForDirection = (direction: 'TD' | 'LR' | 'RL' | 'BT') => {
   }
 }
 
-export function NodeEditorCore() {
+export function FlowchartEditor() {
   const reactFlowWrapper = useRef<HTMLDivElement>(null)
   const [nodes, setNodes, onNodesChangeOriginal] = useNodesState(initialNodes)
   const [edges, setEdges, onEdgesChange] = useEdgesState<ReactFlowEdge>([])
@@ -92,12 +96,55 @@ export function NodeEditorCore() {
   const [flowchartNodes, setFlowchartNodes] = useAtom(nodesAtom)
   const [flowchartEdges, setFlowchartEdges] = useAtom(edgesAtom)
   const [layoutDirection] = useAtom(layoutDirectionAtom)
+  
+  // Sync atoms for bidirectional code <-> GUI sync
+  const [, syncRawCodeToFlowchart] = useAtom(syncRawCodeToFlowchartAtom)
+  const [, syncFlowchartToRawCode] = useAtom(syncFlowchartToRawCodeAtom)
   const [, saveToHistory] = useAtom(saveToHistoryAtom)
   const [, updateNode] = useAtom(updateNodeAtom)
   const [, updateEdge] = useAtom(updateEdgeAtom)
   const [shouldFocusPropertyPanel, setShouldFocusPropertyPanel] = useAtom(focusPropertyPanelAtom)
   const [selectedNodeId, setSelectedNodeId] = useAtom(selectedNodeIdAtom)
   const [selectedEdgeId, setSelectedEdgeId] = useAtom(selectedEdgeIdAtom)
+  
+  // Import rawCode to monitor changes
+  const rawCode = useAtomValue(rawCodeAtom)
+  
+  // Trigger sync from raw code to flowchart when raw code changes
+  useEffect(() => {
+    // Skip if this is a GUI update
+    if (isGUIUpdateRef.current) {
+      return
+    }
+    isCodeUpdateRef.current = true
+    syncRawCodeToFlowchart()
+    // Reset flag after a short delay
+    setTimeout(() => {
+      isCodeUpdateRef.current = false
+    }, 100)
+  }, [rawCode, syncRawCodeToFlowchart])
+  
+  // Trigger sync from flowchart to raw code
+  useEffect(() => {
+    // Skip if this is a code update
+    if (isCodeUpdateRef.current) {
+      return
+    }
+    isGUIUpdateRef.current = true
+    syncFlowchartToRawCode()
+    // Reset flag after a short delay
+    setTimeout(() => {
+      isGUIUpdateRef.current = false
+    }, 100)
+  }, [flowchartNodes, flowchartEdges, layoutDirection, syncFlowchartToRawCode])
+  
+  // Update React Flow edges when layout direction changes
+  useEffect(() => {
+    if (flowchartEdges.length > 0) {
+      const reactFlowEdges = toReactFlowEdges(flowchartEdges)
+      setEdges(reactFlowEdges)
+    }
+  }, [layoutDirection, flowchartEdges, setEdges])
   
   // Custom onNodesChange to prevent selection reset during label editing
   const onNodesChange = useCallback((changes: any) => {
@@ -120,6 +167,9 @@ export function NodeEditorCore() {
   
   // Track if we're updating from code editor to prevent infinite loops
   const isCodeUpdateRef = useRef(false)
+  
+  // Track if we're updating from GUI to prevent sync loops
+  const isGUIUpdateRef = useRef(false)
 
   // Get current selection based on tracked IDs
   const selectedNode = useMemo(() => {
@@ -146,8 +196,8 @@ export function NodeEditorCore() {
 
   // Sync flowchart atoms to React Flow state (for code editor updates)
   useEffect(() => {
-    if (isCodeUpdateRef.current) {
-      isCodeUpdateRef.current = false
+    // Skip if this is NOT a code update OR if this is a GUI update
+    if (!isCodeUpdateRef.current || isGUIUpdateRef.current) {
       return
     }
     
@@ -189,6 +239,8 @@ export function NodeEditorCore() {
     setFlowchartNodes(customNodes)
     setFlowchartEdges([])
     saveToHistory({ nodes: customNodes, edges: [] })
+    // Trigger initial sync to raw code
+    syncFlowchartToRawCode()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []) // Only run once on mount
 
@@ -211,13 +263,17 @@ export function NodeEditorCore() {
         
         
         if (nodesChanged || edgesChanged) {
-          
           saveToHistory({ nodes: customNodes, edges: customEdges })
           
           // Also sync to flowchart atoms (prevent code editor loop)
-          isCodeUpdateRef.current = true
+          // Mark as GUI update to prevent React Flow sync
+          isGUIUpdateRef.current = true
           setFlowchartNodes(customNodes)
           setFlowchartEdges(customEdges)
+          // Reset flag after update
+          setTimeout(() => {
+            isGUIUpdateRef.current = false
+          }, 50)
         }
       }
     }, 500)
@@ -698,7 +754,7 @@ export function NodeEditorCore() {
           setEdges(rfEdges)
         }}
       />
-      <NodeToolbar
+      <FlowchartToolbar
         onNodeTypeSelect={setSelectedNodeType}
         selectedNodeType={selectedNodeType}
       />
@@ -734,7 +790,7 @@ export function NodeEditorCore() {
       >
         <Background />
       </ReactFlow>
-      <PropertyPanel
+      <FlowchartPropertyPanel
         selectedNode={selectedNode}
         selectedEdge={selectedEdge}
         onNodeUpdate={handleNodeUpdate}

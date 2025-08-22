@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from 'react'
-import { Node, Edge } from '../../flowchart/types'
-import { MERMAID_NODE_TYPES, MERMAID_EDGE_TYPES } from '../../flowchart'
+import { Node, Edge } from '../types'
+import { MERMAID_NODE_TYPES, MERMAID_EDGE_TYPES } from '..'
 import { useAtomValue } from 'jotai'
-import { nodesAtom } from '../../flowchart/atoms'
+import { nodesAtom } from '../atoms'
 
 interface PropertyPanelProps {
   selectedNode: Node | null
@@ -12,7 +12,7 @@ interface PropertyPanelProps {
   autoFocus?: boolean
 }
 
-export function PropertyPanel({
+export function FlowchartPropertyPanel({
   selectedNode,
   selectedEdge,
   onNodeUpdate,

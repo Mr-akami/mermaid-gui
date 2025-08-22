@@ -1,5 +1,5 @@
 import { atom } from 'jotai'
-import { Node, Edge } from '../../flowchart/types'
+import { Node, Edge } from '../types'
 
 // Atom to track the currently selected node ID
 export const selectedNodeIdAtom = atom<string | null>(null)
