@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { toReactFlowNodes } from './flowchartConverters'
-import type { Node } from '../../common/types'
+import type { Node } from '../types'
 
 describe('flowchartConverters - node ordering', () => {
   it('should place parent nodes before child nodes', () => {
@@ -72,7 +72,7 @@ describe('flowchartConverters - node ordering', () => {
     expect(n1Index).toBe(2)
   })
 
-  it('should convert subgraph nodes to group type for React Flow', () => {
+  it('should keep subgraph nodes as subgraph type for React Flow', () => {
     const nodes: Node[] = [
       {
         id: 'sg1',
@@ -93,9 +93,9 @@ describe('flowchartConverters - node ordering', () => {
 
     const result = toReactFlowNodes(nodes)
 
-    // Subgraph should be converted to 'group' type
+    // Subgraph should keep its type for React Flow
     const subgraph = result.find(n => n.id === 'sg1')
-    expect(subgraph?.type).toBe('group')
+    expect(subgraph?.type).toBe('subgraph')
     
     // Regular nodes should keep their type
     const node = result.find(n => n.id === 'n1')
@@ -200,14 +200,17 @@ describe('flowchartConverters - node ordering', () => {
       n3: result.findIndex(n => n.id === 'n3'),
     }
 
-    // Top-level nodes first
-    expect(indices.n1).toBeLessThan(indices.sg2)
-    expect(indices.sg1).toBeLessThan(indices.sg2)
+    // Subgraphs come first (for z-index ordering)
+    expect(indices.sg1).toBeLessThan(indices.n1)
+    expect(indices.sg2).toBeLessThan(indices.n1)
+    expect(indices.sg3).toBeLessThan(indices.n1)
     
-    // Then nested nodes in proper order
+    // Among subgraphs, parent-child order is preserved
     expect(indices.sg1).toBeLessThan(indices.sg2)
     expect(indices.sg2).toBeLessThan(indices.sg3)
-    expect(indices.sg2).toBeLessThan(indices.n2)
+    
+    // Regular nodes come after all subgraphs
+    expect(indices.sg3).toBeLessThan(indices.n2)
     expect(indices.sg3).toBeLessThan(indices.n3)
   })
 })

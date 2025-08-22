@@ -42,7 +42,7 @@ vi.mock('@xyflow/react', async () => {
       return [
         [
           { id: 'n1', type: 'rectangle', position: { x: 0, y: 0 }, data: { label: 'Node 1' } },
-          { id: 'group1', type: 'group', position: { x: 100, y: 100 }, data: { label: 'Group 1' } }
+          { id: 'group1', type: 'subgraph', position: { x: 100, y: 100 }, data: { label: 'Group 1' } }
         ],
         mockSetNodes,
         vi.fn()
@@ -63,10 +63,10 @@ describe('NodeEditorCore - Drop Operations', () => {
     capturedOnNodeDragStop = null
   })
 
-  it('should update node parent when dropped on a group', async () => {
-    // Setup: group node is intersecting
+  it('should update node parent when dropped on a subgraph', async () => {
+    // Setup: subgraph node is intersecting
     mockGetIntersectingNodes.mockReturnValue([
-      { id: 'group1', type: 'group', position: { x: 100, y: 100 }, data: { label: 'Group 1' } }
+      { id: 'group1', type: 'subgraph', position: { x: 100, y: 100 }, data: { label: 'Group 1' } }
     ])
 
     render(<NodeEditorCore />, { wrapper: Wrapper })
@@ -98,7 +98,7 @@ describe('NodeEditorCore - Drop Operations', () => {
     const updateFn = mockSetNodes.mock.calls[0][0]
     const updatedNodes = updateFn([
       { id: 'n1', type: 'rectangle', position: { x: 150, y: 150 }, data: { label: 'Node 1' } },
-      { id: 'group1', type: 'group', position: { x: 100, y: 100 }, data: { label: 'Group 1' } }
+      { id: 'group1', type: 'subgraph', position: { x: 100, y: 100 }, data: { label: 'Group 1' } }
     ])
     
     // Check that n1 now has parentId set to group1
@@ -110,7 +110,7 @@ describe('NodeEditorCore - Drop Operations', () => {
     expect(updatedN1.position.y).toBe(50) // 150 - 100
   })
 
-  it('should not update node if dropped on non-group node', async () => {
+  it('should not update node if dropped on non-subgraph node', async () => {
     // Setup: regular node is intersecting
     mockGetIntersectingNodes.mockReturnValue([
       { id: 'n2', type: 'rectangle', position: { x: 100, y: 100 }, data: { label: 'Node 2' } }
@@ -184,7 +184,7 @@ describe('NodeEditorCore - Drop Operations', () => {
       },
       { 
         id: 'group1', 
-        type: 'group', 
+        type: 'subgraph', 
         position: { x: 100, y: 100 }, 
         data: { label: 'Group 1' } 
       }
@@ -199,10 +199,10 @@ describe('NodeEditorCore - Drop Operations', () => {
     expect(updatedN1.position.y).toBe(250)
   })
 
-  it('should not allow dropping a group inside another group', async () => {
-    // Setup: group node is intersecting
+  it('should not allow dropping a subgraph inside another subgraph', async () => {
+    // Setup: subgraph node is intersecting
     mockGetIntersectingNodes.mockReturnValue([
-      { id: 'group2', type: 'group', position: { x: 200, y: 200 }, data: { label: 'Group 2' } }
+      { id: 'group2', type: 'subgraph', position: { x: 200, y: 200 }, data: { label: 'Group 2' } }
     ])
 
     render(<NodeEditorCore />, { wrapper: Wrapper })
@@ -212,10 +212,10 @@ describe('NodeEditorCore - Drop Operations', () => {
       await new Promise(resolve => setTimeout(resolve, 100))
     })
 
-    // Simulate drag stop of a group node
+    // Simulate drag stop of a subgraph node
     const draggedNode = {
       id: 'group1',
-      type: 'group',
+      type: 'subgraph',
       position: { x: 250, y: 250 },
       data: { label: 'Group 1' }
     }

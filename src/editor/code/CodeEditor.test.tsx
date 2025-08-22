@@ -128,7 +128,7 @@ describe('CodeEditor', () => {
       )
 
       const textarea = screen.getByRole('textbox') as HTMLTextAreaElement
-      expect(textarea.value).toContain('flowchart TB')
+      expect(textarea.value).toContain('flowchart TD')
       expect(textarea.value).toContain('X --> Y')
     })
 

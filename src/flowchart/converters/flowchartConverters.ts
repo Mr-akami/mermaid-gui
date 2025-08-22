@@ -1,5 +1,5 @@
 import { Node as ReactFlowNode, Edge as ReactFlowEdge } from '@xyflow/react'
-import { Node as CustomNode, Edge as CustomEdge } from '../../common/types'
+import { Node as CustomNode, Edge as CustomEdge } from '../types'
 
 /**
  * Core conversion utilities for flowchart data

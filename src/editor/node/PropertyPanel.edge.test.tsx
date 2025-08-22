@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { PropertyPanel } from './PropertyPanel'
 import { Provider as JotaiProvider } from 'jotai'
-import { Edge } from '../../common/types'
+import { Edge } from '../../flowchart/types'
 import { MERMAID_EDGE_TYPES } from '../../flowchart'
 
 describe('PropertyPanel - Edge Type Changes', () => {

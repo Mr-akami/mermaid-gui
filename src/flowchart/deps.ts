@@ -1,17 +1,16 @@
 // External dependencies
 export { atom } from 'jotai'
 
-// Core dependencies
-export { buildFlowchartCode } from '../core/mermaid-code-builder/index'
-export { parseFlowchart } from '../core/mermaid-parser/index'
+// Internal dependencies
+export { buildFlowchartCode } from './builders'
 
-// Common types
+// Types
 export type {
   Node,
   Edge,
   FlowchartData,
   MermaidParseResult,
-} from '../common/types/index'
+} from './types'
 
 // History atoms
-export { saveToHistoryAtom } from '../history/index'
+export { saveToHistoryAtom } from './history'

@@ -1,7 +1,6 @@
 import { useAtomValue, useAtom, useSetAtom } from 'jotai'
 import { useState, useCallback, useEffect, useRef } from 'react'
-import { mermaidCodeAtom, nodesAtom, edgesAtom, layoutDirectionAtom, updateLayoutDirectionAtom } from '../../flowchart'
-import { parseFlowchartCode } from '../../core/mermaid-code-parser/flowchartParser'
+import { mermaidCodeAtom, nodesAtom, edgesAtom, layoutDirectionAtom, updateLayoutDirectionAtom, parseFlowchartCode } from '../../flowchart'
 
 export function CodeEditor() {
   const mermaidCode = useAtomValue(mermaidCodeAtom)

@@ -1,5 +1,5 @@
 import { atom } from 'jotai'
-import type { Node, Edge } from '../common/types'
+import type { Node, Edge } from '../types'
 
 interface HistoryState {
   nodes: Node[]

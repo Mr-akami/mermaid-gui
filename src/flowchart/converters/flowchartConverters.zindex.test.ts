@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { toReactFlowNodes } from './flowchartConverters'
-import type { Node } from '../../common/types'
+import type { Node } from '../types'
 
 describe('Subgraph z-index ordering', () => {
   it('should set lower z-index for subgraphs and place them first in array', () => {

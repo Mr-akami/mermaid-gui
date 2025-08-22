@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Node, Edge } from '../../common/types'
+import { Node, Edge } from '../../flowchart/types'
 import { MERMAID_NODE_TYPES, MERMAID_EDGE_TYPES } from '../../flowchart'
 import { useAtomValue } from 'jotai'
 import { nodesAtom } from '../../flowchart/atoms'

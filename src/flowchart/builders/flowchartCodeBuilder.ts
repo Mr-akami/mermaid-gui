@@ -26,7 +26,7 @@ export function buildFlowchartCode(data: FlowchartData, direction: 'TD' | 'TB' |
       
       // Add direction if specified
       if (node.direction) {
-        lines.push(`${indent}    direction ${node.direction}`)
+        lines.push(`${indent}direction ${node.direction}`)
       }
       
       // Find and process child nodes
@@ -50,7 +50,7 @@ export function buildFlowchartCode(data: FlowchartData, direction: 'TD' | 'TB' |
       }
       
       orderedChildNodes.forEach(child => {
-        processNode(child, indent + '    ')
+        processNode(child, indent)
       })
       
       lines.push(`${indent}end`)
@@ -138,8 +138,15 @@ function groupEdgesWithAmpersand(edges: FlowchartData['edges'], nodeDisplayNames
 
   groups.forEach((group) => {
     // Check if we can optimize with & operator
-    // For now, disable optimization to match expected test output
-    const canOptimize = false
+    // Can optimize when we have multiple sources AND multiple targets,
+    // or when all edges in the group form a complete bipartite graph
+    const sourcesArray = Array.from(group.sources)
+    const targetsArray = Array.from(group.targets)
+    
+    // Check if all source-target combinations exist
+    const expectedEdgeCount = sourcesArray.length * targetsArray.length
+    const canOptimize = group.edges.length === expectedEdgeCount && 
+                       expectedEdgeCount > 1
 
     if (canOptimize) {
       // Build optimized edge with & operator

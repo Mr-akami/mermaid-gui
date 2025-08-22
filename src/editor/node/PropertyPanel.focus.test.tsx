@@ -2,7 +2,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { describe, it, expect, vi } from 'vitest'
 import { PropertyPanel } from './PropertyPanel'
 import { Provider as JotaiProvider } from 'jotai'
-import { Node } from '../../common/types'
+import { Node } from '../../flowchart/types'
 
 describe('PropertyPanel - Focus Retention During Editing', () => {
   const mockOnNodeUpdate = vi.fn()

@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { buildFlowchartCode } from './flowchartCodeBuilder'
-import type { Node, Edge } from '../../common/types'
+import type { Node, Edge } from '../types'
 
 describe('flowchartCodeBuilder - subgraph support', () => {
   it('should generate code for a simple subgraph', () => {
@@ -38,8 +38,8 @@ describe('flowchartCodeBuilder - subgraph support', () => {
       },
     ]
 
-    const result = buildFlowchartCode({ nodes, edges }, 'TB')
-    expect(result).toBe(`flowchart TB
+    const result = buildFlowchartCode({ nodes, edges }, 'TD')
+    expect(result).toBe(`flowchart TD
     subgraph one
     a1[a1]
     a2[a2]
@@ -82,8 +82,8 @@ describe('flowchartCodeBuilder - subgraph support', () => {
       },
     ]
 
-    const result = buildFlowchartCode({ nodes, edges }, 'TB')
-    expect(result).toBe(`flowchart TB
+    const result = buildFlowchartCode({ nodes, edges }, 'TD')
+    expect(result).toBe(`flowchart TD
     subgraph ide1 [one]
     a1[a1]
     a2[a2]
@@ -161,8 +161,8 @@ describe('flowchartCodeBuilder - subgraph support', () => {
       },
     ]
 
-    const result = buildFlowchartCode({ nodes, edges }, 'TB')
-    expect(result).toBe(`flowchart TB
+    const result = buildFlowchartCode({ nodes, edges }, 'TD')
+    expect(result).toBe(`flowchart TD
     subgraph one
     a1[a1]
     a2[a2]
@@ -241,8 +241,8 @@ describe('flowchartCodeBuilder - subgraph support', () => {
       },
     ]
 
-    const result = buildFlowchartCode({ nodes, edges }, 'TB')
-    expect(result).toBe(`flowchart TB
+    const result = buildFlowchartCode({ nodes, edges }, 'TD')
+    expect(result).toBe(`flowchart TD
     subgraph ide1 [one]
     a1[a1]
     a2[a2]
@@ -303,15 +303,14 @@ describe('flowchartCodeBuilder - subgraph support', () => {
       },
     ]
 
-    const result = buildFlowchartCode({ nodes, edges }, 'TB')
-    expect(result).toBe(`flowchart TB
+    const result = buildFlowchartCode({ nodes, edges }, 'TD')
+    expect(result).toBe(`flowchart TD
     c1[c1]
     subgraph one
     a1[a1]
     a2[a2]
     end
-    c1 --> a2
-    a1 --> a2`)
+    c1 & a1 --> a2`)
   })
 
   it('should maintain proper indentation for nested subgraphs', () => {
@@ -342,8 +341,8 @@ describe('flowchartCodeBuilder - subgraph support', () => {
     ]
     const edges: Edge[] = []
 
-    const result = buildFlowchartCode({ nodes, edges }, 'TB')
-    expect(result).toBe(`flowchart TB
+    const result = buildFlowchartCode({ nodes, edges }, 'TD')
+    expect(result).toBe(`flowchart TD
     subgraph outer
     subgraph inner
     n1[node1]

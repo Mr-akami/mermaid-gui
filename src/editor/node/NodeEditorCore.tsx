@@ -32,10 +32,10 @@ import {
   updateEdgeAtom,
   layoutDirectionAtom,
 } from '../../flowchart'
-import { saveToHistoryAtom } from '../../history'
+import { saveToHistoryAtom } from '../../flowchart/history'
 import { toCustomNodes, toReactFlowNodes, toCustomEdges, toReactFlowEdges } from './deps'
 import { focusPropertyPanelAtom, selectedNodeIdAtom, selectedEdgeIdAtom } from './atoms'
-import type { Edge } from '../../common/types'
+import type { Edge } from '../../flowchart/types'
 
 // Create nodeTypes object dynamically from MERMAID_NODE_TYPES
 const nodeTypes = MERMAID_NODE_TYPES.reduce(
@@ -84,7 +84,7 @@ const getHandlesForDirection = (direction: 'TD' | 'LR' | 'RL' | 'BT') => {
 export function NodeEditorCore() {
   const reactFlowWrapper = useRef<HTMLDivElement>(null)
   const [nodes, setNodes, onNodesChangeOriginal] = useNodesState(initialNodes)
-  const [edges, setEdges, onEdgesChange] = useEdgesState([])
+  const [edges, setEdges, onEdgesChange] = useEdgesState<ReactFlowEdge>([])
   const [selectedNodeType, setSelectedNodeType] = useState<string | null>(null)
   const { screenToFlowPosition } = useReactFlow()
 

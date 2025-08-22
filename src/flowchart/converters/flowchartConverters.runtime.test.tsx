@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest'
 import { render } from '@testing-library/react'
 import { ReactFlow, ReactFlowProvider } from '@xyflow/react'
 import { toReactFlowNodes, toReactFlowEdges } from './flowchartConverters'
-import type { Node, Edge } from '../../common/types'
+import type { Node, Edge } from '../types'
 import '@xyflow/react/dist/style.css'
 
 describe('Runtime z-index behavior', () => {

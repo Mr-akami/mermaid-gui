@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { PropertyPanel } from './PropertyPanel'
 import { Provider as JotaiProvider } from 'jotai'
-import { Node, Edge } from '../../common/types'
+import { Node, Edge } from '../../flowchart/types'
 
 describe('PropertyPanel', () => {
   const mockOnNodeUpdate = vi.fn()

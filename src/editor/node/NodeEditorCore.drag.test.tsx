@@ -56,10 +56,10 @@ describe('NodeEditorCore - Drag and Drop', () => {
     mockGetIntersectingNodes.mockClear()
   })
 
-  it('should detect intersection with group node on drag stop', async () => {
-    // Mock intersecting nodes to return a group node
+  it('should detect intersection with subgraph node on drag stop', async () => {
+    // Mock intersecting nodes to return a subgraph node
     mockGetIntersectingNodes.mockReturnValue([
-      { id: 'group1', type: 'group', position: { x: 100, y: 100 }, data: { label: 'Group 1' } }
+      { id: 'group1', type: 'subgraph', position: { x: 100, y: 100 }, data: { label: 'Group 1' } }
     ])
 
     render(<NodeEditorCore />, { wrapper: Wrapper })
@@ -82,11 +82,11 @@ describe('NodeEditorCore - Drag and Drop', () => {
     })
   })
 
-  it('should find the first group node among intersecting nodes', async () => {
-    // Mock intersecting nodes with both regular and group nodes
+  it('should find the first subgraph node among intersecting nodes', async () => {
+    // Mock intersecting nodes with both regular and subgraph nodes
     mockGetIntersectingNodes.mockReturnValue([
       { id: 'n2', type: 'rectangle', position: { x: 50, y: 50 }, data: { label: 'Node 2' } },
-      { id: 'group1', type: 'group', position: { x: 100, y: 100 }, data: { label: 'Group 1' } },
+      { id: 'group1', type: 'subgraph', position: { x: 100, y: 100 }, data: { label: 'Group 1' } },
       { id: 'n3', type: 'circle', position: { x: 200, y: 200 }, data: { label: 'Node 3' } }
     ])
 
@@ -101,11 +101,11 @@ describe('NodeEditorCore - Drag and Drop', () => {
     const dragButton = screen.getByText('Trigger Drag Stop')
     fireEvent.click(dragButton)
 
-    // Verify the handler processed the group node
+    // Verify the handler processed the subgraph node
     expect(mockGetIntersectingNodes).toHaveBeenCalled()
   })
 
-  it('should handle drag stop when no group nodes are intersecting', async () => {
+  it('should handle drag stop when no subgraph nodes are intersecting', async () => {
     // Mock intersecting nodes with only regular nodes
     mockGetIntersectingNodes.mockReturnValue([
       { id: 'n2', type: 'rectangle', position: { x: 50, y: 50 }, data: { label: 'Node 2' } },
