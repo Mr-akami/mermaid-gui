@@ -20,7 +20,6 @@ describe('parseFlowchartCode with nested subgraphs', () => {
 
     const result = parseFlowchartCode(code)
     
-    console.log('Parsed nodes:', result.nodes.map(n => ({
       id: n.id,
       type: n.type,
       parentId: n.parentId,

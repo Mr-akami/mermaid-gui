@@ -117,6 +117,118 @@ export function parseFlowchartCode(code: string): ParsedFlowchart {
       continue
     }
     
+    // Check for & operator connections (e.g., a --> b & c --> d)
+    if (line.includes('&')) {
+      // Parse the line more carefully to handle patterns like "a --> b & c --> d"
+      // which should create edges: a->b, a->c, b->d, c->d
+      
+      // Split by connectors to find segments
+      const segments: Array<{nodes: string[], connector?: string}> = []
+      let currentSegment = {nodes: [] as string[], connector: undefined as string | undefined}
+      const parts = line.split(/\s+/)
+      
+      for (let i = 0; i < parts.length; i++) {
+        let part = parts[i]
+        
+        // Check if part contains a connector pattern embedded in it (like "c-->")
+        const embeddedConnectorMatch = part.match(/^(.+?)((?:--|==|-\.)+>?)(.*)$/)
+        if (embeddedConnectorMatch && embeddedConnectorMatch[2].match(/^(?:--|==|-\.)+>?$/)) {
+          // Split the part into node, connector, and possibly another node
+          const [, beforeConnector, connector, afterConnector] = embeddedConnectorMatch
+          
+          // Process the node before the connector
+          if (beforeConnector && beforeConnector !== '&') {
+            currentSegment.nodes.push(beforeConnector)
+          }
+          
+          // Process the connector
+          if (currentSegment.nodes.length > 0) {
+            currentSegment.connector = connector
+            segments.push(currentSegment)
+            currentSegment = {nodes: [], connector: undefined}
+          }
+          
+          // Process any text after the connector
+          if (afterConnector && afterConnector !== '&') {
+            currentSegment.nodes.push(afterConnector)
+          }
+        } else if (part.match(/^(?:--|==|-\.|-)+>?$/)) {
+          // It's a standalone connector
+          if (currentSegment.nodes.length > 0) {
+            currentSegment.connector = part
+            segments.push(currentSegment)
+            currentSegment = {nodes: [], connector: undefined}
+          } else if (segments.length > 0 && !currentSegment.connector) {
+            // This is a connector after & without nodes, update the previous segment's connector
+            currentSegment.connector = part
+          }
+        } else if (part === '&') {
+          // Continue collecting nodes
+          continue
+        } else {
+          // It's a node
+          currentSegment.nodes.push(part)
+        }
+      }
+      
+      // Add the last segment if it has nodes
+      if (currentSegment.nodes.length > 0) {
+        segments.push(currentSegment)
+      }
+      
+      // Ensure all nodes exist
+      for (const segment of segments) {
+        for (const nodeDef of segment.nodes) {
+          const nodeId = getNodeId(nodeDef)
+          if (!nodeMap.has(nodeId)) {
+            const node = parseNode(nodeDef) || {
+              id: nodeId,
+              type: 'rectangle' as const,
+              data: { label: nodeId },
+              position: { x: 0, y: 0 },
+              childIds: []
+            }
+            
+            if (subgraphStack.length > 0) {
+              const parent = subgraphStack[subgraphStack.length - 1]
+              node.parentId = parent.id
+              parent.childIds?.push(node.id)
+            }
+            nodeMap.set(node.id, node)
+            result.nodes.push(node)
+          }
+        }
+      }
+      
+      // Create edges between segments
+      // For patterns like "a --> b & c --> d", we want:
+      // - a -> b, a -> c (from first to second segment)
+      // - b -> d, c -> d (both nodes from second segment to third)
+      // For patterns like "a --> b & c & d --> e & f", we want:
+      // - a -> b, a -> c, a -> d (first to second)
+      // - b -> e, b -> f, c -> e, c -> f, d -> e, d -> f (second to third)
+      
+      for (let i = 0; i < segments.length - 1; i++) {
+        const sourceSegment = segments[i]
+        const targetSegment = segments[i + 1]
+        const connector = sourceSegment.connector || '-->'
+        
+        // Always create edges from all sources to all targets
+        for (const source of sourceSegment.nodes) {
+          for (const target of targetSegment.nodes) {
+            const sourceId = getNodeId(source)
+            const targetId = getNodeId(target)
+            const edge = parseEdge(sourceId, targetId, connector)
+            if (edge) {
+              result.edges.push(edge)
+            }
+          }
+        }
+      }
+      
+      continue
+    }
+    
     // Check for chained connections first (e.g., A --> B --> C)
     const chainPattern = /^(.+?)\s+((?:--|==|-\.)+>?)\s+(.+)$/
     const chainMatch = line.match(chainPattern)

@@ -211,6 +211,7 @@ export function NodeEditorCore() {
         
         
         if (nodesChanged || edgesChanged) {
+          
           saveToHistory({ nodes: customNodes, edges: customEdges })
           
           // Also sync to flowchart atoms (prevent code editor loop)

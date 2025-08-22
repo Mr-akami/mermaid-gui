@@ -106,81 +106,148 @@ export function buildFlowchartCode(data: FlowchartData, direction: 'TD' | 'TB' |
 
 // Group edges that can use & operator
 function groupEdgesWithAmpersand(edges: FlowchartData['edges'], nodeDisplayNames?: Map<string, string>): string[] {
-  // Group by connector type and label
-  const groups = new Map<string, {
-    type: typeof edges[0]['type']
-    label?: string
-    sources: Set<string>
-    targets: Set<string>
-    edges: typeof edges
-  }>()
-
-  edges.forEach((edge) => {
-    const key = `${edge.type}|${edge.data?.label || ''}`
-    
-    if (!groups.has(key)) {
-      groups.set(key, {
-        type: edge.type,
-        label: edge.data?.label,
-        sources: new Set(),
-        targets: new Set(),
-        edges: []
-      })
-    }
-    
-    const group = groups.get(key)!
-    group.sources.add(edge.source)
-    group.targets.add(edge.target)
-    group.edges.push(edge)
-  })
-
   const result: string[] = []
-
-  groups.forEach((group) => {
-    // Check if we can optimize with & operator
-    // Can optimize when we have multiple sources AND multiple targets,
-    // or when all edges in the group form a complete bipartite graph
-    const sourcesArray = Array.from(group.sources)
-    const targetsArray = Array.from(group.targets)
+  const processedEdges = new Set<typeof edges[0]>()
+  
+  // Try to detect patterns that can use & operator
+  edges.forEach((edge) => {
+    if (processedEdges.has(edge)) return
     
-    // Check if all source-target combinations exist
-    const expectedEdgeCount = sourcesArray.length * targetsArray.length
-    const canOptimize = group.edges.length === expectedEdgeCount && 
-                       expectedEdgeCount > 1
-
-    if (canOptimize) {
-      // Build optimized edge with & operator
-      const sources = Array.from(group.sources).map(id => nodeDisplayNames?.get(id) || id).join(' & ')
-      const targets = Array.from(group.targets).map(id => nodeDisplayNames?.get(id) || id).join(' & ')
-      const connector = getConnector(group.type)
+    const connector = getConnector(edge.type)
+    const label = edge.data?.label
+    
+    // Find all edges with the same source and same type/label
+    const sameSourceEdges = edges.filter(e => 
+      !processedEdges.has(e) &&
+      e.source === edge.source &&
+      e.type === edge.type &&
+      e.data?.label === label
+    )
+    
+    // If we have multiple targets from the same source, check if they continue
+    if (sameSourceEdges.length > 1) {
+      // Get all targets
+      const targets = sameSourceEdges.map(e => e.target)
       
-      if (group.label) {
-        const escapedLabel = escapeEdgeLabel(group.label)
-        result.push(`${sources} ${connector}|${escapedLabel}| ${targets}`)
-      } else {
-        result.push(`${sources} ${connector} ${targets}`)
-      }
-    } else {
-      // Can't optimize, use individual edges
-      group.edges.forEach(edge => {
-        if (nodeDisplayNames) {
-          const source = nodeDisplayNames.get(edge.source) || edge.source
-          const target = nodeDisplayNames.get(edge.target) || edge.target
-          const connector = getConnector(edge.type)
-          
-          if (edge.data?.label) {
-            const escapedLabel = escapeEdgeLabel(edge.data.label)
-            result.push(`${source} ${connector}|${escapedLabel}| ${target}`)
-          } else {
-            result.push(`${source} ${connector} ${target}`)
-          }
-        } else {
-          result.push(buildEdgeCode(edge))
+      // For each target, check if it has continuation edges
+      const continuations = new Map<string, typeof edges>()
+      targets.forEach(target => {
+        const nextEdges = edges.filter(e => 
+          !processedEdges.has(e) &&
+          e.source === target &&
+          !sameSourceEdges.includes(e)
+        )
+        if (nextEdges.length > 0) {
+          continuations.set(target, nextEdges)
         }
       })
+      
+      // Check if we can form a pattern like "a --> b & c --> d"
+      // This means some targets have the same continuation
+      if (continuations.size > 0) {
+        // Group continuations by their target and type
+        const continuationGroups = new Map<string, {
+          type: typeof edges[0]['type']
+          label?: string
+          sources: string[]
+          target: string
+        }>()
+        
+        continuations.forEach((nextEdges, source) => {
+          nextEdges.forEach(nextEdge => {
+            const key = `${nextEdge.target}|${nextEdge.type}|${nextEdge.data?.label || ''}`
+            if (!continuationGroups.has(key)) {
+              continuationGroups.set(key, {
+                type: nextEdge.type,
+                label: nextEdge.data?.label,
+                sources: [],
+                target: nextEdge.target
+              })
+            }
+            continuationGroups.get(key)!.sources.push(source)
+          })
+        })
+        
+        // Check if all targets continue to the same destination
+        let hasSharedContinuation = false
+        continuationGroups.forEach(group => {
+          if (group.sources.length === targets.length) {
+            // All targets continue to this destination
+            hasSharedContinuation = true
+            
+            // Generate "a --> b & c --> d" pattern
+            const source = nodeDisplayNames?.get(edge.source) || edge.source
+            const targetList = targets.map(t => nodeDisplayNames?.get(t) || t).join(' & ')
+            const finalTarget = nodeDisplayNames?.get(group.target) || group.target
+            const nextConnector = getConnector(group.type)
+            
+            if (label) {
+              const escapedLabel = escapeEdgeLabel(label)
+              result.push(`${source} ${connector}|${escapedLabel}| ${targetList} ${nextConnector} ${finalTarget}`)
+            } else {
+              result.push(`${source} ${connector} ${targetList} ${nextConnector} ${finalTarget}`)
+            }
+            
+            // Mark all involved edges as processed
+            sameSourceEdges.forEach(e => processedEdges.add(e))
+            continuations.forEach(nextEdges => {
+              nextEdges.forEach(e => {
+                if (e.target === group.target && e.type === group.type) {
+                  processedEdges.add(e)
+                }
+              })
+            })
+          }
+        })
+        
+        if (!hasSharedContinuation) {
+          // Use simple & for multiple targets from same source
+          const source = nodeDisplayNames?.get(edge.source) || edge.source
+          const targetList = targets.map(t => nodeDisplayNames?.get(t) || t).join(' & ')
+          
+          if (label) {
+            const escapedLabel = escapeEdgeLabel(label)
+            result.push(`${source} ${connector}|${escapedLabel}| ${targetList}`)
+          } else {
+            result.push(`${source} ${connector} ${targetList}`)
+          }
+          
+          sameSourceEdges.forEach(e => processedEdges.add(e))
+        }
+      } else {
+        // Simple case: one source to multiple targets
+        const source = nodeDisplayNames?.get(edge.source) || edge.source
+        const targetList = targets.map(t => nodeDisplayNames?.get(t) || t).join(' & ')
+        
+        if (label) {
+          const escapedLabel = escapeEdgeLabel(label)
+          result.push(`${source} ${connector}|${escapedLabel}| ${targetList}`)
+        } else {
+          result.push(`${source} ${connector} ${targetList}`)
+        }
+        
+        sameSourceEdges.forEach(e => processedEdges.add(e))
+      }
+    } else {
+      // Single edge, can't optimize
+      processedEdges.add(edge)
+      
+      if (nodeDisplayNames) {
+        const source = nodeDisplayNames.get(edge.source) || edge.source
+        const target = nodeDisplayNames.get(edge.target) || edge.target
+        
+        if (label) {
+          const escapedLabel = escapeEdgeLabel(label)
+          result.push(`${source} ${connector}|${escapedLabel}| ${target}`)
+        } else {
+          result.push(`${source} ${connector} ${target}`)
+        }
+      } else {
+        result.push(buildEdgeCode(edge))
+      }
     }
   })
-
+  
   return result
 }
 

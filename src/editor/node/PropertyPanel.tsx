@@ -37,7 +37,6 @@ export function PropertyPanel({
     }
     
     if (selectedNode) {
-      console.log('Selected node:', selectedNode.id, 'Parent:', selectedNode.parentId)
       setLabel(selectedNode.data.label || '')
       setNodeType(selectedNode.type)
       setParentId(selectedNode.parentId || null)
