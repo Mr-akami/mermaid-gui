@@ -86,22 +86,17 @@ export const ParticipantLifeline = memo((props: NodeProps) => {
   const handleHandleClick = useCallback((handleId: string, e: React.MouseEvent) => {
     e.stopPropagation()
     
-    // Check if this handle is already connected
-    if (isHandleConnected(handleId)) return
-    
     // Call the parent's handler if provided
     if (participantData.onHandleClick) {
       participantData.onHandleClick(id, handleId)
     }
-  }, [id, participantData, isHandleConnected])
+  }, [id, participantData])
 
   const handleMouseDown = useCallback((handleId: string, e: React.MouseEvent<HTMLDivElement>) => {
     e.stopPropagation()
     e.preventDefault()
     
-    // Don't allow dragging connected handles
-    if (isHandleConnected(handleId)) return
-    
+    // Allow dragging even if connected
     const handle = handles.find(h => h.id === handleId)
     if (!handle) return
     
@@ -110,7 +105,7 @@ export const ParticipantLifeline = memo((props: NodeProps) => {
       startY: 0,
       currentY: handle.y
     })
-  }, [handles, isHandleConnected])
+  }, [handles])
 
   const handleMouseMove = useCallback((e: MouseEvent) => {
     if (!draggedHandle || !lifelineRef.current) return
@@ -249,7 +244,7 @@ export const ParticipantLifeline = memo((props: NodeProps) => {
                   left: '-9px', // Center the 20px width div on lifeline (2px width)
                   width: '20px',
                   height: '20px',
-                  cursor: isConnected ? 'not-allowed' : (draggedHandle?.id === handle.id ? 'grabbing' : 'grab'),
+                  cursor: draggedHandle?.id === handle.id ? 'grabbing' : 'grab',
                   zIndex: 10
                 }}
               >
@@ -262,9 +257,8 @@ export const ParticipantLifeline = memo((props: NodeProps) => {
                     width: '12px',
                     height: '12px',
                     borderRadius: '50%',
-                    background: isSelected ? '#4CAF50' : (isConnected ? '#999' : '#555'),
+                    background: isSelected ? '#4CAF50' : (isConnected ? '#2196F3' : '#555'),
                     border: isSelected ? '2px solid #2E7D32' : '2px solid #333',
-                    opacity: isConnected ? 0.5 : 1,
                     pointerEvents: 'none'
                   }}
                 />

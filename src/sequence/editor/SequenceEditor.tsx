@@ -54,7 +54,7 @@ function SequenceEditorContent() {
   }, [participants])
 
   const [nodesState, setNodes, onNodesChange] = useNodesState(nodes)
-  const [edgesState, setEdges, onEdgesChange] = useEdgesState([])
+  const [edgesState, setEdges, onEdgesChange] = useEdgesState([] as Edge[])
   
   // Custom node change handler to restrict Y movement
   const handleNodesChange = useCallback((changes: any[]) => {
@@ -75,37 +75,55 @@ function SequenceEditorContent() {
     onNodesChange(filteredChanges)
   }, [onNodesChange])
 
+  // Check if a handle is already connected
+  const isHandleConnected = useCallback((nodeId: string, handleId: string) => {
+    return (edgesState as Edge[]).some(edge => 
+      (edge.source === nodeId && edge.sourceHandle === `${handleId}-source`) ||
+      (edge.target === nodeId && edge.targetHandle === `${handleId}-target`) ||
+      (edge.source === nodeId && edge.sourceHandle === `${handleId}-target`) ||
+      (edge.target === nodeId && edge.targetHandle === `${handleId}-source`)
+    )
+  }, [edgesState])
+
   // Handle edge creation from handle clicks
   const handleEdgeCreation = useCallback((nodeId: string, handleId: string) => {
+    // Check if this handle is already connected
+    const handleConnected = isHandleConnected(nodeId, handleId)
+    
     if (!edgeCreation) {
-      // First click - set as source
-      setEdgeCreation({
-        sourceNode: nodeId,
-        sourceHandle: `${handleId}-source`
-      })
-    } else if (edgeCreation.sourceNode !== nodeId || !edgeCreation.sourceHandle?.includes(handleId)) {
-      // Second click on different handle - create edge
-      const newEdge: Edge = {
-        id: nanoid(),
-        source: edgeCreation.sourceNode!,
-        target: nodeId,
-        sourceHandle: edgeCreation.sourceHandle!,
-        targetHandle: `${handleId}-target`,
-        type: 'sequenceMessage',
-        data: {
-          label: 'Message',
-          arrowType: '->>'
+      // First click - only allow if not connected
+      if (!handleConnected) {
+        setEdgeCreation({
+          sourceNode: nodeId,
+          sourceHandle: `${handleId}-source`
+        })
+      }
+    } else {
+      // Check if clicking on a different handle
+      if (edgeCreation.sourceNode !== nodeId || !edgeCreation.sourceHandle?.includes(handleId)) {
+        // Second click on different handle - only create edge if target not connected
+        if (!handleConnected) {
+          const newEdge: Edge = {
+            id: nanoid(),
+            source: edgeCreation.sourceNode!,
+            target: nodeId,
+            sourceHandle: edgeCreation.sourceHandle!,
+            targetHandle: `${handleId}-target`,
+            type: 'sequenceMessage',
+            data: {
+              label: 'Message',
+              arrowType: '->>'
+            }
+          }
+          
+          // Immediately add the edge
+          setEdges((prev) => [...(prev as Edge[]), newEdge])
         }
       }
-      
-      // Immediately add the edge
-      setEdges((prev: Edge[]) => [...prev, newEdge])
-      setEdgeCreation(null)
-    } else {
-      // Clicked same handle - cancel
+      // Clear edge creation state whether edge was created or not
       setEdgeCreation(null)
     }
-  }, [edgeCreation, setEdgeCreation, setEdges])
+  }, [edgeCreation, setEdgeCreation, setEdges, isHandleConnected])
 
   // Update nodes when participants change
   useEffect(() => {
@@ -177,7 +195,7 @@ function SequenceEditorContent() {
       }
     }
     
-    setEdges((edges: Edge[]) => [...edges, newEdge])
+    setEdges((edges) => [...(edges as Edge[]), newEdge])
   }, [setEdges])
 
   return (
