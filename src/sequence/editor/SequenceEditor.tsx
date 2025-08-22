@@ -10,7 +10,8 @@ import {
   type Node,
   type Edge,
   type Connection,
-  ReactFlowProvider
+  ReactFlowProvider,
+  MarkerType
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
 import { useAtom, useSetAtom } from 'jotai'
@@ -110,6 +111,12 @@ function SequenceEditorContent() {
             sourceHandle: edgeCreation.sourceHandle!,
             targetHandle: `${handleId}-target`,
             type: 'sequenceMessage',
+            markerEnd: {
+              type: MarkerType.ArrowClosed,
+              width: 20,
+              height: 20,
+              color: '#333'
+            },
             data: {
               label: 'Message',
               arrowType: '->>'
@@ -189,6 +196,12 @@ function SequenceEditorContent() {
       sourceHandle: params.sourceHandle || undefined,
       targetHandle: params.targetHandle || undefined,
       type: 'sequenceMessage',
+      markerEnd: {
+        type: MarkerType.ArrowClosed,
+        width: 20,
+        height: 20,
+        color: '#333'
+      },
       data: {
         label: 'Message',
         arrowType: '->>'
