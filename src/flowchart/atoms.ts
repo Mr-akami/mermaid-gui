@@ -127,10 +127,20 @@ export const syncRawCodeToFlowchartAtom = atom(
                                    parsedDirection === 'DT' ? 'BT' : 
                                    parsedDirection as 'TD' | 'LR' | 'RL' | 'BT'
         
+        // First set layout direction
+        set(layoutDirectionAtom, normalizedDirection)
+        
+        // Add handles to edges based on direction
+        const handles = getHandlesForDirection(normalizedDirection)
+        const edgesWithHandles = result.edges.map(edge => ({
+          ...edge,
+          sourceHandle: handles.source,
+          targetHandle: handles.target,
+        }))
+        
         // Set nodes and edges
         set(nodesAtom, result.nodes)
-        set(edgesAtom, result.edges)
-        set(updateLayoutDirectionAtom, normalizedDirection)
+        set(edgesAtom, edgesWithHandles)
         set(parseErrorAtom, null)
       }
     } catch (err) {
