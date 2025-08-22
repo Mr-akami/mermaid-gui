@@ -36,7 +36,8 @@ export {
   updateLoopAtom,
   removeLoopAtom,
   syncRawCodeToSequenceAtom,
-  syncSequenceToRawCodeAtom
+  syncSequenceToRawCodeAtom,
+  placementModeAtom
 } from './atoms'
 
 // Future exports will include:

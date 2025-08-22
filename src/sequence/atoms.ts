@@ -15,6 +15,15 @@ export const notesAtom = atom<SequenceNote[]>([])
 export const loopsAtom = atom<SequenceLoop[]>([])
 export const activationsAtom = atom<SequenceActivation[]>([])
 
+// UI state atoms
+export const placementModeAtom = atom<'participant' | 'actor' | 'note' | null>(null)
+
+// Edge creation state
+export const edgeCreationAtom = atom<{
+  sourceNode: string | null
+  sourceHandle: string | null
+} | null>(null)
+
 // Combined state atom
 export const sequenceStateAtom = atom<SequenceState>((get) => ({
   participants: get(participantsAtom),

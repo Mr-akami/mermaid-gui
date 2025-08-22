@@ -9,9 +9,9 @@ const FlowchartEditor = lazy(() =>
   import('../../flowchart/editor').then(module => ({ default: module.FlowchartEditor }))
 )
 
-// Future diagram types can be added here
-// const SequenceEditor = lazy(() => import('../../sequence/editor').then(module => ({ default: module.SequenceEditor })))
-// const ClassEditor = lazy(() => import('../../class/editor').then(module => ({ default: module.ClassEditor })))
+const SequenceEditor = lazy(() => 
+  import('../../sequence/editor/SequenceEditor').then(module => ({ default: module.SequenceEditor }))
+)
 
 export function EditorContainer({ diagramType }: EditorContainerProps) {
   const [editorWidth, setEditorWidth] = useState(50) // percentage
@@ -28,11 +28,8 @@ export function EditorContainer({ diagramType }: EditorContainerProps) {
     switch (diagramType) {
       case 'flowchart':
         return <FlowchartEditor />
-      // Future diagram types
-      // case 'sequence':
-      //   return <SequenceEditor />
-      // case 'class':
-      //   return <ClassEditor />
+      case 'sequence':
+        return <SequenceEditor />
       default:
         return <div>Unsupported diagram type: {diagramType}</div>
     }
