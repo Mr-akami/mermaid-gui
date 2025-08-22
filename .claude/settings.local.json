@@ -84,7 +84,8 @@
       "Bash(if [ -f \"$file\" ])",
       "Bash(then)",
       "Bash(fi)",
-      "Bash(done)"
+      "Bash(done)",
+      "WebFetch(domain:docs.mermaidchart.com)"
     ],
     "deny": []
   },
