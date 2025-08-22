@@ -283,8 +283,6 @@ export const updateNodeAtom = atom(
     const updatedNodes = nodes.map((node) => {
       if (node.id === update.id) {
         // Handle parent-child relationship updates
-        const oldParentId = node.parentId
-        const newParentId = update.parentId
         
         let updatedNode = {
           ...node,
