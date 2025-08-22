@@ -85,7 +85,12 @@
       "Bash(then)",
       "Bash(fi)",
       "Bash(done)",
-      "WebFetch(domain:docs.mermaidchart.com)"
+      "WebFetch(domain:docs.mermaidchart.com)",
+      "mcp__serena__write_memory",
+      "mcp__serena__execute_shell_command",
+      "Bash(touch:*)",
+      "mcp__serena__think_about_whether_you_are_done",
+      "mcp__serena__summarize_changes"
     ],
     "deny": []
   },
