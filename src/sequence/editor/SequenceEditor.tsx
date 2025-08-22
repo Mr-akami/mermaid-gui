@@ -15,7 +15,7 @@ import {
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
 import { useAtom, useSetAtom } from 'jotai'
-import { participantsAtom, placementModeAtom, addParticipantAtom, edgeCreationAtom } from '../atoms'
+import { participantsAtom, placementModeAtom, addParticipantAtom, edgeCreationAtom, syncSequenceToRawCodeAtom, messagesAtom, addMessageAtom } from '../atoms'
 import { ParticipantLifeline } from '../components/ParticipantLifeline'
 import { SequenceMessage } from '../components/SequenceMessage'
 import { SequenceToolbar } from './SequenceToolbar'
@@ -31,8 +31,10 @@ const edgeTypes = {
 
 function SequenceEditorContent() {
   const [participants] = useAtom(participantsAtom)
+  const [messages] = useAtom(messagesAtom)
   const [placementMode, setPlacementMode] = useAtom(placementModeAtom)
   const addParticipant = useSetAtom(addParticipantAtom)
+  const addMessage = useSetAtom(addMessageAtom)
   const [edgeCreation, setEdgeCreation] = useAtom(edgeCreationAtom)
   const { screenToFlowPosition } = useReactFlow()
   
@@ -109,12 +111,22 @@ function SequenceEditorContent() {
           
           // Immediately add the edge
           setEdges((prev) => [...(prev as Edge[]), newEdge])
+          
+          // Add to messages atom for Mermaid code generation
+          addMessage({
+            id: newEdge.id,
+            from: edgeCreation.sourceNode!,
+            to: nodeId,
+            type: '->' as any, // Will be properly typed as ArrowType.SOLID
+            label: 'Message',
+            sequenceNumber: messages.length
+          })
         }
       }
       // Clear edge creation state whether edge was created or not
       setEdgeCreation(null)
     }
-  }, [edgeCreation, setEdgeCreation, setEdges, isHandleConnected])
+  }, [edgeCreation, setEdgeCreation, setEdges, isHandleConnected, addMessage, messages.length])
 
   // Initialize and update nodes when participants change
   useEffect(() => {
@@ -145,6 +157,13 @@ function SequenceEditorContent() {
       }))
     })
   }, [participants, handleEdgeCreation, setNodes])
+
+  // Add sync effects for GUI -> Code
+  const syncSequenceToRawCode = useSetAtom(syncSequenceToRawCodeAtom)
+  
+  useEffect(() => {
+    syncSequenceToRawCode()
+  }, [participants, messages, syncSequenceToRawCode])
 
   const handlePaneClick = useCallback((event: React.MouseEvent) => {
     if (!placementMode) return

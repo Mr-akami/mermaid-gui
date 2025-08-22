@@ -1,4 +1,7 @@
 import { atom } from 'jotai'
+import { buildSequenceCode } from './core/builders/sequenceCodeBuilder'
+import { parseSequenceCode } from './core/code-parser/sequenceParser'
+import { rawCodeAtom, isEditingAtom } from '../editor/atoms'
 import type {
   SequenceParticipant,
   SequenceMessage,
@@ -156,50 +159,39 @@ export const removeLoopAtom = atom(
 // Mermaid code generation atom (simplified for now)
 export const sequenceMermaidCodeAtom = atom<string>((get) => {
   const state = get(sequenceStateAtom)
-  
-  let code = 'sequenceDiagram\n'
-  
-  // Add participants
-  for (const participant of state.participants.sort((a, b) => a.order - b.order)) {
-    code += `    ${participant.type} ${participant.id} as ${participant.label}\n`
-  }
-  
-  // Add messages
-  for (const message of state.messages) {
-    code += `    ${message.from}${message.type}${message.to}: ${message.label}\n`
-  }
-  
-  // Add notes
-  for (const note of state.notes) {
-    const target = Array.isArray(note.target) ? note.target.join(',') : note.target
-    code += `    Note ${note.position} of ${target}: ${note.text}\n`
-  }
-  
-  // Add loops
-  for (const loop of state.loops) {
-    code += `    loop ${loop.label}\n`
-    // For now, just add a placeholder - will be implemented properly with the builder
-    code += `        # Loop content for messages: ${loop.messages.join(', ')}\n`
-    code += `    end\n`
-  }
-  
-  return code
+  return buildSequenceCode(state)
 })
 
 // Sync atoms (simplified for now - will be implemented properly later)
 export const syncRawCodeToSequenceAtom = atom(
   null,
-  (_get, _set, rawCode: string) => {
-    // TODO: Implement parsing of raw code to sequence state
-    console.log('Sync raw code to sequence:', rawCode)
+  (_get, set, rawCode: string) => {
+    const result = parseSequenceCode(rawCode)
+    
+    if (result.error) {
+      console.error('Failed to parse sequence code:', result.error)
+      return
+    }
+    
+    set(participantsAtom, result.participants)
+    set(messagesAtom, result.messages)
+    set(notesAtom, result.notes)
+    set(loopsAtom, result.loops)
+    set(activationsAtom, result.activations)
   }
 )
 
 export const syncSequenceToRawCodeAtom = atom(
   null,
-  (get, _set) => {
-    // TODO: Implement syncing sequence state to raw code
+  (get, set) => {
+    const isEditing = get(isEditingAtom)
+    
+    // Only sync if user is not editing
+    if (isEditing) {
+      return
+    }
+    
     const mermaidCode = get(sequenceMermaidCodeAtom)
-    console.log('Sync sequence to raw code:', mermaidCode)
+    set(rawCodeAtom, mermaidCode)
   }
 )
