@@ -79,21 +79,102 @@ mainly builders is called in atom.
 atom manage state and pure logic.
 hooks is adopter between tsx and atom. hooks doesn't have logic basically.
 
+### Recent Refactoring (2024-12)
+
+#### Editor Architecture Refactoring
+The editor has been refactored to support multiple diagram types:
+
+1. **Generic Editor Components** (`src/editor/`)
+   - `EditorContainer` - Main container that switches between diagram types
+   - `BaseEditor` - Common wrapper with providers
+   - `CodeEditor` - Generic code editor that works with any diagram type
+   - Generic atoms: `rawCodeAtom`, `diagramTypeAtom`, `parseErrorAtom`, `isEditingAtom`
+
+2. **Flowchart-Specific Components** (`src/flowchart/editor/`)
+   - `FlowchartEditor` (formerly NodeEditorCore)
+   - `FlowchartToolbar` (formerly NodeToolbar)
+   - `FlowchartPropertyPanel` (formerly PropertyPanel)
+
+#### Data Flow Architecture
+
+**Code → GUI Sync:**
+```
+rawCodeAtom → syncRawCodeToFlowchartAtom → parseFlowchartCode → nodesAtom/edgesAtom → ReactFlow
+```
+
+**GUI → Code Sync:**
+```
+nodesAtom/edgesAtom → flowchartMermaidCodeAtom → syncFlowchartToRawCodeAtom → rawCodeAtom → CodeEditor
+```
+
+#### Sync Loop Prevention
+To prevent infinite sync loops between Code and GUI:
+- `isCodeUpdateRef` - Flag for code-initiated updates
+- `isGUIUpdateRef` - Flag for GUI-initiated updates
+- Each sync checks these flags to avoid circular updates
+
+#### Key Atoms
+
+**Generic Editor Atoms** (`src/editor/atoms.ts`):
+- `rawCodeAtom` - The raw text content in the code editor
+- `diagramTypeAtom` - Current diagram type (flowchart, sequence, etc.)
+- `parseErrorAtom` - Parse error messages
+- `isEditingAtom` - Whether user is currently editing code
+
+**Flowchart Atoms** (`src/flowchart/atoms.ts`):
+- `nodesAtom` - Flowchart nodes data
+- `edgesAtom` - Flowchart edges data
+- `flowchartMermaidCodeAtom` - Generated Mermaid code from GUI (formerly mermaidCodeAtom)
+- `syncRawCodeToFlowchartAtom` - Write-only atom to sync code to GUI
+- `syncFlowchartToRawCodeAtom` - Write-only atom to sync GUI to code
+- `updateLayoutDirectionAtom` - Updates layout direction and edge handles
+
 ## Project Structure Conventions
 
 It is feature based directory strategy.
 
-- flowchart/
-  - components/ - React components (FlowchartNode.tsx, FlowchartEdge.tsx, etc.)
-  - converters/ - Data format converters (React Flow ↔ Custom types)
-  - history/ - Undo/redo state management
-  - core/
-    - builders/ - Mermaid code generation
-    - code-parser/ - Mermaid code parsing
-  - atoms.ts - Jotai atoms for state management
-  - types.ts - TypeScript type definitions
-  - index.ts - Public exports
-  - deps.ts - External dependencies
+### Current Structure (After Refactoring)
+
+```
+src/
+├── editor/                 # Generic editor components
+│   ├── common/            # Shared editor utilities
+│   │   ├── BaseEditor.tsx
+│   │   ├── EditorContainer.tsx
+│   │   ├── Resizer.tsx
+│   │   └── types.ts
+│   ├── code/              # Code editor
+│   │   └── CodeEditor.tsx
+│   ├── node/              # Legacy node editor (being phased out)
+│   │   └── NodeEditor.tsx
+│   └── atoms.ts           # Generic editor atoms
+│
+├── flowchart/             # Flowchart-specific functionality
+│   ├── components/        # React components
+│   │   ├── FlowchartNode.tsx
+│   │   ├── FlowchartEdge.tsx
+│   │   ├── BiDirectionalEdge.tsx
+│   │   └── ResizableSubgraph.tsx
+│   ├── converters/        # Data format converters
+│   ├── history/           # Undo/redo state management
+│   ├── core/              # Pure logic (no React/Jotai)
+│   │   ├── builders/      # Mermaid code generation
+│   │   └── code-parser/   # Mermaid code parsing
+│   ├── editor/            # Flowchart-specific editor components
+│   │   ├── FlowchartEditor.tsx
+│   │   ├── FlowchartToolbar.tsx
+│   │   ├── FlowchartPropertyPanel.tsx
+│   │   ├── UndoRedoButtons.tsx
+│   │   ├── atoms.ts
+│   │   └── deps.ts
+│   ├── atoms.ts           # Flowchart state management
+│   ├── types.ts           # TypeScript type definitions
+│   ├── index.ts           # Public exports
+│   └── deps.ts            # External dependencies
+│
+└── app/                   # Application entry point
+    └── App.tsx
+```
 
 ### Directory Structure Rules
 
