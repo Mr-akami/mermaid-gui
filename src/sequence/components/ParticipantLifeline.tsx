@@ -1,6 +1,6 @@
-import { memo, useState, useCallback, useRef } from 'react'
+import { memo, useState, useCallback, useRef, useEffect } from 'react'
 import React from 'react'
-import { Handle, Position, type NodeProps, useEdges, useReactFlow } from '@xyflow/react'
+import { Handle, Position, type NodeProps, useEdges, useReactFlow, useUpdateNodeInternals } from '@xyflow/react'
 import { useAtom } from 'jotai'
 import { edgeCreationAtom } from '../atoms'
 
@@ -21,6 +21,7 @@ export const ParticipantLifeline = memo((props: NodeProps) => {
   const [draggedHandle, setDraggedHandle] = useState<{ id: string; startY: number; currentY: number } | null>(null)
   const lifelineRef = useRef<HTMLDivElement>(null)
   const { screenToFlowPosition } = useReactFlow()
+  const updateNodeInternals = useUpdateNodeInternals()
   
   // Get edges from React Flow to track connections
   const edges = useEdges()
@@ -141,8 +142,12 @@ export const ParticipantLifeline = memo((props: NodeProps) => {
   }, [draggedHandle, handles, screenToFlowPosition])
 
   const handleMouseUp = useCallback(() => {
+    if (draggedHandle) {
+      // Update React Flow's internal state to recalculate edge positions
+      updateNodeInternals(id)
+    }
     setDraggedHandle(null)
-  }, [])
+  }, [draggedHandle, id, updateNodeInternals])
 
   // Add global mouse event listeners for dragging
   React.useEffect(() => {
@@ -155,6 +160,11 @@ export const ParticipantLifeline = memo((props: NodeProps) => {
       }
     }
   }, [draggedHandle, handleMouseMove, handleMouseUp])
+
+  // Update node internals when handles change
+  useEffect(() => {
+    updateNodeInternals(id)
+  }, [handles, id, updateNodeInternals])
 
   return (
     <div

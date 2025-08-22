@@ -10,16 +10,43 @@ interface MessageData {
 }
 
 export const SequenceMessage = memo((props: EdgeProps) => {
-  const { sourceX, sourceY, targetX, targetY, data, markerEnd } = props
+  const { source, target, sourceX, sourceY, targetX, targetY, data, markerEnd } = props
   const messageData = data as MessageData | undefined
   
-  // Use straight path for sequence diagrams
-  const [edgePath, labelX, labelY] = getStraightPath({
-    sourceX,
-    sourceY,
-    targetX,
-    targetY,
-  })
+  // Check if this is a self-loop (same source and target)
+  const isSelfLoop = source === target
+  
+  let edgePath: string
+  let labelX: number
+  let labelY: number
+  
+  if (isSelfLoop) {
+    // Create a rectangular path for self-loops
+    const loopOffset = 50 // How far to extend the loop
+    
+    // Create a path that goes right, down/up, and back left
+    edgePath = `
+      M ${sourceX},${sourceY}
+      L ${sourceX + loopOffset},${sourceY}
+      L ${sourceX + loopOffset},${targetY}
+      L ${targetX},${targetY}
+    `
+    
+    // Position label at the rightmost point of the loop
+    labelX = sourceX + loopOffset
+    labelY = (sourceY + targetY) / 2
+  } else {
+    // Use straight path for normal messages
+    const [straightPath, straightLabelX, straightLabelY] = getStraightPath({
+      sourceX,
+      sourceY,
+      targetX,
+      targetY,
+    })
+    edgePath = straightPath
+    labelX = straightLabelX
+    labelY = straightLabelY
+  }
 
   // Determine line style based on arrow type
   const isDotted = messageData?.arrowType && (
