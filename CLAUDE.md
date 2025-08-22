@@ -72,10 +72,10 @@ The project follows a three-layer architecture:
 2. **Hooks** - Business logic that connects TSX components with state
 3. **Pure ts** - State management and core application logic
    1. jotai - state management
-   2. core - under core dir, it is like package it means those code are separated from other code. Keep portability and no react and jotai dependencies
-   3. code/mermaid-code-builder - convert linked components to mermaid code
+   2. core - under flowchart/core dir, it is like package it means those code are separated from other code. Keep portability and no react and jotai dependencies
+   3. builders - convert linked components to mermaid code
 
-mainly mermaid-code-builder is called in atom.
+mainly builders is called in atom.
 atom manage state and pure logic.
 hooks is adopter between tsx and atom. hooks doesn't have logic basically.
 
@@ -83,23 +83,24 @@ hooks is adopter between tsx and atom. hooks doesn't have logic basically.
 
 It is feature based directory strategy.
 
-- flow-chart
-  - xxx.tsx
-  - atom.ts - jotai atoms and slice
-  - useXXXX.ts - hooks
-- state-manager
-  - xxx.tsx
-  - atom.ts
-  - useXXX.ts
-- core
-  - mermaid-code-builder
+- flowchart/
+  - components/ - React components (FlowchartNode.tsx, FlowchartEdge.tsx, etc.)
+  - converters/ - Data format converters (React Flow ↔ Custom types)
+  - history/ - Undo/redo state management
+  - core/
+    - builders/ - Mermaid code generation
+    - code-parser/ - Mermaid code parsing
+  - atoms.ts - Jotai atoms for state management
+  - types.ts - TypeScript type definitions
+  - index.ts - Public exports
+  - deps.ts - External dependencies
 
 ### Directory Structure Rules
 
-1. **No Subdirectories in Features** - Keep feature directories flat to avoid deep nesting
-   - Components are .tsx files
-   - Hooks start with "use" prefix
-   - No components/ or hooks/ subdirectories
+1. **Feature Organization** - Features can have subdirectories for logical grouping
+   - components/ for React components
+   - core/ for pure logic without React/Jotai dependencies
+   - Other subdirectories as needed for organization
 
 2. **Cross-Feature Imports** - Use deps.ts for external dependencies
    - Each feature directory can only import from other features via deps.ts
@@ -138,11 +139,6 @@ Each file contains compressed syntax patterns using short keys (e.g., `n` for no
    - Python、JavaScript、Bash等でのブラウザ操作
    - MCPツールを調査するためのコード実行
    - subprocessやコマンド実行によるアプローチ
-
-2. **利用可能なのはMCPツールの直接呼び出しのみ**
-   - playwright:browser_navigate
-   - playwright:browser_screenshot
-   - 他のPlaywright MCPツール
 
 3. **エラー時は即座に報告**
    - 回避策を探さない
