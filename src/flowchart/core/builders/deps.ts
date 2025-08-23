@@ -1,2 +1,2 @@
 // External dependencies
-export type { Node, Edge, FlowchartData } from '../../types'
+export type { IRNode, IREdge, IRFlowchartData } from '../types'

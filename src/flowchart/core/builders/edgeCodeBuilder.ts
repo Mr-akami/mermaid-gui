@@ -1,6 +1,6 @@
-import type { Edge } from './deps'
+import type { IREdge } from './deps'
 
-export function buildEdgeCode(edge: Edge): string {
+export function buildEdgeCode(edge: IREdge): string {
   const connector = getConnector(edge.type)
 
   if (edge.data?.label) {
@@ -11,7 +11,7 @@ export function buildEdgeCode(edge: Edge): string {
   return `${edge.source} ${connector} ${edge.target}`
 }
 
-function getConnector(type: Edge['type']): string {
+function getConnector(type: IREdge['type']): string {
   switch (type) {
     case 'normal':
       return '---'

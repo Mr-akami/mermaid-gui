@@ -1,9 +1,9 @@
-import type { Node, Edge } from '../../types'
+import type { IRNode, IREdge } from '../types'
 
-export interface ParsedFlowchart {
+export interface IRParsedFlowchart {
   direction: 'TD' | 'TB' | 'LR' | 'RL' | 'BT' | 'DT'
-  nodes: Node[]
-  edges: Edge[]
+  nodes: IRNode[]
+  edges: IREdge[]
 }
 
 // Node type patterns - order matters for matching
@@ -32,7 +32,7 @@ const EDGE_PATTERNS = {
   'dotted-arrow': /^-\.->$/,
 }
 
-export function parseFlowchartCode(code: string): ParsedFlowchart {
+export function parseFlowchartCode(code: string): IRParsedFlowchart {
   const lines = code.split('\n').map(line => line.trim()).filter(line => line.length > 0)
   
   const result: ParsedFlowchart = {
@@ -41,8 +41,8 @@ export function parseFlowchartCode(code: string): ParsedFlowchart {
     edges: []
   }
   
-  const nodeMap = new Map<string, Node>()
-  const subgraphStack: Node[] = []
+  const nodeMap = new Map<string, IRNode>()
+  const subgraphStack: IRNode[] = []
   let nodeIdCounter = 0
   
   for (let i = 0; i < lines.length; i++) {
@@ -64,7 +64,7 @@ export function parseFlowchartCode(code: string): ParsedFlowchart {
       if (match) {
         const id = match[1] || `sg${nodeIdCounter++}`
         const label = match[2] || match[1] || 'Subgraph'
-        const newSubgraph: Node = {
+        const newSubgraph: IRNode = {
           id,
           type: 'subgraph',
           data: { label: label.replace(/<br>/g, '\n') },
@@ -335,7 +335,7 @@ function getNodeId(nodeDefinition: string): string {
   return match ? match[1] : nodeDefinition
 }
 
-function parseNode(nodeDefinition: string): Node | null {
+function parseNode(nodeDefinition: string): IRNode | null {
   // Try each node pattern in order
   for (const [type, pattern] of NODE_PATTERNS) {
     const match = nodeDefinition.match(pattern)
@@ -343,7 +343,7 @@ function parseNode(nodeDefinition: string): Node | null {
       const [, id, label] = match
       return {
         id,
-        type: type as Node['type'],
+        type: type as IRNode['type'],
         data: { 
           label: (label || id).replace(/<br>/g, '\n').replace(/\\(.)/g, '$1')
         },
@@ -368,9 +368,9 @@ function parseNode(nodeDefinition: string): Node | null {
   return null
 }
 
-function parseEdge(sourceId: string, targetId: string, connection: string): Edge | null {
+function parseEdge(sourceId: string, targetId: string, connection: string): IREdge | null {
   // Parse edge type and label
-  let edgeType: Edge['type'] = 'normal'
+  let edgeType: IREdge['type'] = 'normal'
   let label = ''
   
   // Check for label in connection
@@ -384,7 +384,7 @@ function parseEdge(sourceId: string, targetId: string, connection: string): Edge
   const edgePattern = connection.replace(/\s/g, '')
   for (const [type, pattern] of Object.entries(EDGE_PATTERNS)) {
     if (pattern.test(edgePattern)) {
-      edgeType = type as Edge['type']
+      edgeType = type as IREdge['type']
       break
     }
   }
@@ -398,10 +398,10 @@ function parseEdge(sourceId: string, targetId: string, connection: string): Edge
   }
 }
 
-function assignNodePositions(nodes: Node[], edges: Edge[], direction: string) {
+function assignNodePositions(nodes: IRNode[], edges: IREdge[], direction: string) {
   // Simple layout algorithm - arrange nodes in a grid
   const levels = calculateNodeLevels(nodes, edges)
-  const nodesByLevel = new Map<number, Node[]>()
+  const nodesByLevel = new Map<number, IRNode[]>()
   
   // Group nodes by level
   for (const node of nodes) {
@@ -441,7 +441,7 @@ function assignNodePositions(nodes: Node[], edges: Edge[], direction: string) {
   })
 }
 
-function calculateNodeLevels(nodes: Node[], edges: Edge[]): Map<string, number> {
+function calculateNodeLevels(nodes: IRNode[], edges: IREdge[]): Map<string, number> {
   const levels = new Map<string, number>()
   const visited = new Set<string>()
   
@@ -460,7 +460,7 @@ function calculateNodeLevels(nodes: Node[], edges: Edge[]): Map<string, number> 
   )
   
   // BFS to assign levels
-  const queue: { node: Node; level: number }[] = roots.map(node => ({ node, level: 0 }))
+  const queue: { node: IRNode; level: number }[] = roots.map(node => ({ node, level: 0 }))
   
   while (queue.length > 0) {
     const { node, level } = queue.shift()!

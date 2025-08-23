@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Node, Edge } from '../types'
+import { IRNode, IREdge } from '../core/types'
 import { MERMAID_NODE_TYPES, MERMAID_EDGE_TYPES } from '..'
 import { useAtomValue } from 'jotai'
 import { nodesAtom } from '../atoms'

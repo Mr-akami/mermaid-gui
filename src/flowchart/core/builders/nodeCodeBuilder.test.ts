@@ -1,11 +1,11 @@
 import { describe, it, expect } from 'vitest'
 import { buildNodeCode } from './nodeCodeBuilder'
-import type { Node } from './deps'
+import type { IRNode } from './deps'
 
 describe('nodeCodeBuilder', () => {
   describe('buildNodeCode', () => {
     it('should build code for a subgraph node', () => {
-      const node: Node = {
+      const node: IRNode = {
         id: 'subgraph1',
         type: 'subgraph',
         childIds: ['node1', 'node2'],
@@ -18,7 +18,7 @@ describe('nodeCodeBuilder', () => {
     })
 
     it('should build code for a rectangle node', () => {
-      const node: Node = {
+      const node: IRNode = {
         id: 'node1',
         type: 'rectangle',
         childIds: [],
@@ -31,7 +31,7 @@ describe('nodeCodeBuilder', () => {
     })
 
     it('should build code for a circle node', () => {
-      const node: Node = {
+      const node: IRNode = {
         id: 'node2',
         type: 'circle',
         childIds: [],
@@ -44,7 +44,7 @@ describe('nodeCodeBuilder', () => {
     })
 
     it('should build code for a diamond node', () => {
-      const node: Node = {
+      const node: IRNode = {
         id: 'node3',
         type: 'diamond',
         childIds: [],
@@ -57,7 +57,7 @@ describe('nodeCodeBuilder', () => {
     })
 
     it('should handle empty label', () => {
-      const node: Node = {
+      const node: IRNode = {
         id: 'node4',
         type: 'rectangle',
         childIds: [],
@@ -70,7 +70,7 @@ describe('nodeCodeBuilder', () => {
     })
 
     it('should escape special characters in labels', () => {
-      const node: Node = {
+      const node: IRNode = {
         id: 'node5',
         type: 'rectangle',
         childIds: [],
@@ -83,7 +83,7 @@ describe('nodeCodeBuilder', () => {
     })
 
     it('should build code for roundEdges node', () => {
-      const node: Node = {
+      const node: IRNode = {
         id: 'node6',
         type: 'roundEdges',
         childIds: [],
@@ -96,7 +96,7 @@ describe('nodeCodeBuilder', () => {
     })
 
     it('should build code for stadium node', () => {
-      const node: Node = {
+      const node: IRNode = {
         id: 'node7',
         type: 'stadium',
         childIds: [],
@@ -109,7 +109,7 @@ describe('nodeCodeBuilder', () => {
     })
 
     it('should build code for subroutine node', () => {
-      const node: Node = {
+      const node: IRNode = {
         id: 'node8',
         type: 'subroutine',
         childIds: [],
@@ -122,7 +122,7 @@ describe('nodeCodeBuilder', () => {
     })
 
     it('should build code for cylindrical node', () => {
-      const node: Node = {
+      const node: IRNode = {
         id: 'node9',
         type: 'cylindrical',
         childIds: [],
@@ -135,7 +135,7 @@ describe('nodeCodeBuilder', () => {
     })
 
     it('should build code for parallelogram node', () => {
-      const node: Node = {
+      const node: IRNode = {
         id: 'node10',
         type: 'parallelogram',
         childIds: [],
@@ -148,7 +148,7 @@ describe('nodeCodeBuilder', () => {
     })
 
     it('should build code for trapezoid node', () => {
-      const node: Node = {
+      const node: IRNode = {
         id: 'node11',
         type: 'trapezoid',
         childIds: [],
@@ -161,7 +161,7 @@ describe('nodeCodeBuilder', () => {
     })
 
     it('should build code for hexagon node', () => {
-      const node: Node = {
+      const node: IRNode = {
         id: 'node12',
         type: 'hexagon',
         childIds: [],
@@ -174,7 +174,7 @@ describe('nodeCodeBuilder', () => {
     })
 
     it('should build code for doubleCircle node', () => {
-      const node: Node = {
+      const node: IRNode = {
         id: 'node13',
         type: 'doubleCircle',
         childIds: [],
@@ -187,7 +187,7 @@ describe('nodeCodeBuilder', () => {
     })
 
     it('should throw error for unknown node type', () => {
-      const node: Node = {
+      const node: IRNode = {
         id: 'node14',
         type: 'unknown' as any,
         childIds: [],

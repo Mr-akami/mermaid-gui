@@ -1,10 +1,10 @@
 import { describe, it, expect } from 'vitest'
 import { buildFlowchartCode } from './flowchartCodeBuilder'
-import type { Node, Edge } from '../../types'
+import type { IRNode, IREdge } from '../types'
 
 describe('flowchartCodeBuilder - subgraph support', () => {
   it('should generate code for a simple subgraph', () => {
-    const nodes: Node[] = [
+    const nodes: IRNode[] = [
       {
         id: 'subgraph1',
         type: 'subgraph',
@@ -29,7 +29,7 @@ describe('flowchartCodeBuilder - subgraph support', () => {
         childIds: [],
       },
     ]
-    const edges: Edge[] = [
+    const edges: IREdge[] = [
       {
         id: 'e1',
         source: 'a1',
@@ -48,7 +48,7 @@ describe('flowchartCodeBuilder - subgraph support', () => {
   })
 
   it('should generate code for subgraph with explicit ID', () => {
-    const nodes: Node[] = [
+    const nodes: IRNode[] = [
       {
         id: 'ide1',
         type: 'subgraph',
@@ -73,7 +73,7 @@ describe('flowchartCodeBuilder - subgraph support', () => {
         childIds: [],
       },
     ]
-    const edges: Edge[] = [
+    const edges: IREdge[] = [
       {
         id: 'e1',
         source: 'a1',
@@ -92,7 +92,7 @@ describe('flowchartCodeBuilder - subgraph support', () => {
   })
 
   it('should handle edges between subgraphs', () => {
-    const nodes: Node[] = [
+    const nodes: IRNode[] = [
       {
         id: 'subgraph1',
         type: 'subgraph',
@@ -140,7 +140,7 @@ describe('flowchartCodeBuilder - subgraph support', () => {
         childIds: [],
       },
     ]
-    const edges: Edge[] = [
+    const edges: IREdge[] = [
       {
         id: 'e1',
         source: 'a1',
@@ -177,7 +177,7 @@ describe('flowchartCodeBuilder - subgraph support', () => {
   })
 
   it('should handle nested subgraphs', () => {
-    const nodes: Node[] = [
+    const nodes: IRNode[] = [
       {
         id: 'ide1',
         type: 'subgraph',
@@ -226,7 +226,7 @@ describe('flowchartCodeBuilder - subgraph support', () => {
         childIds: [],
       },
     ]
-    const edges: Edge[] = [
+    const edges: IREdge[] = [
       {
         id: 'e1',
         source: 'a1',
@@ -256,7 +256,7 @@ describe('flowchartCodeBuilder - subgraph support', () => {
   })
 
   it('should handle nodes outside subgraphs connecting to nodes inside', () => {
-    const nodes: Node[] = [
+    const nodes: IRNode[] = [
       {
         id: 'c1',
         type: 'rectangle',
@@ -288,7 +288,7 @@ describe('flowchartCodeBuilder - subgraph support', () => {
         childIds: [],
       },
     ]
-    const edges: Edge[] = [
+    const edges: IREdge[] = [
       {
         id: 'e1',
         source: 'c1',
@@ -314,7 +314,7 @@ describe('flowchartCodeBuilder - subgraph support', () => {
   })
 
   it('should maintain proper indentation for nested subgraphs', () => {
-    const nodes: Node[] = [
+    const nodes: IRNode[] = [
       {
         id: 'sg1',
         type: 'subgraph',
@@ -339,7 +339,7 @@ describe('flowchartCodeBuilder - subgraph support', () => {
         childIds: [],
       },
     ]
-    const edges: Edge[] = []
+    const edges: IREdge[] = []
 
     const result = buildFlowchartCode({ nodes, edges }, 'TD')
     expect(result).toBe(`flowchart TD

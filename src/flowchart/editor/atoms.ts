@@ -1,5 +1,5 @@
 import { atom } from 'jotai'
-import { Node, Edge } from '../types'
+import { IRNode, IREdge } from '../core/types'
 
 // Atom to track the currently selected node ID
 export const selectedNodeIdAtom = atom<string | null>(null)
@@ -8,10 +8,10 @@ export const selectedNodeIdAtom = atom<string | null>(null)
 export const selectedEdgeIdAtom = atom<string | null>(null)
 
 // Atom to track the currently selected node
-export const selectedNodeAtom = atom<Node | null>(null)
+export const selectedNodeAtom = atom<IRNode | null>(null)
 
 // Atom to track the currently selected edge
-export const selectedEdgeAtom = atom<Edge | null>(null)
+export const selectedEdgeAtom = atom<IREdge | null>(null)
 
 // Atom to trigger PropertyPanel focus
 export const focusPropertyPanelAtom = atom(false)
@@ -19,7 +19,7 @@ export const focusPropertyPanelAtom = atom(false)
 // Write atom to handle selection updates
 export const updateSelectionAtom = atom(
   null,
-  (get, set, update: { node?: Node | null; edge?: Edge | null }) => {
+  (get, set, update: { node?: IRNode | null; edge?: IREdge | null }) => {
     if (update.node !== undefined) {
       set(selectedNodeAtom, update.node)
       // Clear edge selection when node is selected

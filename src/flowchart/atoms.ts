@@ -1,9 +1,9 @@
 import {
   atom,
   buildFlowchartCode,
-  Node,
-  Edge,
-  FlowchartData,
+  IRNode,
+  IREdge,
+  IRFlowchartData,
   saveToHistoryAtom,
   parseFlowchartCode,
 } from './deps'
@@ -18,8 +18,8 @@ const nodeCountersAtom = atom<Record<string, number>>({
 })
 
 // Base atoms for nodes and edges
-export const nodesAtom = atom<Node[]>([])
-export const edgesAtom = atom<Edge[]>([])
+export const nodesAtom = atom<IRNode[]>([])
+export const edgesAtom = atom<IREdge[]>([])
 
 // Layout direction atom
 export const layoutDirectionAtom = atom<'TD' | 'LR' | 'RL' | 'BT'>('TD')
@@ -92,7 +92,7 @@ export const updateLayoutDirectionAtom = atom(
 )
 
 // Computed atom for flowchart data
-export const flowchartDataAtom = atom<FlowchartData>((get) => ({
+export const flowchartDataAtom = atom<IRFlowchartData>((get) => ({
   nodes: get(nodesAtom),
   edges: get(edgesAtom),
 }))
@@ -172,7 +172,7 @@ export const addNodeAtom = atom(
     get,
     set,
     newNode: {
-      type: Node['type']
+      type: IRNode['type']
       position: { x: number; y: number }
       label: string
       parentId?: string
@@ -210,7 +210,7 @@ export const addNodeAtom = atom(
     const defaultSubgraphSize = { width: 600, height: 200 }
     const nodeSize = newNode.type === 'subgraph' ? defaultSubgraphSize : defaultNodeSize
 
-    const node: Node = {
+    const node: IRNode = {
       id: nodeId,
       type: newNode.type,
       parentId: newNode.parentId,
@@ -343,7 +343,7 @@ export const addEdgeAtom = atom(
     newEdge: {
       source: string
       target: string
-      type: Edge['type']
+      type: IREdge['type']
       label?: string
     },
   ) => {
@@ -353,7 +353,7 @@ export const addEdgeAtom = atom(
 
     set(edgeCounterAtom, nextCount)
 
-    const edge: Edge = {
+    const edge: IREdge = {
       id: `Edge${nextCount}`,
       source: newEdge.source,
       target: newEdge.target,
@@ -374,7 +374,7 @@ export const updateEdgeAtom = atom(
     update: {
       id: string
       data?: { label?: string }
-      type?: Edge['type']
+      type?: IREdge['type']
     },
   ) => {
     const edges = get(edgesAtom)

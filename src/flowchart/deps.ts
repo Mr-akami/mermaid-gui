@@ -7,11 +7,10 @@ export { parseFlowchartCode } from './core/code-parser/flowchartParser'
 
 // Types
 export type {
-  Node,
-  Edge,
-  FlowchartData,
-  MermaidParseResult,
-} from './types'
+  IRNode,
+  IREdge,
+  IRFlowchartData,
+} from './core/types'
 
 // History atoms
 export { saveToHistoryAtom } from './history'

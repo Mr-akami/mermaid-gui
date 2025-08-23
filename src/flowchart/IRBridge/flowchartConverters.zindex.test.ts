@@ -1,10 +1,10 @@
 import { describe, it, expect } from 'vitest'
-import { toReactFlowNodes } from './flowchartConverters'
-import type { Node } from '../types'
+import { toReactFlowNodes } from './toXyflowFromIR'
+import type { IRNode } from '../core/types'
 
 describe('Subgraph z-index ordering', () => {
   it('should set lower z-index for subgraphs and place them first in array', () => {
-    const nodes: Node[] = [
+    const nodes: IRNode[] = [
       {
         id: 'node1',
         type: 'rectangle',
@@ -58,7 +58,7 @@ describe('Subgraph z-index ordering', () => {
   })
 
   it('should maintain creation order among subgraphs', () => {
-    const nodes: Node[] = [
+    const nodes: IRNode[] = [
       {
         id: 'sg3',
         type: 'subgraph',
@@ -92,7 +92,7 @@ describe('Subgraph z-index ordering', () => {
   })
 
   it('should handle mixed nodes with parent-child relationships', () => {
-    const nodes: Node[] = [
+    const nodes: IRNode[] = [
       {
         id: 'node1',
         type: 'rectangle',

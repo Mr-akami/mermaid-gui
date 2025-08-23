@@ -11,7 +11,7 @@ import {
   addEdgeAtom,
   removeEdgeAtom,
 } from './atoms'
-import type { Node, Edge } from './deps'
+import type { IRNode, IREdge } from './deps'
 
 describe('flowchart atoms', () => {
   it('should initialize with empty nodes and edges', () => {
@@ -24,7 +24,7 @@ describe('flowchart atoms', () => {
   it('should compute flowchartData from nodes and edges', () => {
     const store = createStore()
 
-    const node1: Node = {
+    const node1: IRNode = {
       id: 'node1',
       type: 'rectangle',
       childIds: [],
@@ -32,7 +32,7 @@ describe('flowchart atoms', () => {
       data: { label: 'Start' },
     }
 
-    const edge1: Edge = {
+    const edge1: IREdge = {
       id: 'edge1',
       source: 'node1',
       target: 'node2',
@@ -50,7 +50,7 @@ describe('flowchart atoms', () => {
   it('should generate mermaid code from flowchart data', () => {
     const store = createStore()
 
-    const node1: Node = {
+    const node1: IRNode = {
       id: 'A',
       type: 'rectangle',
       childIds: [],
@@ -91,7 +91,7 @@ describe('flowchart atoms', () => {
     it('should remove a node', () => {
       const store = createStore()
 
-      const node1: Node = {
+      const node1: IRNode = {
         id: 'node1',
         type: 'rectangle',
         childIds: [],
@@ -108,7 +108,7 @@ describe('flowchart atoms', () => {
     it('should update a node', () => {
       const store = createStore()
 
-      const node1: Node = {
+      const node1: IRNode = {
         id: 'node1',
         type: 'rectangle',
         childIds: [],
@@ -152,7 +152,7 @@ describe('flowchart atoms', () => {
     it('should remove an edge', () => {
       const store = createStore()
 
-      const edge1: Edge = {
+      const edge1: IREdge = {
         id: 'edge1',
         source: 'node1',
         target: 'node2',

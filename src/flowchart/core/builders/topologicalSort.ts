@@ -1,4 +1,4 @@
-import type { FlowchartData } from './deps'
+import type { IRFlowchartData } from './deps'
 
 /**
  * Topological sort implementation for DAG ordering
@@ -6,9 +6,9 @@ import type { FlowchartData } from './deps'
  * that nodes appear before their dependents in the result
  */
 export function topologicalSort(
-  nodes: FlowchartData['nodes'], 
-  edges: FlowchartData['edges']
-): FlowchartData['nodes'] {
+  nodes: IRFlowchartData['nodes'], 
+  edges: IRFlowchartData['edges']
+): IRFlowchartData['nodes'] {
   if (nodes.length === 0) return []
   
   // Build adjacency list and incoming degree count
@@ -37,7 +37,7 @@ export function topologicalSort(
     }
   }
   
-  const result: FlowchartData['nodes'] = []
+  const result: IRFlowchartData['nodes'] = []
   const nodeMap = new Map(nodes.map(node => [node.id, node]))
   
   // Process nodes in topological order

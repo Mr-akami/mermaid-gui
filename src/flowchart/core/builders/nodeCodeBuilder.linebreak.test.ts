@@ -1,10 +1,10 @@
 import { describe, it, expect } from 'vitest'
 import { buildNodeCode } from './nodeCodeBuilder'
-import type { Node } from './deps'
+import type { IRNode } from './deps'
 
 describe('nodeCodeBuilder - Line Break Support', () => {
   it('should convert newlines to <br> in rectangle node', () => {
-    const node: Node = {
+    const node: IRNode = {
       id: 'N1',
       type: 'rectangle',
       data: { label: 'Line 1\nLine 2\nLine 3' },
@@ -17,7 +17,7 @@ describe('nodeCodeBuilder - Line Break Support', () => {
   })
 
   it('should convert newlines to <br> in circle node', () => {
-    const node: Node = {
+    const node: IRNode = {
       id: 'N2',
       type: 'circle',
       data: { label: 'First\nSecond' },
@@ -30,7 +30,7 @@ describe('nodeCodeBuilder - Line Break Support', () => {
   })
 
   it('should convert newlines to <br> in diamond node', () => {
-    const node: Node = {
+    const node: IRNode = {
       id: 'N3',
       type: 'diamond',
       data: { label: 'Condition\nCheck' },
@@ -43,7 +43,7 @@ describe('nodeCodeBuilder - Line Break Support', () => {
   })
 
   it('should handle multiple consecutive newlines', () => {
-    const node: Node = {
+    const node: IRNode = {
       id: 'N4',
       type: 'rectangle',
       data: { label: 'Line 1\n\n\nLine 2' },
@@ -56,7 +56,7 @@ describe('nodeCodeBuilder - Line Break Support', () => {
   })
 
   it('should handle labels with both newlines and special characters', () => {
-    const node: Node = {
+    const node: IRNode = {
       id: 'N5',
       type: 'rectangle',
       data: { label: 'Test [with]\nbrackets' },
@@ -69,7 +69,7 @@ describe('nodeCodeBuilder - Line Break Support', () => {
   })
 
   it('should handle empty label with newline', () => {
-    const node: Node = {
+    const node: IRNode = {
       id: 'N6',
       type: 'rectangle',
       data: { label: '\n' },

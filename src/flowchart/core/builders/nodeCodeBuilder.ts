@@ -1,6 +1,6 @@
-import type { Node } from './deps'
+import type { IRNode } from './deps'
 
-export function buildNodeCode(node: Node): string {
+export function buildNodeCode(node: IRNode): string {
   const label = node.data.label || ' '
   const escapedLabel = escapeLabel(label)
 

@@ -26,7 +26,7 @@ export { useAtom, useAtomValue } from 'jotai'
 // Import React Flow CSS
 import '@xyflow/react/dist/style.css'
 
-// Node type utilities from flowchart converters
+// Node type utilities from flowchart IRBridge
 export { 
   toCustomNode, 
   toReactFlowNode, 
@@ -36,4 +36,4 @@ export {
   toReactFlowEdge,
   toCustomEdges,
   toReactFlowEdges 
-} from '../converters'
+} from '../IRBridge'

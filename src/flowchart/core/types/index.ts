@@ -1,4 +1,4 @@
-export interface Node {
+export interface IRNode {
   id: string
   type: 'rectangle' | 'circle' | 'diamond' | 'roundEdges' | 'stadium' | 'subroutine' | 'cylindrical' | 'parallelogram' | 'trapezoid' | 'hexagon' | 'doubleCircle' | 'subgraph'
   parentId?: string
@@ -12,7 +12,7 @@ export interface Node {
   direction?: 'TD' | 'TB' | 'LR' | 'RL' | 'BT' | 'DT' // Direction for subgraphs
 }
 
-export interface Edge {
+export interface IREdge {
   id: string
   source: string
   target: string
@@ -30,13 +30,13 @@ export interface Edge {
   }
 }
 
-export interface FlowchartData {
-  nodes: Node[]
-  edges: Edge[]
+export interface IRFlowchartData {
+  nodes: IRNode[]
+  edges: IREdge[]
 }
 
 export interface MermaidParseResult {
   success: boolean
-  data?: FlowchartData
+  data?: IRFlowchartData
   error?: string
 }

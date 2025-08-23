@@ -5,7 +5,6 @@ import {
   BaseEdge,
   useStore,
   ReactFlowState,
-  MarkerType,
 } from '@xyflow/react'
 import { memo } from 'react'
 
@@ -74,16 +73,11 @@ export const BiDirectionalEdge = memo(
       }
     }
 
-    const hasArrow = edgeType.includes('arrow')
+    const hasArrow = typeof edgeType === 'string' && edgeType.includes('arrow')
     const edgeStyle = getEdgeStyle()
 
     // Use provided markerEnd or create proper marker based on edge type
-    const finalMarkerEnd = hasArrow ? (markerEnd || {
-      type: MarkerType.ArrowClosed,
-      width: 20,
-      height: 20,
-      color: '#333',
-    }) : undefined
+    const finalMarkerEnd = hasArrow ? (markerEnd || `url(#arrow-${id})`) : undefined
 
     return (
       <>
@@ -103,7 +97,7 @@ export const BiDirectionalEdge = memo(
               }}
               className="px-2 py-1 bg-white border border-gray-300 rounded"
             >
-              {data.label}
+              {String(data.label)}
             </div>
           </EdgeLabelRenderer>
         )}

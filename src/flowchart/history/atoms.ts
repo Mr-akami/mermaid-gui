@@ -1,9 +1,9 @@
 import { atom } from 'jotai'
-import type { Node, Edge } from '../types'
+import type { IRNode, IREdge } from '../core/types'
 
 interface HistoryState {
-  nodes: Node[]
-  edges: Edge[]
+  nodes: IRNode[]
+  edges: IREdge[]
 }
 
 interface History {

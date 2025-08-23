@@ -1,14 +1,12 @@
 import { describe, it, expect } from 'vitest'
-import { render } from '@testing-library/react'
-import { ReactFlow, ReactFlowProvider } from '@xyflow/react'
-import { toReactFlowNodes, toReactFlowEdges } from './flowchartConverters'
-import type { Node, Edge } from '../types'
+import { toReactFlowNodes } from './toXyflowFromIR'
+import type { IRNode } from '../core/types'
 import '@xyflow/react/dist/style.css'
 
 describe('Runtime z-index behavior', () => {
   it('should always render subgraphs behind other nodes regardless of creation order', () => {
     // Test case 1: Node created first, then subgraph
-    const nodes1: Node[] = [
+    const nodes1: IRNode[] = [
       {
         id: 'node1',
         type: 'rectangle',
@@ -32,12 +30,12 @@ describe('Runtime z-index behavior', () => {
     const node1 = rfNodes1.find(n => n.id === 'node1')
     
     expect(sg1?.zIndex).toBeLessThan(node1?.zIndex || 0)
-    expect(sg1?.style?.zIndex).toBeLessThan(node1?.style?.zIndex || 0)
+    expect(Number(sg1?.style?.zIndex || 0)).toBeLessThan(Number(node1?.style?.zIndex || 0))
   })
 
   it('should handle subgraph created after nodes correctly', () => {
     // Test case 2: Subgraph created last
-    const nodes2: Node[] = [
+    const nodes2: IRNode[] = [
       {
         id: 'node1',
         type: 'rectangle',
@@ -74,13 +72,13 @@ describe('Runtime z-index behavior', () => {
     
     regularNodes.forEach(node => {
       expect(sg?.zIndex).toBeLessThan(node.zIndex || 0)
-      expect(sg?.style?.zIndex).toBeLessThan(node.style?.zIndex || 0)
+      expect(Number(sg?.style?.zIndex || 0)).toBeLessThan(Number(node.style?.zIndex || 0))
     })
   })
 
   it('should handle dynamic node addition with subgraphs', () => {
     // Simulate adding nodes dynamically
-    let nodes: Node[] = [
+    let nodes: IRNode[] = [
       {
         id: 'sg1',
         type: 'subgraph',
@@ -137,7 +135,7 @@ describe('Runtime z-index behavior', () => {
   })
 
   it('should maintain z-index even with parent-child relationships', () => {
-    const nodes: Node[] = [
+    const nodes: IRNode[] = [
       {
         id: 'sg1',
         type: 'subgraph',

@@ -1,11 +1,11 @@
 import { describe, it, expect } from 'vitest'
 import { buildFlowchartCode } from './flowchartCodeBuilder'
-import type { FlowchartData } from './deps'
+import type { IRFlowchartData } from './deps'
 
 describe('flowchartCodeBuilder', () => {
   describe('buildFlowchartCode', () => {
     it('should build code for a simple flowchart', () => {
-      const data: FlowchartData = {
+      const data: IRFlowchartData = {
         nodes: [
           {
             id: 'A',
@@ -40,7 +40,7 @@ describe('flowchartCodeBuilder', () => {
     })
 
     it('should build code for a flowchart with subgraph', () => {
-      const data: FlowchartData = {
+      const data: IRFlowchartData = {
         nodes: [
           {
             id: 'sub1',
@@ -101,7 +101,7 @@ describe('flowchartCodeBuilder', () => {
     })
 
     it('should handle empty flowchart', () => {
-      const data: FlowchartData = {
+      const data: IRFlowchartData = {
         nodes: [],
         edges: [],
       }
@@ -111,7 +111,7 @@ describe('flowchartCodeBuilder', () => {
     })
 
     it('should handle edges with labels', () => {
-      const data: FlowchartData = {
+      const data: IRFlowchartData = {
         nodes: [
           {
             id: 'A',
@@ -163,7 +163,7 @@ describe('flowchartCodeBuilder', () => {
     })
 
     it('should optimize edges with & operator when multiple sources to multiple targets', () => {
-      const data: FlowchartData = {
+      const data: IRFlowchartData = {
         nodes: [
           {
             id: 'A',
@@ -232,7 +232,7 @@ describe('flowchartCodeBuilder', () => {
     })
 
     it('should optimize edges with & operator and labels', () => {
-      const data: FlowchartData = {
+      const data: IRFlowchartData = {
         nodes: [
           {
             id: 'A',
@@ -305,7 +305,7 @@ describe('flowchartCodeBuilder', () => {
     })
 
     it('should not optimize when edges have different types', () => {
-      const data: FlowchartData = {
+      const data: IRFlowchartData = {
         nodes: [
           {
             id: 'A',
@@ -355,7 +355,7 @@ describe('flowchartCodeBuilder', () => {
     })
 
     it('should not optimize when edges have different labels', () => {
-      const data: FlowchartData = {
+      const data: IRFlowchartData = {
         nodes: [
           {
             id: 'A',
@@ -407,7 +407,7 @@ describe('flowchartCodeBuilder', () => {
     })
 
     it('should not optimize incomplete edge sets', () => {
-      const data: FlowchartData = {
+      const data: IRFlowchartData = {
         nodes: [
           {
             id: 'A',
@@ -486,7 +486,7 @@ describe('flowchartCodeBuilder', () => {
     })
 
     it('should optimize multiple edge types independently', () => {
-      const data: FlowchartData = {
+      const data: IRFlowchartData = {
         nodes: [
           {
             id: 'A',
@@ -577,7 +577,7 @@ describe('flowchartCodeBuilder', () => {
     })
 
     it('should order nodes using topological sort (DAG)', () => {
-      const data: FlowchartData = {
+      const data: IRFlowchartData = {
         nodes: [
           {
             id: 'E',
@@ -643,7 +643,7 @@ describe('flowchartCodeBuilder', () => {
     })
 
     it('should handle multiple root nodes correctly', () => {
-      const data: FlowchartData = {
+      const data: IRFlowchartData = {
         nodes: [
           {
             id: 'C',

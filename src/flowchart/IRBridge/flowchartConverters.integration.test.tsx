@@ -1,10 +1,9 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, beforeEach } from 'vitest'
 import { renderHook, act } from '@testing-library/react'
 import { Provider } from 'jotai'
 import { useAtom } from 'jotai'
-import { nodesAtom, edgesAtom } from '../atoms'
-import { toReactFlowNodes } from './flowchartConverters'
-import type { Node } from '../types'
+import { nodesAtom } from '../atoms'
+import { toReactFlowNodes } from './toXyflowFromIR'
 
 describe('Z-index integration with atoms', () => {
   let wrapper: ({ children }: { children: React.ReactNode }) => JSX.Element

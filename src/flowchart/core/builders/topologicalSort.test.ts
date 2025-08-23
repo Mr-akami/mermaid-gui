@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { topologicalSort } from './topologicalSort'
-import type { FlowchartData } from './deps'
+import type { IRFlowchartData } from './deps'
 
 describe('topologicalSort', () => {
   it('should return empty array for empty input', () => {
@@ -9,7 +9,7 @@ describe('topologicalSort', () => {
   })
 
   it('should handle single node', () => {
-    const nodes: FlowchartData['nodes'] = [
+    const nodes: IRFlowchartData['nodes'] = [
       {
         id: 'A',
         type: 'rectangle',
@@ -18,14 +18,14 @@ describe('topologicalSort', () => {
         data: { label: 'Node A' },
       }
     ]
-    const edges: FlowchartData['edges'] = []
+    const edges: IRFlowchartData['edges'] = []
 
     const result = topologicalSort(nodes, edges)
     expect(result).toEqual(nodes)
   })
 
   it('should sort simple linear chain', () => {
-    const nodes: FlowchartData['nodes'] = [
+    const nodes: IRFlowchartData['nodes'] = [
       {
         id: 'C',
         type: 'rectangle',
@@ -48,7 +48,7 @@ describe('topologicalSort', () => {
         data: { label: 'Second' },
       },
     ]
-    const edges: FlowchartData['edges'] = [
+    const edges: IRFlowchartData['edges'] = [
       {
         id: 'edge1',
         source: 'A',
@@ -69,7 +69,7 @@ describe('topologicalSort', () => {
   })
 
   it('should handle multiple root nodes', () => {
-    const nodes: FlowchartData['nodes'] = [
+    const nodes: IRFlowchartData['nodes'] = [
       {
         id: 'D',
         type: 'rectangle',
@@ -92,7 +92,7 @@ describe('topologicalSort', () => {
         data: { label: 'Root2' },
       },
     ]
-    const edges: FlowchartData['edges'] = [
+    const edges: IRFlowchartData['edges'] = [
       {
         id: 'edge1',
         source: 'A',
@@ -122,7 +122,7 @@ describe('topologicalSort', () => {
   })
 
   it('should handle diamond pattern', () => {
-    const nodes: FlowchartData['nodes'] = [
+    const nodes: IRFlowchartData['nodes'] = [
       {
         id: 'A',
         type: 'rectangle',
@@ -152,7 +152,7 @@ describe('topologicalSort', () => {
         data: { label: 'End' },
       },
     ]
-    const edges: FlowchartData['edges'] = [
+    const edges: IRFlowchartData['edges'] = [
       {
         id: 'edge1',
         source: 'A',
@@ -196,7 +196,7 @@ describe('topologicalSort', () => {
   })
 
   it('should handle disconnected nodes', () => {
-    const nodes: FlowchartData['nodes'] = [
+    const nodes: IRFlowchartData['nodes'] = [
       {
         id: 'A',
         type: 'rectangle',
@@ -219,7 +219,7 @@ describe('topologicalSort', () => {
         data: { label: 'Disconnected' },
       },
     ]
-    const edges: FlowchartData['edges'] = [
+    const edges: IRFlowchartData['edges'] = [
       {
         id: 'edge1',
         source: 'A',

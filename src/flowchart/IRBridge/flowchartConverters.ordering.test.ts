@@ -1,10 +1,10 @@
 import { describe, it, expect } from 'vitest'
-import { toReactFlowNodes } from './flowchartConverters'
-import type { Node } from '../types'
+import { toReactFlowNodes } from './toXyflowFromIR'
+import type { IRNode } from '../core/types'
 
 describe('flowchartConverters - node ordering', () => {
   it('should place parent nodes before child nodes', () => {
-    const nodes: Node[] = [
+    const nodes: IRNode[] = [
       {
         id: 'n1',
         type: 'rectangle',
@@ -34,7 +34,7 @@ describe('flowchartConverters - node ordering', () => {
   })
 
   it('should handle nested subgraphs with proper ordering', () => {
-    const nodes: Node[] = [
+    const nodes: IRNode[] = [
       {
         id: 'n1',
         type: 'rectangle',
@@ -73,7 +73,7 @@ describe('flowchartConverters - node ordering', () => {
   })
 
   it('should keep subgraph nodes as subgraph type for React Flow', () => {
-    const nodes: Node[] = [
+    const nodes: IRNode[] = [
       {
         id: 'sg1',
         type: 'subgraph',
@@ -103,7 +103,7 @@ describe('flowchartConverters - node ordering', () => {
   })
 
   it('should set parentId on child nodes', () => {
-    const nodes: Node[] = [
+    const nodes: IRNode[] = [
       {
         id: 'sg1',
         type: 'subgraph',
@@ -139,7 +139,7 @@ describe('flowchartConverters - node ordering', () => {
   })
 
   it('should handle complex hierarchy with multiple levels', () => {
-    const nodes: Node[] = [
+    const nodes: IRNode[] = [
       {
         id: 'n3',
         type: 'rectangle',

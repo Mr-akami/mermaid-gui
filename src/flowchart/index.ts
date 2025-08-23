@@ -1,5 +1,5 @@
 // Export types
-export type { Node, Edge, FlowchartData, MermaidParseResult } from './types'
+export type { IRNode, IREdge, IRFlowchartData, MermaidParseResult } from './core/types'
 
 // Export atoms
 export {
@@ -29,8 +29,19 @@ export { ResizableSubgraph } from './components/ResizableSubgraph'
 export { MERMAID_NODE_TYPES, NODE_TYPE_CONFIG, type MermaidNodeType } from './nodeTypes'
 export { MERMAID_EDGE_TYPES, EDGE_TYPE_CONFIG, type MermaidEdgeType } from './edgeTypes'
 
-// Export converters
+// Export IRBridge converters
 export {
+  // From toIRFromXyflow
+  toIRNode,
+  toIREdge,
+  toIRNodes,
+  toIREdges,
+  // From toXyflowFromIR
+  toXyflowNode,
+  toXyflowEdge,
+  toXyflowNodes,
+  toXyflowEdges,
+  // Legacy aliases for backward compatibility
   toCustomNode,
   toReactFlowNode,
   toCustomEdge,
@@ -39,7 +50,7 @@ export {
   toReactFlowNodes,
   toCustomEdges,
   toReactFlowEdges,
-} from './converters'
+} from './IRBridge'
 
 // Export history
 export {

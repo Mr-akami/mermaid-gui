@@ -38,7 +38,7 @@ import {
 import { saveToHistoryAtom } from '../history'
 import { toCustomNodes, toReactFlowNodes, toCustomEdges, toReactFlowEdges } from './deps'
 import { focusPropertyPanelAtom, selectedNodeIdAtom, selectedEdgeIdAtom } from './atoms'
-import type { Edge } from '../types'
+import type { IREdge } from '../core/types'
 import { rawCodeAtom } from '../../editor/atoms'
 
 // Create nodeTypes object dynamically from MERMAID_NODE_TYPES

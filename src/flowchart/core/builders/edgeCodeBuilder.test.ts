@@ -1,11 +1,11 @@
 import { describe, it, expect } from 'vitest'
 import { buildEdgeCode } from './edgeCodeBuilder'
-import type { Edge } from './deps'
+import type { IREdge } from './deps'
 
 describe('edgeCodeBuilder', () => {
   describe('buildEdgeCode', () => {
     it('should build code for a normal edge', () => {
-      const edge: Edge = {
+      const edge: IREdge = {
         id: 'edge1',
         source: 'node1',
         target: 'node2',
@@ -17,7 +17,7 @@ describe('edgeCodeBuilder', () => {
     })
 
     it('should build code for a normal edge with arrow', () => {
-      const edge: Edge = {
+      const edge: IREdge = {
         id: 'edge2',
         source: 'node1',
         target: 'node2',
@@ -29,7 +29,7 @@ describe('edgeCodeBuilder', () => {
     })
 
     it('should build code for a thick edge', () => {
-      const edge: Edge = {
+      const edge: IREdge = {
         id: 'edge3',
         source: 'node1',
         target: 'node2',
@@ -41,7 +41,7 @@ describe('edgeCodeBuilder', () => {
     })
 
     it('should build code for a thick edge with arrow', () => {
-      const edge: Edge = {
+      const edge: IREdge = {
         id: 'edge4',
         source: 'node1',
         target: 'node2',
@@ -53,7 +53,7 @@ describe('edgeCodeBuilder', () => {
     })
 
     it('should build code for a dotted edge', () => {
-      const edge: Edge = {
+      const edge: IREdge = {
         id: 'edge5',
         source: 'node1',
         target: 'node2',
@@ -65,7 +65,7 @@ describe('edgeCodeBuilder', () => {
     })
 
     it('should build code for a dotted edge with arrow', () => {
-      const edge: Edge = {
+      const edge: IREdge = {
         id: 'edge6',
         source: 'node1',
         target: 'node2',
@@ -77,7 +77,7 @@ describe('edgeCodeBuilder', () => {
     })
 
     it('should build code for an edge with label', () => {
-      const edge: Edge = {
+      const edge: IREdge = {
         id: 'edge7',
         source: 'node1',
         target: 'node2',
@@ -92,7 +92,7 @@ describe('edgeCodeBuilder', () => {
     })
 
     it('should escape special characters in edge labels', () => {
-      const edge: Edge = {
+      const edge: IREdge = {
         id: 'edge8',
         source: 'node1',
         target: 'node2',

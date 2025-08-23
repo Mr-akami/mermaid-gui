@@ -1,13 +1,13 @@
-import type { FlowchartData, Node } from './deps'
+import type { IRFlowchartData, IRNode } from './deps'
 import { buildNodeCode } from './nodeCodeBuilder'
 import { buildEdgeCode } from './edgeCodeBuilder'
 import { topologicalSort } from './topologicalSort'
 
-export function buildFlowchartCode(data: FlowchartData, direction: 'TD' | 'TB' | 'LR' | 'RL' | 'BT' | 'DT' = 'TD'): string {
+export function buildFlowchartCode(data: IRFlowchartData, direction: 'TD' | 'TB' | 'LR' | 'RL' | 'BT' | 'DT' = 'TD'): string {
   const lines: string[] = [`flowchart ${direction}`]
 
   // Helper function to build subgraph declaration
-  function buildSubgraphDeclaration(node: Node): string {
+  function buildSubgraphDeclaration(node: IRNode): string {
     const label = node.data.label || 'Subgraph'
     // Convert newlines to <br> in subgraph labels
     const processedLabel = label.replace(/\n/g, '<br>')
@@ -20,7 +20,7 @@ export function buildFlowchartCode(data: FlowchartData, direction: 'TD' | 'TB' |
   }
 
   // Process nodes recursively with proper indentation
-  function processNode(node: Node, indent: string = '    '): void {
+  function processNode(node: IRNode, indent: string = '    '): void {
     if (node.type === 'subgraph') {
       lines.push(`${indent}${buildSubgraphDeclaration(node)}`)
       
@@ -33,12 +33,12 @@ export function buildFlowchartCode(data: FlowchartData, direction: 'TD' | 'TB' |
       const childNodes = data.nodes.filter(n => n.parentId === node.id)
       
       // Use childIds order if available, otherwise use topological sort
-      let orderedChildNodes: Node[]
+      let orderedChildNodes: IRNode[]
       if (node.childIds && node.childIds.length > 0) {
         // Sort child nodes according to childIds order
         orderedChildNodes = node.childIds
           .map(childId => childNodes.find(n => n.id === childId))
-          .filter((n): n is Node => n !== undefined)
+          .filter((n): n is IRNode => n !== undefined)
       } else {
         orderedChildNodes = topologicalSort(
           childNodes, 
@@ -105,7 +105,7 @@ export function buildFlowchartCode(data: FlowchartData, direction: 'TD' | 'TB' |
 
 
 // Group edges that can use & operator
-function groupEdgesWithAmpersand(edges: FlowchartData['edges'], nodeDisplayNames?: Map<string, string>): string[] {
+function groupEdgesWithAmpersand(edges: IRFlowchartData['edges'], nodeDisplayNames?: Map<string, string>): string[] {
   const result: string[] = []
   const processedEdges = new Set<typeof edges[0]>()
   
@@ -251,7 +251,7 @@ function groupEdgesWithAmpersand(edges: FlowchartData['edges'], nodeDisplayNames
   return result
 }
 
-function getConnector(type: FlowchartData['edges'][0]['type']): string {
+function getConnector(type: IRFlowchartData['edges'][0]['type']): string {
   switch (type) {
     case 'normal':
       return '---'

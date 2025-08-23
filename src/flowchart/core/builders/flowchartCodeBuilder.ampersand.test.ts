@@ -1,10 +1,10 @@
 import { describe, it, expect } from 'vitest'
 import { buildFlowchartCode } from './flowchartCodeBuilder'
-import type { FlowchartData } from './deps'
+import type { IRFlowchartData } from './deps'
 
 describe('buildFlowchartCode with & operator', () => {
   it('should build code with & operator for pattern a --> b & c --> d', () => {
-    const data: FlowchartData = {
+    const data: IRFlowchartData = {
       nodes: [
         { id: 'a', type: 'rectangle', data: { label: 'a' }, position: { x: 0, y: 0 }, childIds: [] },
         { id: 'b', type: 'rectangle', data: { label: 'b' }, position: { x: 100, y: 0 }, childIds: [] },
@@ -32,7 +32,7 @@ describe('buildFlowchartCode with & operator', () => {
   })
   
   it('should build code with & operator for simple multiple targets', () => {
-    const data: FlowchartData = {
+    const data: IRFlowchartData = {
       nodes: [
         { id: 'a', type: 'rectangle', data: { label: 'Start' }, position: { x: 0, y: 0 }, childIds: [] },
         { id: 'b', type: 'rectangle', data: { label: 'Process 1' }, position: { x: 100, y: 0 }, childIds: [] },
@@ -51,7 +51,7 @@ describe('buildFlowchartCode with & operator', () => {
   })
   
   it('should handle different edge types correctly', () => {
-    const data: FlowchartData = {
+    const data: IRFlowchartData = {
       nodes: [
         { id: 'a', type: 'rectangle', data: { label: 'a' }, position: { x: 0, y: 0 }, childIds: [] },
         { id: 'b', type: 'rectangle', data: { label: 'b' }, position: { x: 100, y: 0 }, childIds: [] },
@@ -73,7 +73,7 @@ describe('buildFlowchartCode with & operator', () => {
   })
   
   it('should not use & operator when edges dont form the pattern', () => {
-    const data: FlowchartData = {
+    const data: IRFlowchartData = {
       nodes: [
         { id: 'a', type: 'rectangle', data: { label: 'a' }, position: { x: 0, y: 0 }, childIds: [] },
         { id: 'b', type: 'rectangle', data: { label: 'b' }, position: { x: 100, y: 0 }, childIds: [] },

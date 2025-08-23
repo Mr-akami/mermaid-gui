@@ -8,7 +8,7 @@ import {
   canUndoAtom,
   canRedoAtom 
 } from './atoms'
-import { Node } from '../types'
+import { IRNode } from '../core/types'
 
 // Helper to create a valid node
 const createNode = (id: string, type: Node['type'] = 'rectangle', label?: string): Node => ({
