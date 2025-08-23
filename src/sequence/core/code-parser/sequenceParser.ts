@@ -2,12 +2,12 @@ import { nanoid } from 'nanoid'
 import {
   ArrowType,
   NotePosition,
-  type SequenceParticipant,
-  type SequenceMessage,
-  type SequenceNote,
-  type SequenceLoop,
-  type SequenceMermaidParseResult
-} from '../../types'
+  type IRSequenceParticipant,
+  type IRSequenceMessage,
+  type IRSequenceNote,
+  type IRSequenceLoop,
+  type IRSequenceMermaidParseResult
+} from '../types'
 
 // Regex patterns for parsing sequence diagrams
 const PARTICIPANT_PATTERNS = {
@@ -45,15 +45,15 @@ const ARROW_TYPE_MAP: Record<string, ArrowType> = {
 }
 
 interface ParseContext {
-  participants: SequenceParticipant[]
-  messages: SequenceMessage[]
-  notes: SequenceNote[]
-  loops: SequenceLoop[]
-  currentLoop: SequenceLoop | null
+  participants: IRSequenceParticipant[]
+  messages: IRSequenceMessage[]
+  notes: IRSequenceNote[]
+  loops: IRSequenceLoop[]
+  currentLoop: IRSequenceLoop | null
   participantOrder: number
 }
 
-export function parseSequenceCode(code: string): SequenceMermaidParseResult {
+export function parseSequenceCode(code: string): IRSequenceMermaidParseResult {
   try {
     const lines = code.split('\n').map(line => line.trim()).filter(Boolean)
     
@@ -117,7 +117,7 @@ function tryParseParticipant(line: string, context: ParseContext): boolean {
   const withAliasMatch = line.match(PARTICIPANT_PATTERNS.withAlias)
   if (withAliasMatch) {
     const [, id, label] = withAliasMatch
-    const participant: SequenceParticipant = {
+    const participant: IRSequenceParticipant = {
       id: nanoid(),
       type,
       label,
@@ -135,7 +135,7 @@ function tryParseParticipant(line: string, context: ParseContext): boolean {
   const withoutAliasMatch = line.match(PARTICIPANT_PATTERNS.withoutAlias)
   if (withoutAliasMatch) {
     const [, id] = withoutAliasMatch
-    const participant: SequenceParticipant = {
+    const participant: IRSequenceParticipant = {
       id,
       type,
       label: id,
@@ -161,7 +161,7 @@ function tryParseMessage(line: string, context: ParseContext): boolean {
   ensureParticipantExists(from, context)
   ensureParticipantExists(to, context)
 
-  const message: SequenceMessage = {
+  const message: IRSequenceMessage = {
     id: nanoid(),
     from,
     to,
@@ -184,7 +184,7 @@ function tryParseNote(line: string, context: ParseContext): boolean {
   const singleMatch = line.match(NOTE_PATTERNS.single)
   if (singleMatch) {
     const [, position, target, text] = singleMatch
-    const note: SequenceNote = {
+    const note: IRSequenceNote = {
       id: nanoid(),
       position: position === 'left' ? NotePosition.LEFT : NotePosition.RIGHT,
       target,
@@ -200,7 +200,7 @@ function tryParseNote(line: string, context: ParseContext): boolean {
     const [, targets, text] = overMatch
     const targetList = targets.split(',').map(t => t.trim())
     
-    const note: SequenceNote = {
+    const note: IRSequenceNote = {
       id: nanoid(),
       position: NotePosition.OVER,
       target: targetList.length === 1 ? targetList[0] : targetList,
@@ -218,7 +218,7 @@ function tryParseLoop(line: string, context: ParseContext): boolean {
   const startMatch = line.match(LOOP_PATTERNS.start)
   if (startMatch) {
     const [, label] = startMatch
-    const loop: SequenceLoop = {
+    const loop: IRSequenceLoop = {
       id: nanoid(),
       label: label.trim(),
       messages: []
@@ -268,7 +268,7 @@ function tryParseActivation(line: string, context: ParseContext): boolean {
 function ensureParticipantExists(id: string, context: ParseContext): void {
   const exists = context.participants.some(p => p.id === id)
   if (!exists) {
-    const participant: SequenceParticipant = {
+    const participant: IRSequenceParticipant = {
       id,
       type: 'participant',
       label: id,

@@ -21,7 +21,7 @@ import {
   removeNoteAtom,
   removeLoopAtom
 } from './atoms'
-import { ArrowType, NotePosition, type SequenceParticipant, type SequenceMessage, type SequenceNote, type SequenceLoop } from './types'
+import { ArrowType, NotePosition, type IRSequenceParticipant, type IRSequenceMessage, type IRSequenceNote, type IRSequenceLoop } from './core/types'
 
 describe('sequence atoms', () => {
   let store = createStore()
@@ -54,7 +54,7 @@ describe('sequence atoms', () => {
 
   describe('participant operations', () => {
     it('should add participant', () => {
-      const participant: SequenceParticipant = {
+      const participant: IRSequenceParticipant = {
         id: 'A',
         type: 'participant',
         label: 'Alice',
@@ -69,7 +69,7 @@ describe('sequence atoms', () => {
     })
 
     it('should update participant', () => {
-      const participant: SequenceParticipant = {
+      const participant: IRSequenceParticipant = {
         id: 'A',
         type: 'participant',
         label: 'Alice',
@@ -78,7 +78,7 @@ describe('sequence atoms', () => {
 
       store.set(addParticipantAtom, participant)
       
-      const updatedParticipant: SequenceParticipant = {
+      const updatedParticipant: IRSequenceParticipant = {
         ...participant,
         label: 'Alice Updated'
       }
@@ -90,7 +90,7 @@ describe('sequence atoms', () => {
     })
 
     it('should remove participant', () => {
-      const participant: SequenceParticipant = {
+      const participant: IRSequenceParticipant = {
         id: 'A',
         type: 'participant',
         label: 'Alice',
@@ -107,7 +107,7 @@ describe('sequence atoms', () => {
 
   describe('message operations', () => {
     it('should add message', () => {
-      const message: SequenceMessage = {
+      const message: IRSequenceMessage = {
         id: 'msg1',
         from: 'A',
         to: 'B',
@@ -123,7 +123,7 @@ describe('sequence atoms', () => {
     })
 
     it('should update message', () => {
-      const message: SequenceMessage = {
+      const message: IRSequenceMessage = {
         id: 'msg1',
         from: 'A',
         to: 'B',
@@ -133,7 +133,7 @@ describe('sequence atoms', () => {
 
       store.set(addMessageAtom, message)
       
-      const updatedMessage: SequenceMessage = {
+      const updatedMessage: IRSequenceMessage = {
         ...message,
         label: 'Hello Updated'
       }
@@ -145,7 +145,7 @@ describe('sequence atoms', () => {
     })
 
     it('should remove message', () => {
-      const message: SequenceMessage = {
+      const message: IRSequenceMessage = {
         id: 'msg1',
         from: 'A',
         to: 'B',
@@ -163,7 +163,7 @@ describe('sequence atoms', () => {
 
   describe('note operations', () => {
     it('should add note', () => {
-      const note: SequenceNote = {
+      const note: IRSequenceNote = {
         id: 'note1',
         position: NotePosition.RIGHT,
         target: 'A',
@@ -178,7 +178,7 @@ describe('sequence atoms', () => {
     })
 
     it('should update note', () => {
-      const note: SequenceNote = {
+      const note: IRSequenceNote = {
         id: 'note1',
         position: NotePosition.RIGHT,
         target: 'A',
@@ -187,7 +187,7 @@ describe('sequence atoms', () => {
 
       store.set(addNoteAtom, note)
       
-      const updatedNote: SequenceNote = {
+      const updatedNote: IRSequenceNote = {
         ...note,
         text: 'Updated note text'
       }
@@ -199,7 +199,7 @@ describe('sequence atoms', () => {
     })
 
     it('should remove note', () => {
-      const note: SequenceNote = {
+      const note: IRSequenceNote = {
         id: 'note1',
         position: NotePosition.RIGHT,
         target: 'A',
@@ -216,7 +216,7 @@ describe('sequence atoms', () => {
 
   describe('loop operations', () => {
     it('should add loop', () => {
-      const loop: SequenceLoop = {
+      const loop: IRSequenceLoop = {
         id: 'loop1',
         label: 'Every minute',
         messages: ['msg1']
@@ -230,7 +230,7 @@ describe('sequence atoms', () => {
     })
 
     it('should update loop', () => {
-      const loop: SequenceLoop = {
+      const loop: IRSequenceLoop = {
         id: 'loop1',
         label: 'Every minute',
         messages: ['msg1']
@@ -238,7 +238,7 @@ describe('sequence atoms', () => {
 
       store.set(addLoopAtom, loop)
       
-      const updatedLoop: SequenceLoop = {
+      const updatedLoop: IRSequenceLoop = {
         ...loop,
         label: 'Every hour'
       }
@@ -250,7 +250,7 @@ describe('sequence atoms', () => {
     })
 
     it('should remove loop', () => {
-      const loop: SequenceLoop = {
+      const loop: IRSequenceLoop = {
         id: 'loop1',
         label: 'Every minute',
         messages: ['msg1']

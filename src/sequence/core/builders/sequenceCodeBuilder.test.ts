@@ -1,11 +1,11 @@
 import { describe, test, expect } from 'vitest'
 import { buildSequenceCode } from './sequenceCodeBuilder'
-import { SequenceState, ArrowType, NotePosition } from '../../types'
+import { IRSequenceState, ArrowType, NotePosition } from '../types'
 
 describe('sequenceCodeBuilder', () => {
   describe('Basic Builder Structure', () => {
     test('should generate basic sequence diagram for empty state', () => {
-      const state: SequenceState = {
+      const state: IRSequenceState = {
         participants: [],
         messages: [],
         notes: [],
@@ -18,7 +18,7 @@ describe('sequenceCodeBuilder', () => {
     })
 
     test('should generate sequence diagram with participants only', () => {
-      const state: SequenceState = {
+      const state: IRSequenceState = {
         participants: [
           { id: 'A', type: 'participant', label: 'Alice', order: 0 }
         ],
@@ -35,7 +35,7 @@ describe('sequenceCodeBuilder', () => {
 
   describe('Participant Generation', () => {
     test('should generate participant with alias', () => {
-      const state: SequenceState = {
+      const state: IRSequenceState = {
         participants: [
           { id: 'A', type: 'participant', label: 'Alice', alias: 'Alice User', order: 0 }
         ],
@@ -50,7 +50,7 @@ describe('sequenceCodeBuilder', () => {
     })
 
     test('should generate participant without alias', () => {
-      const state: SequenceState = {
+      const state: IRSequenceState = {
         participants: [
           { id: 'Alice', type: 'participant', label: 'Alice', order: 0 }
         ],
@@ -65,7 +65,7 @@ describe('sequenceCodeBuilder', () => {
     })
 
     test('should generate actor type', () => {
-      const state: SequenceState = {
+      const state: IRSequenceState = {
         participants: [
           { id: 'B', type: 'actor', label: 'Bob', order: 0 }
         ],
@@ -80,7 +80,7 @@ describe('sequenceCodeBuilder', () => {
     })
 
     test('should maintain correct order based on order field', () => {
-      const state: SequenceState = {
+      const state: IRSequenceState = {
         participants: [
           { id: 'C', type: 'participant', label: 'Charlie', order: 2 },
           { id: 'A', type: 'participant', label: 'Alice', order: 0 },
@@ -104,7 +104,7 @@ describe('sequenceCodeBuilder', () => {
 
   describe('Message Generation', () => {
     test('should generate solid arrow message', () => {
-      const state: SequenceState = {
+      const state: IRSequenceState = {
         participants: [
           { id: 'A', type: 'participant', label: 'Alice', order: 0 },
           { id: 'B', type: 'participant', label: 'Bob', order: 1 }
@@ -127,7 +127,7 @@ describe('sequenceCodeBuilder', () => {
     })
 
     test('should generate dotted arrow message', () => {
-      const state: SequenceState = {
+      const state: IRSequenceState = {
         participants: [
           { id: 'A', type: 'participant', label: 'Alice', order: 0 },
           { id: 'B', type: 'participant', label: 'Bob', order: 1 }
@@ -150,7 +150,7 @@ describe('sequenceCodeBuilder', () => {
     })
 
     test('should generate solid arrow with head message', () => {
-      const state: SequenceState = {
+      const state: IRSequenceState = {
         participants: [
           { id: 'A', type: 'participant', label: 'Alice', order: 0 },
           { id: 'B', type: 'participant', label: 'Bob', order: 1 }
@@ -173,7 +173,7 @@ describe('sequenceCodeBuilder', () => {
     })
 
     test('should generate dotted arrow with head message', () => {
-      const state: SequenceState = {
+      const state: IRSequenceState = {
         participants: [
           { id: 'A', type: 'participant', label: 'Alice', order: 0 },
           { id: 'B', type: 'participant', label: 'Bob', order: 1 }
@@ -196,7 +196,7 @@ describe('sequenceCodeBuilder', () => {
     })
 
     test('should generate cross arrow messages', () => {
-      const state: SequenceState = {
+      const state: IRSequenceState = {
         participants: [
           { id: 'A', type: 'participant', label: 'Alice', order: 0 },
           { id: 'B', type: 'participant', label: 'Bob', order: 1 }
@@ -221,7 +221,7 @@ describe('sequenceCodeBuilder', () => {
     })
 
     test('should generate async arrow messages', () => {
-      const state: SequenceState = {
+      const state: IRSequenceState = {
         participants: [
           { id: 'A', type: 'participant', label: 'Alice', order: 0 },
           { id: 'B', type: 'participant', label: 'Bob', order: 1 }
@@ -246,7 +246,7 @@ describe('sequenceCodeBuilder', () => {
     })
 
     test('should handle messages without labels', () => {
-      const state: SequenceState = {
+      const state: IRSequenceState = {
         participants: [
           { id: 'A', type: 'participant', label: 'Alice', order: 0 },
           { id: 'B', type: 'participant', label: 'Bob', order: 1 }
@@ -271,7 +271,7 @@ describe('sequenceCodeBuilder', () => {
 
   describe('Activation Generation', () => {
     test('should generate activation around messages', () => {
-      const state: SequenceState = {
+      const state: IRSequenceState = {
         participants: [
           { id: 'A', type: 'participant', label: 'Alice', order: 0 },
           { id: 'B', type: 'participant', label: 'Bob', order: 1 }
@@ -300,7 +300,7 @@ describe('sequenceCodeBuilder', () => {
     })
 
     test('should handle multiple overlapping activations', () => {
-      const state: SequenceState = {
+      const state: IRSequenceState = {
         participants: [
           { id: 'A', type: 'participant', label: 'Alice', order: 0 },
           { id: 'B', type: 'participant', label: 'Bob', order: 1 },
@@ -340,7 +340,7 @@ describe('sequenceCodeBuilder', () => {
 
   describe('Note Generation', () => {
     test('should generate left note', () => {
-      const state: SequenceState = {
+      const state: IRSequenceState = {
         participants: [
           { id: 'A', type: 'participant', label: 'Alice', order: 0 }
         ],
@@ -361,7 +361,7 @@ describe('sequenceCodeBuilder', () => {
     })
 
     test('should generate right note', () => {
-      const state: SequenceState = {
+      const state: IRSequenceState = {
         participants: [
           { id: 'B', type: 'participant', label: 'Bob', order: 0 }
         ],
@@ -382,7 +382,7 @@ describe('sequenceCodeBuilder', () => {
     })
 
     test('should generate note over single participant', () => {
-      const state: SequenceState = {
+      const state: IRSequenceState = {
         participants: [
           { id: 'A', type: 'participant', label: 'Alice', order: 0 }
         ],
@@ -403,7 +403,7 @@ describe('sequenceCodeBuilder', () => {
     })
 
     test('should generate note over multiple participants', () => {
-      const state: SequenceState = {
+      const state: IRSequenceState = {
         participants: [
           { id: 'A', type: 'participant', label: 'Alice', order: 0 },
           { id: 'B', type: 'participant', label: 'Bob', order: 1 }
@@ -428,7 +428,7 @@ describe('sequenceCodeBuilder', () => {
 
   describe('Loop Generation', () => {
     test('should generate simple loop', () => {
-      const state: SequenceState = {
+      const state: IRSequenceState = {
         participants: [
           { id: 'A', type: 'participant', label: 'Alice', order: 0 },
           { id: 'B', type: 'participant', label: 'Bob', order: 1 }
@@ -457,7 +457,7 @@ describe('sequenceCodeBuilder', () => {
     })
 
     test('should generate loop with multiple messages', () => {
-      const state: SequenceState = {
+      const state: IRSequenceState = {
         participants: [
           { id: 'A', type: 'participant', label: 'Alice', order: 0 },
           { id: 'B', type: 'participant', label: 'Bob', order: 1 }
@@ -492,7 +492,7 @@ describe('sequenceCodeBuilder', () => {
 
   describe('Complete Integration', () => {
     test('should generate complete diagram with all features', () => {
-      const state: SequenceState = {
+      const state: IRSequenceState = {
         participants: [
           { id: 'A', type: 'participant', label: 'Alice', order: 0 },
           { id: 'B', type: 'actor', label: 'Bob', order: 1 }
@@ -528,7 +528,7 @@ describe('sequenceCodeBuilder', () => {
     })
 
     test('should handle empty labels and complex order', () => {
-      const state: SequenceState = {
+      const state: IRSequenceState = {
         participants: [
           { id: 'C', type: 'participant', label: 'Charlie', order: 2 },
           { id: 'A', type: 'participant', label: 'Alice', order: 0 },

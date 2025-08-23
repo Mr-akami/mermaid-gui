@@ -2,13 +2,13 @@ import { describe, it, expect } from 'vitest'
 import {
   ArrowType,
   NotePosition,
-  type SequenceParticipant,
-  type SequenceMessage,
-  type SequenceNote,
-  type SequenceLoop,
-  type SequenceState,
-  type SequenceActivation
-} from './types'
+  type IRSequenceParticipant,
+  type IRSequenceMessage,
+  type IRSequenceNote,
+  type IRSequenceLoop,
+  type IRSequenceState,
+  type IRSequenceActivation
+} from './core/types'
 
 describe('Sequence Diagram Types', () => {
   describe('ArrowType enum', () => {
@@ -34,7 +34,7 @@ describe('Sequence Diagram Types', () => {
 
   describe('SequenceParticipant interface', () => {
     it('should create a valid participant', () => {
-      const participant: SequenceParticipant = {
+      const participant: IRSequenceParticipant = {
         id: 'p1',
         type: 'participant',
         label: 'Alice',
@@ -50,7 +50,7 @@ describe('Sequence Diagram Types', () => {
     })
 
     it('should create an actor with alias', () => {
-      const actor: SequenceParticipant = {
+      const actor: IRSequenceParticipant = {
         id: 'a1',
         type: 'actor',
         label: 'A',
@@ -65,7 +65,7 @@ describe('Sequence Diagram Types', () => {
 
   describe('SequenceMessage interface', () => {
     it('should create a valid message', () => {
-      const message: SequenceMessage = {
+      const message: IRSequenceMessage = {
         id: 'm1',
         from: 'p1',
         to: 'p2',
@@ -81,7 +81,7 @@ describe('Sequence Diagram Types', () => {
     })
 
     it('should support activation markers', () => {
-      const message: SequenceMessage = {
+      const message: IRSequenceMessage = {
         id: 'm2',
         from: 'p1',
         to: 'p2',
@@ -98,7 +98,7 @@ describe('Sequence Diagram Types', () => {
 
   describe('SequenceNote interface', () => {
     it('should create a note for single participant', () => {
-      const note: SequenceNote = {
+      const note: IRSequenceNote = {
         id: 'n1',
         position: NotePosition.RIGHT,
         target: 'p1',
@@ -110,7 +110,7 @@ describe('Sequence Diagram Types', () => {
     })
 
     it('should create a note over multiple participants', () => {
-      const note: SequenceNote = {
+      const note: IRSequenceNote = {
         id: 'n2',
         position: NotePosition.OVER,
         target: ['p1', 'p2'],
@@ -124,7 +124,7 @@ describe('Sequence Diagram Types', () => {
 
   describe('SequenceLoop interface', () => {
     it('should create a valid loop', () => {
-      const loop: SequenceLoop = {
+      const loop: IRSequenceLoop = {
         id: 'l1',
         label: 'Every minute',
         messages: ['m1', 'm2', 'm3']
@@ -137,7 +137,7 @@ describe('Sequence Diagram Types', () => {
 
   describe('SequenceActivation interface', () => {
     it('should create a valid activation', () => {
-      const activation: SequenceActivation = {
+      const activation: IRSequenceActivation = {
         participant: 'p1',
         startIndex: 2,
         endIndex: 5
@@ -151,7 +151,7 @@ describe('Sequence Diagram Types', () => {
 
   describe('SequenceState interface', () => {
     it('should create a valid complete state', () => {
-      const state: SequenceState = {
+      const state: IRSequenceState = {
         participants: [
           { id: 'p1', type: 'participant', label: 'Alice', order: 0 },
           { id: 'p2', type: 'participant', label: 'Bob', order: 1 }

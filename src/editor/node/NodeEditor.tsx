@@ -2,5 +2,5 @@ import { EditorContainer } from '../common/EditorContainer'
 
 export function NodeEditor() {
   // Default to sequence diagram
-  return <EditorContainer diagramType="flowchart" />
+  return <EditorContainer diagramType="sequence" />
 }

@@ -3,20 +3,20 @@ import { buildSequenceCode } from './core/builders/sequenceCodeBuilder'
 import { parseSequenceCode } from './core/code-parser/sequenceParser'
 import { rawCodeAtom, isEditingAtom } from '../editor/atoms'
 import type {
-  SequenceParticipant,
-  SequenceMessage,
-  SequenceNote,
-  SequenceLoop,
-  SequenceActivation,
-  SequenceState
-} from './types'
+  IRSequenceParticipant,
+  IRSequenceMessage,
+  IRSequenceNote,
+  IRSequenceLoop,
+  IRSequenceActivation,
+  IRSequenceState
+} from './core/types'
 
 // Base atoms for storing sequence diagram data
-export const participantsAtom = atom<SequenceParticipant[]>([])
-export const messagesAtom = atom<SequenceMessage[]>([])
-export const notesAtom = atom<SequenceNote[]>([])
-export const loopsAtom = atom<SequenceLoop[]>([])
-export const activationsAtom = atom<SequenceActivation[]>([])
+export const participantsAtom = atom<IRSequenceParticipant[]>([])
+export const messagesAtom = atom<IRSequenceMessage[]>([])
+export const notesAtom = atom<IRSequenceNote[]>([])
+export const loopsAtom = atom<IRSequenceLoop[]>([])
+export const activationsAtom = atom<IRSequenceActivation[]>([])
 
 // UI state atoms
 export const placementModeAtom = atom<'participant' | 'actor' | 'note' | null>(null)
@@ -28,7 +28,7 @@ export const edgeCreationAtom = atom<{
 } | null>(null)
 
 // Combined state atom
-export const sequenceStateAtom = atom<SequenceState>((get) => ({
+export const sequenceStateAtom = atom<IRSequenceState>((get) => ({
   participants: get(participantsAtom),
   messages: get(messagesAtom),
   notes: get(notesAtom),
@@ -39,7 +39,7 @@ export const sequenceStateAtom = atom<SequenceState>((get) => ({
 // Participant operations
 export const addParticipantAtom = atom(
   null,
-  (get, set, participant: SequenceParticipant) => {
+  (get, set, participant: IRSequenceParticipant) => {
     const participants = get(participantsAtom)
     set(participantsAtom, [...participants, participant])
   }
@@ -47,7 +47,7 @@ export const addParticipantAtom = atom(
 
 export const updateParticipantAtom = atom(
   null,
-  (get, set, updatedParticipant: SequenceParticipant) => {
+  (get, set, updatedParticipant: IRSequenceParticipant) => {
     const participants = get(participantsAtom)
     const index = participants.findIndex(p => p.id === updatedParticipant.id)
     if (index !== -1) {
@@ -69,7 +69,7 @@ export const removeParticipantAtom = atom(
 // Message operations
 export const addMessageAtom = atom(
   null,
-  (get, set, message: SequenceMessage) => {
+  (get, set, message: IRSequenceMessage) => {
     const messages = get(messagesAtom)
     set(messagesAtom, [...messages, message])
   }
@@ -77,7 +77,7 @@ export const addMessageAtom = atom(
 
 export const updateMessageAtom = atom(
   null,
-  (get, set, updatedMessage: SequenceMessage) => {
+  (get, set, updatedMessage: IRSequenceMessage) => {
     const messages = get(messagesAtom)
     const index = messages.findIndex(m => m.id === updatedMessage.id)
     if (index !== -1) {
@@ -99,7 +99,7 @@ export const removeMessageAtom = atom(
 // Note operations
 export const addNoteAtom = atom(
   null,
-  (get, set, note: SequenceNote) => {
+  (get, set, note: IRSequenceNote) => {
     const notes = get(notesAtom)
     set(notesAtom, [...notes, note])
   }
@@ -107,7 +107,7 @@ export const addNoteAtom = atom(
 
 export const updateNoteAtom = atom(
   null,
-  (get, set, updatedNote: SequenceNote) => {
+  (get, set, updatedNote: IRSequenceNote) => {
     const notes = get(notesAtom)
     const index = notes.findIndex(n => n.id === updatedNote.id)
     if (index !== -1) {
@@ -129,7 +129,7 @@ export const removeNoteAtom = atom(
 // Loop operations
 export const addLoopAtom = atom(
   null,
-  (get, set, loop: SequenceLoop) => {
+  (get, set, loop: IRSequenceLoop) => {
     const loops = get(loopsAtom)
     set(loopsAtom, [...loops, loop])
   }
@@ -137,7 +137,7 @@ export const addLoopAtom = atom(
 
 export const updateLoopAtom = atom(
   null,
-  (get, set, updatedLoop: SequenceLoop) => {
+  (get, set, updatedLoop: IRSequenceLoop) => {
     const loops = get(loopsAtom)
     const index = loops.findIndex(l => l.id === updatedLoop.id)
     if (index !== -1) {

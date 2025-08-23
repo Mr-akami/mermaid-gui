@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { parseSequenceCode } from './sequenceParser'
-import { ArrowType, NotePosition } from '../../types'
+import { ArrowType, NotePosition } from '../types'
 
 describe('sequenceParser', () => {
   describe('basic parsing', () => {

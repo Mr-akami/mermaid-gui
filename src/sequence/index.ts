@@ -2,17 +2,17 @@
 
 // Re-export types
 export type {
-  SequenceParticipant,
-  SequenceMessage,
-  SequenceNote,
-  SequenceLoop,
-  SequenceActivation,
-  SequenceState,
-  SequenceMermaidParseResult
-} from './types'
+  IRSequenceParticipant,
+  IRSequenceMessage,
+  IRSequenceNote,
+  IRSequenceLoop,
+  IRSequenceActivation,
+  IRSequenceState,
+  IRSequenceMermaidParseResult
+} from './core/types'
 
 // Re-export enums
-export { ArrowType, NotePosition } from './types'
+export { ArrowType, NotePosition } from './core/types'
 
 // Re-export atoms
 export {

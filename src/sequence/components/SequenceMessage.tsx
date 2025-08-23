@@ -1,6 +1,6 @@
 import { memo } from 'react'
 import { BaseEdge, EdgeLabelRenderer, getStraightPath, type EdgeProps } from '@xyflow/react'
-import { ArrowType } from '../types'
+import { ArrowType } from '../core/types'
 
 interface MessageData {
   label: string

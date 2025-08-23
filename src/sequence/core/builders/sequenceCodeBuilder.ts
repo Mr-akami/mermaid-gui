@@ -1,9 +1,9 @@
-import { SequenceState, SequenceParticipant, SequenceNote, SequenceLoop } from '../../types'
+import { IRSequenceState, IRSequenceParticipant, IRSequenceNote, IRSequenceLoop } from '../types'
 
 /**
  * Builds Mermaid sequence diagram code from sequence state
  */
-export function buildSequenceCode(state: SequenceState): string {
+export function buildSequenceCode(state: IRSequenceState): string {
   const lines: string[] = ['sequenceDiagram']
 
   // Generate participants first (sorted by order)
@@ -26,7 +26,7 @@ export function buildSequenceCode(state: SequenceState): string {
 /**
  * Generates participant line
  */
-function generateParticipant(participant: SequenceParticipant): string {
+function generateParticipant(participant: IRSequenceParticipant): string {
   const participantType = participant.type === 'actor' ? 'actor' : 'participant'
   
   // Use alias if provided, otherwise use label if different from id
@@ -44,7 +44,7 @@ function generateParticipant(participant: SequenceParticipant): string {
 /**
  * Generates note line
  */
-function generateNote(note: SequenceNote): string {
+function generateNote(note: IRSequenceNote): string {
   let targets: string
   if (Array.isArray(note.target)) {
     targets = note.target.join(',')
@@ -58,13 +58,13 @@ function generateNote(note: SequenceNote): string {
 /**
  * Generates messages with proper activation and loop placement
  */
-function generateMessagesWithActivationsAndLoops(state: SequenceState, lines: string[]): void {
+function generateMessagesWithActivationsAndLoops(state: IRSequenceState, lines: string[]): void {
   const messages = state.messages
   const activations = state.activations
   const loops = state.loops
 
   // Track which messages are in loops
-  const messageInLoop = new Map<string, SequenceLoop>()
+  const messageInLoop = new Map<string, IRSequenceLoop>()
   for (const loop of loops) {
     for (const messageId of loop.messages) {
       messageInLoop.set(messageId, loop)
@@ -99,7 +99,7 @@ function generateMessagesWithActivationsAndLoops(state: SequenceState, lines: st
     // Check if we need to end a loop after this message
     if (loop) {
       // Check if this is the last message in the loop
-      const isLastMessageInLoop = loop.messages.every(msgId => {
+      const isLastMessageInLoop = loop.messages.every((msgId: string) => {
         const msgIndex = messages.findIndex(m => m.id === msgId)
         return msgIndex <= i
       })
