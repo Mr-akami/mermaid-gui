@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { toReactFlowNodes } from './toXyflowFromIR'
+import { toXyflowNodes } from './toXyflowFromIR'
 import type { IRNode } from '../core/types'
 import '@xyflow/react/dist/style.css'
 
@@ -23,7 +23,7 @@ describe('Runtime z-index behavior', () => {
       }
     ]
 
-    const rfNodes1 = toReactFlowNodes(nodes1)
+    const rfNodes1 = toXyflowNodes(nodes1)
     
     // Subgraph should have lower z-index
     const sg1 = rfNodes1.find(n => n.id === 'sg1')
@@ -59,12 +59,12 @@ describe('Runtime z-index behavior', () => {
       }
     ]
 
-    const rfNodes2 = toReactFlowNodes(nodes2)
+    const rfNodes2 = toXyflowNodes(nodes2)
     
     // Check array order - subgraphs should come first
     const firstNode = rfNodes2[0]
     expect(firstNode.id).toBe('sg1')
-    expect(firstNode.type).toBe('group')
+    expect(firstNode.type).toBe('subgraph')
     
     // Check z-index values
     const sg = rfNodes2.find(n => n.id === 'sg1')
@@ -88,7 +88,7 @@ describe('Runtime z-index behavior', () => {
       }
     ]
 
-    let rfNodes = toReactFlowNodes(nodes)
+    let rfNodes = toXyflowNodes(nodes)
     expect(rfNodes[0].zIndex).toBeLessThan(0)
 
     // Add a regular node
@@ -100,7 +100,7 @@ describe('Runtime z-index behavior', () => {
       childIds: []
     })
 
-    rfNodes = toReactFlowNodes(nodes)
+    rfNodes = toXyflowNodes(nodes)
     
     // Subgraph should still be first in array and have lower z-index
     expect(rfNodes[0].id).toBe('sg1')
@@ -118,7 +118,7 @@ describe('Runtime z-index behavior', () => {
       childIds: []
     })
 
-    rfNodes = toReactFlowNodes(nodes)
+    rfNodes = toXyflowNodes(nodes)
     
     // Both subgraphs should be at the beginning
     expect(rfNodes[0].id).toBe('sg1')
@@ -160,7 +160,7 @@ describe('Runtime z-index behavior', () => {
       }
     ]
 
-    const rfNodes = toReactFlowNodes(nodes)
+    const rfNodes = toXyflowNodes(nodes)
     
     // Subgraph should be first
     expect(rfNodes[0].id).toBe('sg1')

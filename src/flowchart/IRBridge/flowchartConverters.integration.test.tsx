@@ -3,7 +3,7 @@ import { renderHook, act } from '@testing-library/react'
 import { Provider } from 'jotai'
 import { useAtom } from 'jotai'
 import { nodesAtom } from '../atoms'
-import { toReactFlowNodes } from './toXyflowFromIR'
+import { toXyflowNodes } from './toXyflowFromIR'
 
 describe('Z-index integration with atoms', () => {
   let wrapper: ({ children }: { children: React.ReactNode }) => JSX.Element
@@ -17,7 +17,7 @@ describe('Z-index integration with atoms', () => {
   it('should maintain z-index when nodes are added in different orders', () => {
     const { result } = renderHook(() => {
       const [nodes, setNodes] = useAtom(nodesAtom)
-      return { nodes, setNodes, toReactFlowNodes }
+      return { nodes, setNodes, toXyflowNodes }
     }, { wrapper })
 
     // Add a regular node first
@@ -33,7 +33,7 @@ describe('Z-index integration with atoms', () => {
       ])
     })
 
-    let rfNodes = toReactFlowNodes(result.current.nodes)
+    let rfNodes = toXyflowNodes(result.current.nodes)
     expect(rfNodes[0].zIndex).toBe(1000)
 
     // Add a subgraph after
@@ -50,7 +50,7 @@ describe('Z-index integration with atoms', () => {
       ])
     })
 
-    rfNodes = toReactFlowNodes(result.current.nodes)
+    rfNodes = toXyflowNodes(result.current.nodes)
     
     // Subgraph should be first in array (background)
     expect(rfNodes[0].id).toBe('sg1')
@@ -74,7 +74,7 @@ describe('Z-index integration with atoms', () => {
       ])
     })
 
-    rfNodes = toReactFlowNodes(result.current.nodes)
+    rfNodes = toXyflowNodes(result.current.nodes)
     
     // Check final order
     expect(rfNodes[0].id).toBe('sg1') // Subgraph first
@@ -86,7 +86,7 @@ describe('Z-index integration with atoms', () => {
   it('should handle multiple subgraphs with correct z-index ordering', () => {
     const { result } = renderHook(() => {
       const [nodes, setNodes] = useAtom(nodesAtom)
-      return { nodes, setNodes, toReactFlowNodes }
+      return { nodes, setNodes, toXyflowNodes }
     }, { wrapper })
 
     // Add multiple nodes and subgraphs in mixed order
@@ -123,7 +123,7 @@ describe('Z-index integration with atoms', () => {
       ])
     })
 
-    const rfNodes = toReactFlowNodes(result.current.nodes)
+    const rfNodes = toXyflowNodes(result.current.nodes)
     
     // All subgraphs should come first
     expect(rfNodes[0].type).toBe('group') // sg1

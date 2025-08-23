@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { page } from '@vitest/browser/context'
 import { render } from '@testing-library/react'
-import { App } from '../app/App.tsx'
+import { App } from '../../app/App'
 
 describe('ResizableSubgraph Browser Test', () => {
   const setup = () => {

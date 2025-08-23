@@ -5,10 +5,10 @@ import { useAtomValue } from 'jotai'
 import { nodesAtom } from '../atoms'
 
 interface PropertyPanelProps {
-  selectedNode: Node | null
-  selectedEdge: Edge | null
+  selectedNode: IRNode | null
+  selectedEdge: IREdge | null
   onNodeUpdate: (update: { id: string; data?: { label: string }; type?: string; parentId?: string | null }) => void
-  onEdgeUpdate: (update: { id: string; data?: { label: string }; type?: Edge['type'] }) => void
+  onEdgeUpdate: (update: { id: string; data?: { label: string }; type?: string }) => void
   autoFocus?: boolean
 }
 
@@ -183,7 +183,7 @@ export function FlowchartPropertyPanel({
             value={selectedNode ? nodeType : edgeType}
             onChange={selectedNode ? handleNodeTypeChange : handleEdgeTypeChange}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            disabled={selectedNode && selectedNode.type === 'subgraph'}
+            disabled={selectedNode?.type === 'subgraph' || false}
           >
             {selectedNode
               ? MERMAID_NODE_TYPES

@@ -11,7 +11,7 @@ import {
 import { IRNode } from '../core/types'
 
 // Helper to create a valid node
-const createNode = (id: string, type: Node['type'] = 'rectangle', label?: string): Node => ({
+const createNode = (id: string, type: IRNode['type'] = 'rectangle', label?: string): IRNode => ({
   id,
   type,
   childIds: [],

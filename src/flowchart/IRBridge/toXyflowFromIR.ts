@@ -121,8 +121,3 @@ export function toXyflowEdges(irEdges: IREdge[]): ReactFlowEdge[] {
   return irEdges.map(toXyflowEdge)
 }
 
-// Legacy aliases for backward compatibility
-export const toReactFlowNode = toXyflowNode
-export const toReactFlowEdge = toXyflowEdge
-export const toReactFlowNodes = toXyflowNodes
-export const toReactFlowEdges = toXyflowEdges

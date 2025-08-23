@@ -35,7 +35,7 @@ const EDGE_PATTERNS = {
 export function parseFlowchartCode(code: string): IRParsedFlowchart {
   const lines = code.split('\n').map(line => line.trim()).filter(line => line.length > 0)
   
-  const result: ParsedFlowchart = {
+  const result: IRParsedFlowchart = {
     direction: 'TD',
     nodes: [],
     edges: []

@@ -20,7 +20,7 @@ const Wrapper = ({ children }: { children: React.ReactNode }) => (
 )
 
 describe('ParticipantLifeline - Context Menu Handle System', () => {
-  const defaultProps: NodeProps = {
+  const defaultProps = {
     id: 'test-node',
     data: {
       type: 'participant',
@@ -29,7 +29,17 @@ describe('ParticipantLifeline - Context Menu Handle System', () => {
     selected: false,
     type: 'participantLifeline',
     isConnectable: true,
-    dragging: false
+    dragging: false,
+    draggable: true,
+    selectable: true,
+    deletable: true,
+    zIndex: 0,
+    xPos: 0,
+    yPos: 0,
+    targetPosition: undefined,
+    sourcePosition: undefined,
+    positionAbsoluteX: 0,
+    positionAbsoluteY: 0
   } as NodeProps
 
   it('should start with no handles', () => {

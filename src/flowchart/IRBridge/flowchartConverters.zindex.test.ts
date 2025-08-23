@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { toReactFlowNodes } from './toXyflowFromIR'
+import { toXyflowNodes } from './toXyflowFromIR'
 import type { IRNode } from '../core/types'
 
 describe('Subgraph z-index ordering', () => {
@@ -35,7 +35,7 @@ describe('Subgraph z-index ordering', () => {
       }
     ]
 
-    const result = toReactFlowNodes(nodes)
+    const result = toXyflowNodes(nodes)
     const resultIds = result.map(n => n.id)
 
     // Subgraphs should come first (background)
@@ -82,7 +82,7 @@ describe('Subgraph z-index ordering', () => {
       }
     ]
 
-    const result = toReactFlowNodes(nodes)
+    const result = toXyflowNodes(nodes)
     const resultIds = result.map(n => n.id)
 
     // Subgraphs should maintain their original order
@@ -117,7 +117,7 @@ describe('Subgraph z-index ordering', () => {
       }
     ]
 
-    const result = toReactFlowNodes(nodes)
+    const result = toXyflowNodes(nodes)
     const resultIds = result.map(n => n.id)
 
     // Subgraph should be first (background)

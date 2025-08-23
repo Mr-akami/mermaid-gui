@@ -79,8 +79,3 @@ export function toIREdges(rfEdges: ReactFlowEdge[]): IREdge[] {
   return rfEdges.map(toIREdge)
 }
 
-// Legacy aliases for backward compatibility
-export const toCustomNode = toIRNode
-export const toCustomEdge = toIREdge
-export const toCustomNodes = toIRNodes
-export const toCustomEdges = toIREdges

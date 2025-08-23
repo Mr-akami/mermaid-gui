@@ -41,15 +41,7 @@ export {
   toXyflowEdge,
   toXyflowNodes,
   toXyflowEdges,
-  // Legacy aliases for backward compatibility
-  toCustomNode,
-  toReactFlowNode,
-  toCustomEdge,
-  toReactFlowEdge,
-  toCustomNodes,
-  toReactFlowNodes,
-  toCustomEdges,
-  toReactFlowEdges,
+
 } from './IRBridge'
 
 // Export history

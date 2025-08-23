@@ -19,7 +19,7 @@ export const focusPropertyPanelAtom = atom(false)
 // Write atom to handle selection updates
 export const updateSelectionAtom = atom(
   null,
-  (get, set, update: { node?: IRNode | null; edge?: IREdge | null }) => {
+  (_get, set, update: { node?: IRNode | null; edge?: IREdge | null }) => {
     if (update.node !== undefined) {
       set(selectedNodeAtom, update.node)
       // Clear edge selection when node is selected

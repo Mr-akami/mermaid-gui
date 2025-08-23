@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { toReactFlowNodes } from './toXyflowFromIR'
+import { toXyflowNodes } from './toXyflowFromIR'
 import type { IRNode } from '../core/types'
 
 describe('flowchartConverters - node ordering', () => {
@@ -22,7 +22,7 @@ describe('flowchartConverters - node ordering', () => {
       },
     ]
 
-    const result = toReactFlowNodes(nodes)
+    const result = toXyflowNodes(nodes)
 
     // Parent should come before child
     const sg1Index = result.findIndex(n => n.id === 'sg1')
@@ -60,7 +60,7 @@ describe('flowchartConverters - node ordering', () => {
       },
     ]
 
-    const result = toReactFlowNodes(nodes)
+    const result = toXyflowNodes(nodes)
 
     // Check ordering: sg1 -> sg2 -> n1
     const sg1Index = result.findIndex(n => n.id === 'sg1')
@@ -91,7 +91,7 @@ describe('flowchartConverters - node ordering', () => {
       },
     ]
 
-    const result = toReactFlowNodes(nodes)
+    const result = toXyflowNodes(nodes)
 
     // Subgraph should keep its type for React Flow
     const subgraph = result.find(n => n.id === 'sg1')
@@ -129,7 +129,7 @@ describe('flowchartConverters - node ordering', () => {
       },
     ]
 
-    const result = toReactFlowNodes(nodes)
+    const result = toXyflowNodes(nodes)
 
     const n1 = result.find(n => n.id === 'n1')
     const n2 = result.find(n => n.id === 'n2')
@@ -188,7 +188,7 @@ describe('flowchartConverters - node ordering', () => {
       },
     ]
 
-    const result = toReactFlowNodes(nodes)
+    const result = toXyflowNodes(nodes)
 
     // Check proper ordering
     const indices = {

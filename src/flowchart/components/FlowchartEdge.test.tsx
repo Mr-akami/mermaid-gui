@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { render } from '@testing-library/react'
 import { FlowchartEdge } from './FlowchartEdge'
-import { ReactFlowProvider } from '@xyflow/react'
+import { ReactFlowProvider, Position } from '@xyflow/react'
 
 describe('FlowchartEdge', () => {
   const defaultProps = {
@@ -12,8 +12,8 @@ describe('FlowchartEdge', () => {
     sourceY: 0,
     targetX: 100,
     targetY: 100,
-    sourcePosition: 'right' as const,
-    targetPosition: 'left' as const,
+    sourcePosition: Position.Right,
+    targetPosition: Position.Left,
   }
 
   const Wrapper = ({ children }: { children: React.ReactNode }) => (

@@ -28,12 +28,12 @@ import '@xyflow/react/dist/style.css'
 
 // Node type utilities from flowchart IRBridge
 export { 
-  toCustomNode, 
-  toReactFlowNode, 
-  toCustomNodes, 
-  toReactFlowNodes,
-  toCustomEdge,
-  toReactFlowEdge,
-  toCustomEdges,
-  toReactFlowEdges 
+  toIRNode, 
+  toXyflowNode, 
+  toIRNodes, 
+  toXyflowNodes,
+  toIREdge,
+  toXyflowEdge,
+  toIREdges,
+  toXyflowEdges 
 } from '../IRBridge'

@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { FlowchartNode } from './FlowchartNode'
-import { ReactFlowProvider } from '@xyflow/react'
+import { ReactFlowProvider, Position } from '@xyflow/react'
 import type { NodeProps } from '@xyflow/react'
 
 // Wrapper component for React Flow context
@@ -16,8 +16,8 @@ describe('FlowchartNode', () => {
     data: { label: 'Test Node' },
     selected: false,
     isConnectable: true,
-    targetPosition: undefined,
-    sourcePosition: undefined,
+    targetPosition: Position.Left,
+    sourcePosition: Position.Right,
     dragging: false,
     zIndex: 0,
     xPos: 0,
@@ -25,6 +25,8 @@ describe('FlowchartNode', () => {
     draggable: true,
     selectable: true,
     deletable: true,
+    positionAbsoluteX: 0,
+    positionAbsoluteY: 0,
   } as NodeProps
 
   describe('Rectangle Node', () => {
@@ -202,7 +204,7 @@ describe('FlowchartNode', () => {
 
     it('should have special handle positions for diamond node', () => {
       const { container } = render(
-        <FlowchartNode data={{ label: 'Decision' }} type="diamond" />,
+        <FlowchartNode {...defaultProps} data={{ label: 'Decision' }} type="diamond" />,
         { wrapper: Wrapper }
       )
       

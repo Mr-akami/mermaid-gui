@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render } from '@testing-library/react'
 import { BiDirectionalEdge } from './BiDirectionalEdge'
-import { ReactFlowProvider, useStore } from '@xyflow/react'
+import { ReactFlowProvider, useStore, Position } from '@xyflow/react'
 import React from 'react'
 
 // Mock ReactFlow components
@@ -37,8 +37,8 @@ describe('BiDirectionalEdge - Bidirectional Detection', () => {
     sourceY: 0,
     targetX: 100,
     targetY: 100,
-    sourcePosition: 'right' as const,
-    targetPosition: 'left' as const,
+    sourcePosition: Position.Right,
+    targetPosition: Position.Left,
   }
 
   const wrapper = ({ children }: { children: React.ReactNode }) => (

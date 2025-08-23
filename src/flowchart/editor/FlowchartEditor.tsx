@@ -25,6 +25,7 @@ import { FlowchartPropertyPanel } from './FlowchartPropertyPanel'
 import {
   MERMAID_NODE_TYPES,
   NODE_TYPE_CONFIG,
+  type MermaidEdgeType,
   nodesAtom,
   edgesAtom,
   BiDirectionalEdge,
@@ -36,9 +37,9 @@ import {
   syncFlowchartToRawCodeAtom,
 } from '..'
 import { saveToHistoryAtom } from '../history'
-import { toCustomNodes, toReactFlowNodes, toCustomEdges, toReactFlowEdges } from './deps'
+import { toIRNodes, toXyflowNodes, toIREdges, toXyflowEdges } from './deps'
 import { focusPropertyPanelAtom, selectedNodeIdAtom, selectedEdgeIdAtom } from './atoms'
-import type { IREdge } from '../core/types'
+
 import { rawCodeAtom } from '../../editor/atoms'
 
 // Create nodeTypes object dynamically from MERMAID_NODE_TYPES
@@ -141,7 +142,7 @@ export function FlowchartEditor() {
   // Update React Flow edges when layout direction changes
   useEffect(() => {
     if (flowchartEdges.length > 0) {
-      const reactFlowEdges = toReactFlowEdges(flowchartEdges)
+      const reactFlowEdges = toXyflowEdges(flowchartEdges)
       setEdges(reactFlowEdges)
     }
   }, [layoutDirection, flowchartEdges, setEdges])
@@ -175,13 +176,13 @@ export function FlowchartEditor() {
   const selectedNode = useMemo(() => {
     if (!selectedNodeId) return null
     const node = nodes.find(n => n.id === selectedNodeId)
-    return node ? toCustomNodes([node])[0] : null
+    return node ? toIRNodes([node])[0] : null
   }, [selectedNodeId, nodes])
   
   const selectedEdge = useMemo(() => {
     if (!selectedEdgeId) return null  
     const edge = edges.find(e => e.id === selectedEdgeId)
-    return edge ? toCustomEdges([edge])[0] : null
+    return edge ? toIREdges([edge])[0] : null
   }, [selectedEdgeId, edges])
 
   // Reset focus flag after PropertyPanel has focused
@@ -209,7 +210,7 @@ export function FlowchartEditor() {
     
     // Preserve existing node positions when syncing from code editor
     setNodes(currentNodes => {
-      const reactFlowNodes = toReactFlowNodes(flowchartNodes).map(newNode => {
+      const reactFlowNodes = toXyflowNodes(flowchartNodes).map(newNode => {
         const existingNode = currentNodes.find(n => n.id === newNode.id)
         if (existingNode) {
           // Preserve position and dimensions of existing node, but keep new z-index
@@ -218,7 +219,7 @@ export function FlowchartEditor() {
             position: existingNode.position,
             ...(existingNode.width && { width: existingNode.width }),
             ...(existingNode.height && { height: existingNode.height }),
-            // Explicitly keep the z-index from toReactFlowNodes
+            // Explicitly keep the z-index from toXyflowNodes
             zIndex: newNode.zIndex,
             style: newNode.style,
           }
@@ -228,13 +229,13 @@ export function FlowchartEditor() {
       return reactFlowNodes
     })
     
-    const reactFlowEdges = toReactFlowEdges(flowchartEdges)
+    const reactFlowEdges = toXyflowEdges(flowchartEdges)
     setEdges(reactFlowEdges)
   }, [flowchartNodes, flowchartEdges, setNodes, setEdges])
 
   // Initialize history with initial state
   useEffect(() => {
-    const customNodes = toCustomNodes(initialNodes)
+    const customNodes = toIRNodes(initialNodes)
     isCodeUpdateRef.current = true  // Prevent sync loop during initialization
     setFlowchartNodes(customNodes)
     setFlowchartEdges([])
@@ -254,8 +255,8 @@ export function FlowchartEditor() {
 
     const timeoutId = setTimeout(() => {
       if (nodes.length > 0 || edges.length > 0) {
-        const customNodes = toCustomNodes(nodes)
-        const customEdges = toCustomEdges(edges)
+        const customNodes = toIRNodes(nodes)
+        const customEdges = toIREdges(edges)
         
         // Check if there are actual changes before updating
         const nodesChanged = JSON.stringify(customNodes) !== JSON.stringify(flowchartNodes)
@@ -646,8 +647,8 @@ export function FlowchartEditor() {
         const nodeCenterX = nodeAbsoluteX + nodeWidth / 2
         const nodeCenterY = nodeAbsoluteY + nodeHeight / 2
         
-        const subgraphWidth = subgraph.style?.width || subgraph.width || 200
-        const subgraphHeight = subgraph.style?.height || subgraph.height || 200
+        const subgraphWidth = Number(subgraph.style?.width || subgraph.width || 200)
+        const subgraphHeight = Number(subgraph.style?.height || subgraph.height || 200)
         
         if (
           nodeCenterX >= subgraph.position.x &&
@@ -682,7 +683,7 @@ export function FlowchartEditor() {
       const edgeUpdate: Parameters<typeof updateEdge>[0] = {
         id: update.id,
         ...(update.data && { data: update.data }),
-        ...(update.type && { type: update.type as Edge['type'] }),
+        ...(update.type && { type: update.type as MermaidEdgeType }),
       }
       updateEdge(edgeUpdate)
       
@@ -740,16 +741,16 @@ export function FlowchartEditor() {
         onUndo={(state) => {
           isUndoRedoRef.current = true
           isCodeUpdateRef.current = true
-          const rfNodes = toReactFlowNodes(state.nodes)
-          const rfEdges = toReactFlowEdges(state.edges)
+          const rfNodes = toXyflowNodes(state.nodes)
+          const rfEdges = toXyflowEdges(state.edges)
           setNodes(rfNodes)
           setEdges(rfEdges)
         }}
         onRedo={(state) => {
           isUndoRedoRef.current = true
           isCodeUpdateRef.current = true
-          const rfNodes = toReactFlowNodes(state.nodes)
-          const rfEdges = toReactFlowEdges(state.edges)
+          const rfNodes = toXyflowNodes(state.nodes)
+          const rfEdges = toXyflowEdges(state.edges)
           setNodes(rfNodes)
           setEdges(rfEdges)
         }}

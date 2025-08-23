@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render } from '@testing-library/react'
 import { BiDirectionalEdge } from './BiDirectionalEdge'
-import { ReactFlowProvider } from '@xyflow/react'
+import { ReactFlowProvider, Position } from '@xyflow/react'
 import React from 'react'
 
 // Mock ReactFlow components
@@ -33,8 +33,8 @@ describe('BiDirectionalEdge', () => {
     sourceY: 0,
     targetX: 100,
     targetY: 100,
-    sourcePosition: 'right' as const,
-    targetPosition: 'left' as const,
+    sourcePosition: Position.Right,
+    targetPosition: Position.Left,
   }
 
   const wrapper = ({ children }: { children: React.ReactNode }) => (
